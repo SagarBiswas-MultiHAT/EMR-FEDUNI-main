@@ -1,0 +1,237 @@
+﻿@using EMRSimulation.Domain.Dtos;
+@model PatientMedicationRegularListViewModel
+
+<div class="container">
+    <div class="row section">
+        <!-- Left Column -->
+        <!-- Right Column -->
+
+        <div class="col-md-8">
+
+            <div class="form-group row mb-1" style="background-color: black;color: white;">
+                <div class="col-sm-7">
+                    <label class="col-sm-7 col-form-label">MEDICATION CHART - REGULAR</label>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Dose Date</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationRegularDate" value="@Convert.ToDateTime(Model.MedicationRegularChartDto.DoseDate).ToShortDateString()" disabled>
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Dose Time</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationRegularTime" value="@Model.MedicationRegularChartDto.DoseTime" disabled>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Medication</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationRegularName" value="@Model.MedicationRegularChartDto.MedicationName" disabled>
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Dosage</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationRegularDose" value="@Model.MedicationRegularChartDto.Dose" disabled>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Additives including dose</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationRegularDoseFrequency" value="@Model.MedicationRegularChartDto.DoseFrequency" disabled>
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Route</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationRegularMedicalRoute" value="@Model.MedicationRegularChartDto.Route" disabled>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Pharmacy</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationRegularPharmacy" value="@Model.MedicationRegularChartDto.Pharmacy" disabled>
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Prescriber</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationRegularPrescriber" value="@Model.MedicationRegularChartDto.Prescriber" disabled>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Prescriber Sign</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationRegularPrescriberSign" value="@Model.MedicationRegularChartDto.PrescriberSign" disabled>
+                </div>
+            </div>
+
+            @if (User.HasClaim(c => c.Value == "student"))
+            {
+                <div class="form-group row mb-1" style="background-color: black;color: white;">
+                    <div class="col-sm-7">
+                        <label class="col-sm-7 col-form-label">ADD NURSE MEDICATION</label>
+                    </div>
+                </div>
+
+                <div class="row mb-1">
+                    <div class="col-sm-3">
+                        <label for="txtNursingOrderStartDate" class="form-label">Start Date</label>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="txtNursingMedicationStartDate" autocomplete="off">
+                    </div>
+                    <div class="col-sm-3">
+                        <label for="txtNursingOrderStartTime" class="form-label">Start Time</label>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="txtNursingMedicationStartTime" autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="row mb-1">
+                    <div class="col-sm-3">
+                        <label for="txtNursingMedicationDose" class="form-label">Dose</label>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="txtNursingMedicationDose" autocomplete="off">
+                    </div>
+                    <div class="col-sm-3">
+                        <label for="txtNursingMedicationRoute" class="form-label">Route</label>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="txtNursingMedicationRoute" autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="row mb-1">
+                    <div class="col-sm-3">
+                        <label for="txtNursingMedicationNurseSign" class="form-label">Nurse Signature</label>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="txtNursingMedicationNurseSign" autocomplete="off">
+                    </div>
+                    <div class="col-sm-3">
+                        <label for="txtNursingMedicationCoNurseSign" class="form-label">Co Sign</label>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="txtNursingMedicationCoNurseSign" autocomplete="off">
+                    </div>
+                </div>
+
+                <div>
+                    <label id="lblMessage" style="color:green"></label>
+                    <button type="button" id="btnSaveMedicationRegularAdmin" class="btn btn-primary" style="background-color:#FF8A30;float: right;">Save</button>
+                </div>
+            }
+
+        </div>
+    </div>
+
+    <div class="row section">
+        <div class="col-md-12">
+            <div id="divlstMedicationRegularadmin"></div>
+        </div>
+        <input type="hidden" id="hdnPatientsMedicationRegularId" value="@Model.MedicationRegularChartDto.Id" />
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#txtNursingMedicationStartDate").datepicker({
+            dateFormat: "yy-mm-dd" // Set the format here
+        });
+
+        var LabId = $('#txtLabId').val();
+        var PatientId = $('#txtPatientId').val();
+
+        $("#btnSaveMedicationRegularAdmin").on("click", function (e) {
+            e.preventDefault(); // Prevent default link behavior
+
+            var txtNursingMedicationStartDate = $('#txtNursingMedicationStartDate').val() + "T00:00:00";
+            var txtNursingMedicationStartTime = $('#txtNursingMedicationStartTime').val();
+            var txtNursingMedicationRoute = $('#txtNursingMedicationRoute').val();
+            var txtNursingMedicationNurseSign = $('#txtNursingMedicationNurseSign').val();
+            var txtNursingMedicationCoNurseSign = $('#txtNursingMedicationCoNurseSign').val();
+
+            var txtNursingMedicationDose = $('#txtNursingMedicationDose').val();
+
+            if (txtNursingMedicationStartDate === "" || txtNursingMedicationStartDate === "T00:00:00" || txtNursingMedicationStartTime === "" 
+                || txtNursingMedicationDose === "" || txtNursingMedicationRoute === "" || txtNursingMedicationNurseSign === "" || txtNursingMedicationCoNurseSign === "") 
+            {
+                e.preventDefault();
+                $('#lblMessage').text("Please fill in the missing fields.").css('color', 'red');
+                return;
+            }
+
+            var toPost = {
+                Id: 0,
+                PatientMedicationChartId: $('#hdnPatientsMedicationRegularId').val(),
+                LabId: LabId,
+                PatientId: PatientId,
+                DoseDate: txtNursingMedicationStartDate,
+                DoseTime: txtNursingMedicationStartTime,
+                Dose: txtNursingMedicationDose,
+                Route: txtNursingMedicationRoute,
+                Reason: "",
+                StudentSign: txtNursingMedicationNurseSign,
+                CoSign: txtNursingMedicationCoNurseSign
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/patient/addpatientmedicationregularadministration",
+                contentType: "application/json",
+                data: JSON.stringify(toPost), // Convert JavaScript object to JSON string
+                success: function (response) {
+                    if (response > 0) {
+                        $('#lblMessage').text("Patient Medication - Regular record added successfully").css('color', 'green');
+                        getpatientmedicationRegularadministration();
+                    } else {
+                        $('#lblMessage').text("Error").css('color', 'red');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $("#error-message").text("Error occurred").css('color', 'red');
+                }
+            });
+        });
+
+        getpatientmedicationRegularadministration();
+
+        function getpatientmedicationRegularadministration() {
+            $.ajax({
+                url: "/patient/getpatientmedicationregularadministration",
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId, patientMedicationChartId: $('#hdnPatientsMedicationRegularId').val() }, // Wrap Id in an object
+                success: function (response) {
+                    // Load the response into the right-side content area
+                    $('#divlstMedicationRegularadmin').html("");
+                    $('#divlstMedicationRegularadmin').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        }
+
+    });
+</script>

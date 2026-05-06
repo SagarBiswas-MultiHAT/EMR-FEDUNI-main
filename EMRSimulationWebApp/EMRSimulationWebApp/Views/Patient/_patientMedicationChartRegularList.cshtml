@@ -1,0 +1,124 @@
+﻿@{
+    ViewData["Title"] = "Patient List";
+}
+@using EMRSimulation.Domain.Dtos;
+@model IEnumerable<MedicationRegularChartDto>
+
+<div class="form-group row mb-1" style="background-color: black;color: white;">
+    <div class="col-sm-7">
+        <label class="col-sm-5 col-form-label">MEDICATION CHART - REGULAR</label>
+    </div>
+</div>
+<div class="text-left">
+    <table id="patientsMedicationChartRegularTable" class="display">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>MedicationName</th>
+                <th>Dose</th>
+                <th>Frequency</th>
+                <th>DoseDate</th>
+                <th>DoseTime</th>
+                <th>Indication</th>
+                <th>Route</th>
+                <th>Pharmacy</th>
+                <th>Prescriber</th>
+                <th>PrescriberSign</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.MedicationName</td>
+                    <td>@item.Dose</td>
+                    <td>@item.DoseFrequency</td>
+                    <td>@Convert.ToDateTime(item.DoseDate).ToShortDateString()</td>
+                    <td>@item.DoseTime</td>
+                    <td>@item.Indication</td>
+                    <td>@item.Route</td>
+                    <td>@item.Pharmacy</td>
+                    <td>@item.Prescriber</td>
+                    <td>@item.PrescriberSign</td>
+                    <td>
+                        <a href="javascript:void(0);" class="btn btn-primary deletePatientsMedicationChartRegular" data-custom="@item.Id" style="background-color:#FF8A30;">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <label id="lblMessage" style="color:green"></label>
+</div>
+
+<script>
+    var LabId = null;
+    var PatientId = null;
+
+    $(document).ready(function () {
+        var table = $('#patientsMedicationChartRegularTable').DataTable({
+            "paging": true, // Remove paging control
+            "info": false, // Remove "Showing 1 to X" information
+            "searching": false, // Remove search box
+            "ordering": true, // Enable column ordering (if needed)
+            "autoWidth": false, // Prevent auto width
+            "lengthChange": false,  // Hide the entries per page dropdown
+            // "pageLength": 3,  // Set the default number of entries per page (optional)
+            "columnDefs": [
+                {
+                    "targets": [0],
+                    "visible": false
+                } // Disable sorting for the action column
+            ]
+        });
+
+        LabId = $('#txtLabId').val();
+        PatientId = $('#txtPatientId').val();
+
+        $('#patientsMedicationChartRegularTable').on('click', '.deletePatientsMedicationChartRegular', function () {
+        
+            var addsId = $(this).attr("data-custom");
+
+            $.ajax({
+                type: "GET",
+                url: "/supervisor/deletemedicationRegularchart",
+                contentType: "application/json",
+                data: { Id: addsId }, // Wrap Id in an object
+                success: function (response) {
+                    if (response.id > 0) {
+
+                        alert("Patient Medication - Regular record deleted successfully")
+
+                        $.ajax({
+                            url: "/supervisor/getpatientmedicationRegularlist",
+                            method: "GET",
+                            data: { labId: LabId, patientId: PatientId }, // Wrap Id in an object
+                            success: function (response) {
+                                // Load the response into the right-side content area
+                                $('#divlstMedicationRegular').html("");
+                                $('#divlstMedicationRegular').html(response);
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error loading the page:", error);
+                            }
+                        });
+
+                    } else {
+                        $('#lblMessage').text(response.resultMessage).css('color', 'red');
+                    }
+                
+
+                    console.log("Success:", response);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log("Error:", textStatus);
+                }
+            });
+        });
+    });
+    
+
+</script>

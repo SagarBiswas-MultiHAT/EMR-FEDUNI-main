@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Patient List";
+}
+@using EMRSimulation.Domain.Dtos;
+@model LabDto
+
+<div class="form-group row mb-1" style="background-color: #424242;color: white;">
+    <div class="col-sm-10">
+        <label class="col-form-label" style="font-size:20px;">@Model.LabName</label>
+    </div>
+
+    <div class="col-sm-2">
+
+        @if (User.HasClaim(c => c.Value == "supervisor"))
+        {
+            <label style="font-size:20px;"><img src="~/images/profileicon.png" />Supervisor</label>
+        }
+        else if (User.HasClaim(c => c.Value == "student"))
+        {
+            <label style="font-size:20px;"><img src="~/images/profileicon.png" />Student</label>
+        }
+    </div>
+</div>

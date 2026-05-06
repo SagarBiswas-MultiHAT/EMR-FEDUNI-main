@@ -1,0 +1,124 @@
+@{
+    ViewData["Title"] = "Patient List";
+}
+@using EMRSimulation.Domain.Dtos;
+@model PatientNeurologicalChartViewModel
+<div class="form-group row mb-1" style="background-color: black;color: white;">
+    <div class="col-sm-7">
+        <label class="col-sm-5 col-form-label">NEUROLOGICAL RECORDS</label>
+    </div>
+</div>
+<div class="text-left">
+    <table id="patientsNeurologicalAdminTable" class="display">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+
+                <th>GCS Total</th>
+                <th>Eyes Open</th>
+                <th>Verbal Response</th>
+                <th>Motor Response</th>
+                <th>Right Pupil</th>
+                <th>Left Pupil</th>
+                <th>Right Arm Response</th>
+                <th>Right Leg Response</th>
+                <th>Left Arm Response</th>
+                <th>Left Leg Response</th>
+                <!--
+                <th>ET Tube</th>
+-->
+                <th>Officer Sign</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var patient in Model.neurologicalChartDtoList)
+            {
+                <tr>
+                    <td>@patient.Id</td>
+                    <td>@(patient.Date?.ToShortDateString() ?? "")</td>
+
+                    <td><strong>@patient.TotalComaScale@(patient.VerbalResponseScore == "T" ? "T" : "")</strong></td>
+                    <td>@patient.EyesOpenScore</td>
+                    <td>@patient.VerbalResponseScore</td>
+                    <td>@patient.MotorResponseScore</td>
+                    <td>@patient.RightPupilSize mm @patient.RightPupilReaction</td>
+                    <td>@patient.LeftPupilSize mm @patient.LeftPupilReaction</td>
+                    <td>@patient.RightArmResponse</td>
+                    <td>@patient.RightLegResponse</td>
+                    <td>@patient.LeftArmResponse</td>
+                    <td>@patient.LeftLegResponse</td>
+                    <!--
+                    <td>@(patient.EndotrachealTube == true ? "Yes" : "No")</td>
+-->
+                    <td>@patient.OfficerSign</td>
+
+                    @{
+                        var actionType = "";
+                        if (User.HasClaim(c => c.Value == "student"))
+                        {
+                            actionType = "Add Record";
+                        }
+                        else if (User.HasClaim(c => c.Value == "supervisor"))
+                        {
+                            actionType = "View Record";
+                        }
+                    }
+                    <td>
+                        <a href="javascript:void(0);" class="btn btn-primary addNeurologicalAdmin" data-custom="@patient.Id" style="background-color:#FF8A30;">@actionType</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <label id="lblMessage" style="color:green"></label>
+</div>
+<script>
+    $(document).ready(function () {
+        var table = $('#patientsNeurologicalAdminTable').DataTable({
+            "paging": true, // Enable paging control
+            "info": false, // Remove "Showing 1 to X" information
+            "searching": false, // Remove search box
+            "ordering": true, // Enable column ordering
+            "autoWidth": false, // Prevent auto width
+            "lengthChange": false,  // Hide the entries per page dropdown
+            "columnDefs": [
+                {
+                    "targets": [0],
+                    "visible": false
+                }, // Hide ID column
+                {
+                    //"targets": [12],
+                    "targets": [11],
+                    "orderable": false
+                } // Disable sorting for the action column
+            ]
+        });
+
+        $('#patientsNeurologicalAdminTable').on('click', '.addNeurologicalAdmin', function () {
+            var neurologicalId = $(this).attr("data-custom");
+            var LabId = $('#txtLabId').val();
+            var PatientId = $('#txtPatientId').val();
+            // Get the URL for neurological chart details
+            var pageUrl = "/patient/getpatientneurologicalchart";
+            // Use AJAX to load the content from the URL
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { Id: neurologicalId, labId: LabId, patientId: PatientId },
+                success: function (response) {
+                    // Load the response into the right-side content area
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+    });
+
+</script>

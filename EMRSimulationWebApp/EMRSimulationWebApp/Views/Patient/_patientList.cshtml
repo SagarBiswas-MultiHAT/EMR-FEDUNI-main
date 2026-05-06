@@ -1,0 +1,215 @@
+﻿@{
+    ViewData["Title"] = "Patient List";
+}
+@using EMRSimulation.Domain.Dtos;
+@model IEnumerable<PatientDto>
+
+<div class="text-left">
+    <table id="patientsTable" class="display">
+        <thead>
+            <tr>
+                <th>Patient ID</th>
+                <th>URI Number</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Date of Birth</th>
+                <th>Gender</th>
+                <th>Admit Date</th>
+                <th>Alerts</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var patient in Model)
+            {
+                <tr>
+                    <td>@patient.Id</td>
+                    <td>@patient.UriNumber</td>
+                    <td>@patient.FirstName</td>
+                    <td>@patient.LastName</td>
+                    <td>@patient.DateOfBirth?.ToString("yyyy-MM-dd")</td>
+                    <td>@patient.Gender</td>
+                    <td>@patient.AdmitDate?.ToString("yyyy-MM-dd")</td>
+
+                    @if (patient.Alert == 1)
+                    {
+                        <td><img src="~/images/flag.png" height="35px" /></td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+
+                    <td>@patient.Weight</td>
+                    <td>@patient.Height</td>
+                    <td>@patient.Age</td>
+                    <td>@patient.Allergy</td>
+                    <td>@patient.Intolerance</td>
+                    <td>@patient.Address</td>
+
+                    <td>
+                        <a href="javascript:void(0);" class="btn btn-primary" style="background-color:#FF8A30;">Select</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="patient-card" id="patientCard" style="display:none">
+    <div class="patient-header">
+        <span id="patientName"></span>
+    </div>
+    <div class="patient-info">
+        <div class="row">
+            <div class="col"><strong>URI:</strong> <span id="uri">Kg</span></div>
+            <div class="col"><strong>Date of Birth:</strong> <span id="dob">Kg</span></div>
+            <div class="col"><strong>Weight:</strong> <span id="weight">Kg</span></div>
+            <div class="col"><strong>Height:</strong> <span id="height">Kg</span></div>
+            <div class="col"><strong>Age:</strong> <span id="age">Kg</span></div>
+            <div class="col"><strong>Gender:</strong> <span id="gender">Kg</span></div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <strong class="allergy">Allergy:</strong>
+                <div id="allergy" class="allergy"></div>
+            </div>
+            <div class="col">
+                <strong>Intolerance:</strong>
+                <div id="intolerance"></div>
+            </div>
+            <div class="col">
+                <strong>Address:</strong>
+                <div id="address"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button id="btnViewPatientRecords" class="btn btn-primary" style="background-color:#FF8A30;float: right; display:none">View Patient Records</button>
+
+<script>
+    $(document).ready(function () {
+        console.log("_patientList.cshtml doc ready");
+
+        var table = $('#patientsTable').DataTable({
+            "paging": true,
+            "info": false,
+            "searching": false,
+            "ordering": true,
+            "autoWidth": false,
+            "lengthChange": false,
+            "pageLength": 10
+            ,
+            "columnDefs": [
+                {   "targets": [0,8,9,10,11,12,13],
+                    "visible": false
+                }
+            ]
+        });
+
+        // Row click event to get first name and display it
+        $('#patientsTable tbody').on('click', 'tr', function () {
+
+            var data = table.row(this).data();
+
+            var patientId = data[0];
+            var uri = data[1];
+            var firstName = data[2];
+            var lastName = data[3];
+            var dateOfBirth = data[4];
+            var weight = data[8];
+            var height = data[9];
+            var age = data[10];
+            var gender = data[5];            
+            var allergy = data[11];
+            var intolerance = data[12];
+            var address = data[13];
+
+            var patientInfo = "";
+            patientInfo = "<b>First Name:</b> " + firstName + "<BR/>"
+            patientInfo += "<b>Last Name: </b>" + lastName + "<BR/>"
+            patientInfo += "<b>DOB: </b>" + dateOfBirth + "<BR/>"
+            patientInfo += "<b>Gender: </b>" + gender + "<BR/>"
+
+            $('#patientInformation').html(patientInfo);
+            $('#divPatientInformation').show();
+
+            // Display the first name in the div
+            $('#patientName').text(firstName + " " + lastName);
+            $('#uri').text(uri);
+            $('#dob').text(dateOfBirth);
+            $('#weight').html(weight);
+            $('#height').text(height);
+            $('#age').text(age);
+            $('#gender').text(gender);
+            $('#address').text(address);
+            $('#txtPatientId').val(patientId);
+
+            if (allergy && allergy.trim() !== '') {
+                
+                var allergyList = allergy.split(',');
+
+                var allergyHtml = '<ul>';
+                allergyList.forEach(function (allergy) {
+                    allergyHtml += '<li>' + allergy + '</li>';
+                });
+                allergyHtml += '</ul>';
+
+                // Display the allergy
+                $('#allergy').html(allergyHtml);
+            }
+
+            if (intolerance && intolerance.trim() !== '') {
+
+                var intoleranceList = intolerance.split(',');
+
+                var intoleranceHtml = '<ul>';
+                intoleranceList.forEach(function (intolerance) {
+                    intoleranceHtml += '<li>' + intolerance + '</li>';
+                });
+                intoleranceHtml += '</ul>';
+
+                // Display the intolerance
+                $('#intolerance').html(intoleranceHtml);
+            }
+
+            $('#patientCard').show();
+            $('#btnViewPatientRecords').show();
+        });
+
+        // Toggle Flow Sheet Menu
+        $(document).on('click', '#btnViewPatientRecords', function () {
+            $("#toggleRecordMenu").show();
+            $("#toggleProgressMenu").show()
+            $("#togglePatientUsecaseMenu").show();
+            
+            var LabId = $('#txtLabId').val();
+            var PatientId = $('#txtPatientId').val();
+
+            $.ajax({
+                url: "/patient/getpatientrecord",
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId },
+                success: function (response) {
+                    // Load the response into the right-side content area
+                    $('#content-area').html("");
+                    $('#patient-header').html("");
+                    $('#patient-header').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+                
+        });
+
+    });
+
+</script>

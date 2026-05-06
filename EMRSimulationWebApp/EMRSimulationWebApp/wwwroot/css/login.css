@@ -1,0 +1,278 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.hero-section {
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+    max-height: fit-content;
+}
+
+.hero-left {
+    background: #003466;
+    color: white;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+}
+
+    .hero-left h1 {
+        font-size: 4rem;
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: 20px;
+    }
+
+    .hero-left .subtitle {
+        font-size: 2rem;
+        font-weight: 300;
+        margin-top: 20px;
+    }
+
+.hero-right {
+    background: #003466;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0.75;
+    overflow: hidden;
+    max-width: 809px;
+}
+
+.monitor-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.monitor-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.2));
+}
+
+.footer-section {
+    background: white;
+    padding: 20px 60px;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+}
+
+.footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.university-logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo-icon {
+    width: 304px;
+    height: 80px;
+    background: url('/images/Federation_Uni_Logo_Blue-2024_CMYK.jpg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.login-buttons {
+    display: flex;
+    gap: 20px;
+}
+
+.btn-login {
+    padding: 15px 45px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-radius: 50px;
+    border: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    min-width: 250px;
+}
+
+.btn-student {
+    background: linear-gradient(135deg, #f6c85f 0%, #f39c12 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+}
+
+    .btn-student:hover {
+        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+    }
+
+.btn-supervisor {
+    background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(127, 140, 141, 0.3);
+}
+
+    .btn-supervisor:hover {
+        background: linear-gradient(135deg, #7f8c8d 0%, #6c7a7b 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(127, 140, 141, 0.4);
+    }
+
+@media (max-width: 1200px) {
+    .hero-left h1 {
+        font-size: 3.5rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .hero-section {
+        flex-direction: column;
+    }
+
+    .hero-left h1 {
+        font-size: 3rem;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        gap: 30px;
+        text-align: center;
+    }
+
+    .login-buttons {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-left {
+        padding: 40px 30px;
+    }
+
+        .hero-left h1 {
+            font-size: 2.5rem;
+        }
+
+        .hero-left .subtitle {
+            font-size: 1.4rem;
+        }
+
+    .footer-section {
+        padding: 20px 30px;
+    }
+
+    .btn-login {
+        padding: 12px 35px;
+        font-size: 1rem;
+        min-width: 200px;
+    }
+}
+
+.login-container {
+    width: 50%;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    margin: auto;
+    margin-top: 150px;
+    padding: 20px
+}
+/*
+body {
+    background: url('/images/background.png');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #fff;
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
+
+.home-icon {
+    width: 40px;
+    height: auto;
+}
+
+.fed-logo {
+    width: 180px;
+    height: auto;
+}
+
+.emr-logo {
+    width: 80px;
+    height: auto;
+}
+
+.login-box {
+    margin-top: 0px;
+    height: 300px
+}
+*/
+h2 {
+    margin-bottom: 20px;
+}
+
+.input-container {
+    margin-bottom: 20px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-bottom: 2px solid #ccc;
+    outline: none;
+}
+
+    input:focus {
+        border-bottom-color: #000;
+    }
+
+.login-btn {
+    background-color: #FF8C00;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+    .login-btn:hover {
+        background-color: #e67e22;
+    }
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 12px;
+    color: #666;
+}
+
+

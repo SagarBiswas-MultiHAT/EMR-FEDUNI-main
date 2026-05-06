@@ -1,0 +1,512 @@
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .card-header {
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            padding: 12px 15px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .form-control, .form-select {
+            border-radius: 4px;
+            padding: 8px 12px;
+        }
+
+        .gcs-total {
+            font-weight: bold;
+            font-size: 1.1rem;
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+
+        .section-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .pupil-section, .response-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .save-btn {
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 6px;
+        }
+
+        .input-hint {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-top: 3px;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .guide-card {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+        }
+
+        .guide-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .guide-content {
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        #divlstNeurologicalRecord {
+            min-height: 100px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            background-color: white;
+        }
+    </style>
+        <div class="card">
+            <div class="card-header" style="background-color: black; color: white;">
+                <h5 class="mb-0">NEUROLOGICAL RECORD</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <!-- Date and Time -->
+                        <div class="row mb-4">
+                            <div class="col-sm-4">
+                                <label class="form-label required-field">Date</label>
+                                <input type="text" class="form-control" id="txtsNeurologicalRecordDate" autocomplete="off" />
+                                <div class="input-hint">Format: YYYY-MM-DD</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label required-field">Time</label>
+                                <input type="time" class="form-control" id="txtsNeurologicalRecordTime" autocomplete="off" />
+                            </div>
+                        </div>
+
+                        <!-- GCS Assessment -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="section-title">Glasgow Coma Scale Assessment</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label required-field">Eyes Open Score</label>
+                                <select class="form-select" id="txtsNeurologicalRecordEyesOpenScore">
+                                    <option value="">Select...</option>
+                                    <option value="4">4 - Spontaneously</option>
+                                    <option value="3">3 - To speech</option>
+                                    <option value="2">2 - To pain</option>
+                                    <option value="1">1 - Nil</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label required-field">Verbal Response Score</label>
+                                <select class="form-select" id="txtsNeurologicalRecordVerbalResponseScore">
+                                    <option value="">Select...</option>
+                                    <option value="5">5 - Oriented</option>
+                                    <option value="4">4 - Confused</option>
+                                    <option value="3">3 - Inappropriate</option>
+                                    <option value="2">2 - Incomprehensible</option>
+                                    <option value="1">1 - Nil</option>
+                                    <option value="T">T - Intubated</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label required-field">Motor Response Score</label>
+                                <select class="form-select" id="txtsNeurologicalRecordMotorResponseScore">
+                                    <option value="">Select...</option>
+                                    <option value="6">6 - Obeys commands</option>
+                                    <option value="5">5 - Localises to pain</option>
+                                    <option value="4">4 - Withdraws to pain</option>
+                                    <option value="3">3 - Abnormal flexion</option>
+                                    <option value="2">2 - Extensor</option>
+                                    <option value="1">1 - Nil</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4 offset-sm-8 mt-3">
+                                <label class="form-label"><strong>Total GCS</strong></label>
+                                <input type="text" class="form-control gcs-total" id="txtsNeurologicalRecordTotalGCS" readonly />
+                            </div>
+                        </div>
+
+                        <!-- Pupil Assessment -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="section-title">Pupil Assessment</div>
+                            </div>
+
+                            <!-- Right Pupil -->
+                            <div class="col-md-6">
+                                <div class="pupil-section">
+                                    <div class="guide-title">Right Pupil</div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <label class="form-label">Size (mm)</label>
+                                            <select class="form-select" id="txtsNeurologicalRecordRightPupilSize">
+                                                <option value="">Select...</option>
+                                                <option value="1">1 mm</option>
+                                                <option value="2">2 mm</option>
+                                                <option value="3">3 mm</option>
+                                                <option value="4">4 mm</option>
+                                                <option value="5">5 mm</option>
+                                                <option value="6">6 mm</option>
+                                                <option value="7">7 mm</option>
+                                                <option value="8">8 mm</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="form-label">Reaction</label>
+                                            <select class="form-select" id="txtsNeurologicalRecordRightPupilReaction">
+                                                <option value="">Select...</option>
+                                                <option value="+">+ (reacts)</option>
+                                                <option value="-">- (no reaction)</option>
+                                                <option value="Sluggish">Sluggish</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Left Pupil -->
+                            <div class="col-md-6">
+                                <div class="pupil-section">
+                                    <div class="guide-title">Left Pupil</div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <label class="form-label">Size (mm)</label>
+                                            <select class="form-select" id="txtsNeurologicalRecordLeftPupilSize">
+                                                <option value="">Select...</option>
+                                                <option value="1">1 mm</option>
+                                                <option value="2">2 mm</option>
+                                                <option value="3">3 mm</option>
+                                                <option value="4">4 mm</option>
+                                                <option value="5">5 mm</option>
+                                                <option value="6">6 mm</option>
+                                                <option value="7">7 mm</option>
+                                                <option value="8">8 mm</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="form-label">Reaction</label>
+                                            <select class="form-select" id="txtsNeurologicalRecordLeftPupilReaction">
+                                                <option value="">Select...</option>
+                                                <option value="+">+ (reacts)</option>
+                                                <option value="-">- (no reaction)</option>
+                                                <option value="Sluggish">Sluggish</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Motor Response -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="section-title">Motor Response Assessment</div>
+                            </div>
+
+                            <!-- Right Side -->
+                            <div class="col-md-6">
+                                <div class="response-section">
+                                    <div class="guide-title">Right Side</div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <label class="form-label">Arm Response</label>
+                                            <select class="form-select" id="txtsNeurologicalRecordRightArmResponse">
+                                                <option value="">Select...</option>
+                                                <option value="Normal power">Normal power</option>
+                                                <option value="Mild weakness">Mild weakness</option>
+                                                <option value="Severe weakness">Severe weakness</option>
+                                                <option value="Spastic flexion">Spastic flexion</option>
+                                                <option value="Extension">Extension</option>
+                                                <option value="No response">No response</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="form-label">Leg Response</label>
+                                            <select class="form-select" id="txtsNeurologicalRecordRightLegResponse">
+                                                <option value="">Select...</option>
+                                                <option value="Normal power">Normal power</option>
+                                                <option value="Mild weakness">Mild weakness</option>
+                                                <option value="Severe weakness">Severe weakness</option>
+                                                <option value="Spastic flexion">Spastic flexion</option>
+                                                <option value="Extension">Extension</option>
+                                                <option value="No response">No response</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Left Side -->
+                            <div class="col-md-6">
+                                <div class="pupil-section">
+                                    <div class="guide-title">Left Side</div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <label class="form-label">Arm Response</label>
+                                            <select class="form-select" id="txtsNeurologicalRecordLeftArmResponse">
+                                                <option value="">Select...</option>
+                                                <option value="Normal power">Normal power</option>
+                                                <option value="Mild weakness">Mild weakness</option>
+                                                <option value="Severe weakness">Severe weakness</option>
+                                                <option value="Spastic flexion">Spastic flexion</option>
+                                                <option value="Extension">Extension</option>
+                                                <option value="No response">No response</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="form-label">Leg Response</label>
+                                            <select class="form-select" id="txtsNeurologicalRecordLeftLegResponse">
+                                                <option value="">Select...</option>
+                                                <option value="Normal power">Normal power</option>
+                                                <option value="Mild weakness">Mild weakness</option>
+                                                <option value="Severe weakness">Severe weakness</option>
+                                                <option value="Spastic flexion">Spastic flexion</option>
+                                                <option value="Extension">Extension</option>
+                                                <option value="No response">No response</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Information -->
+                        <div class="row mb-4">
+<!--
+                            <div class="col-sm-6">
+                                <label class="form-label">Endotracheal Tube</label>
+                                <select class="form-select" id="txtsNeurologicalRecordEndotrachealTube">
+                                    <option value="">Select...</option>
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                            </div>
+-->
+                            <div class="col-sm-6">
+                                <label class="form-label required-field">Nurse Signature</label>
+                                <input type="text" class="form-control" id="txtsNeurologicalRecordOfficerSign" autocomplete="off" />
+                            </div>
+                        </div>
+
+                        <!-- Save Button -->
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <label id="lblMessage" style="color:green"></label>
+                            <button type="button" id="btnsSaveNeurological" class="btn save-btn text-white" style="background-color:#FF8A33;">
+                                Save Record
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- GCS Guide Panel -->
+                    <div class="col-md-4">
+                        <div class="card guide-card">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">GCS Quick Guide</h6>
+                            </div>
+                            <div class="card-body guide-content">
+                                <strong>Eyes Open</strong><br>
+                                4 - Spontaneously<br>
+                                3 - To speech<br>
+                                2 - To pain<br>
+                                1 - None<br><br>
+
+                                <strong>Verbal Response</strong><br>
+                                5 - Oriented<br>
+                                4 - Confused<br>
+                                3 - Inappropriate words<br>
+                                2 - Incomprehensible sounds<br>
+                                1 - None<br>
+                                T - Intubated<br><br>
+
+                                <strong>Motor Response</strong><br>
+                                6 - Obeys commands<br>
+                                5 - Localizes to pain<br>
+                                4 - Withdraws from pain<br>
+                                3 - Abnormal flexion<br>
+                                2 - Extensor response<br>
+                                1 - None
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Records List -->
+        <div class="card">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Previous Neurological Records</h6>
+            </div>
+            <div class="card-body">
+                <div id="divlstNeurologicalRecord"></div>
+            </div>
+        </div>
+    <script>
+        $(function () {
+            // Initialize datepicker
+            $("#txtsNeurologicalRecordDate").datepicker({
+                dateFormat: "yy-mm-dd",
+                showOtherMonths: true,
+                selectOtherMonths: true
+            });
+
+            var LabId = $('#txtLabId').val();
+            var PatientId = $('#txtPatientId').val();
+
+            // Auto-calculate Total GCS
+            function calculateTotalGCS() {
+                var eyeScore = parseInt($('#txtsNeurologicalRecordEyesOpenScore').val()) || 0;
+                var verbalScore = $('#txtsNeurologicalRecordVerbalResponseScore').val();
+                var motorScore = parseInt($('#txtsNeurologicalRecordMotorResponseScore').val()) || 0;
+
+                var verbalNum = (verbalScore === 'T') ? 1 : (parseInt(verbalScore) || 0);
+                var total = eyeScore + verbalNum + motorScore;
+
+                if (verbalScore === 'T' && total > 0) {
+                    $('#txtsNeurologicalRecordTotalGCS').val(total + 'T');
+                } else if (total > 0) {
+                    $('#txtsNeurologicalRecordTotalGCS').val(total);
+                } else {
+                    $('#txtsNeurologicalRecordTotalGCS').val('');
+                }
+            }
+
+            $('#txtsNeurologicalRecordEyesOpenScore, #txtsNeurologicalRecordVerbalResponseScore, #txtsNeurologicalRecordMotorResponseScore')
+                .change(calculateTotalGCS);
+
+            // Save functionality
+            $("#btnsSaveNeurological").on("click", function (e) {
+                e.preventDefault();
+
+                var txtsNeurologicalRecordDate = $('#txtsNeurologicalRecordDate').val();
+                var txtsNeurologicalRecordTime = $('#txtsNeurologicalRecordTime').val();
+
+                // Validate required fields
+                if (!txtsNeurologicalRecordDate || !txtsNeurologicalRecordTime) {
+                    $('#lblMessage').text("Date and Time are required").css('color', 'red');
+                    return;
+                }
+
+                // Convert date + time into correct formats
+                var formattedDate = txtsNeurologicalRecordDate ? txtsNeurologicalRecordDate + "T00:00:00" : null;
+                var formattedTime = txtsNeurologicalRecordTime ? txtsNeurologicalRecordTime + ":00" : null;
+
+                var toPost = {
+                    Id: 0,
+                    LabId: LabId,
+                    PatientId: PatientId,
+                    Date: formattedDate,
+                    Time: formattedTime,
+                    EyesOpenScore: parseInt($('#txtsNeurologicalRecordEyesOpenScore').val()) || null,
+                    VerbalResponseScore: $('#txtsNeurologicalRecordVerbalResponseScore').val() || null,
+                    MotorResponseScore: parseInt($('#txtsNeurologicalRecordMotorResponseScore').val()) || null,
+                    TotalComaScale: $('#txtsNeurologicalRecordTotalGCS').val().replace('T', '') || null,
+                    //EndotrachealTube: $('#txtsNeurologicalRecordEndotrachealTube').val() === "1",
+                    EndotrachealTube: false,
+                    RightPupilSize: parseInt($('#txtsNeurologicalRecordRightPupilSize').val()) || null,
+                    RightPupilReaction: $('#txtsNeurologicalRecordRightPupilReaction').val() || null,
+                    LeftPupilSize: parseInt($('#txtsNeurologicalRecordLeftPupilSize').val()) || null,
+                    LeftPupilReaction: $('#txtsNeurologicalRecordLeftPupilReaction').val() || null,
+                    RightArmResponse: $('#txtsNeurologicalRecordRightArmResponse').val() || null,
+                    RightLegResponse: $('#txtsNeurologicalRecordRightLegResponse').val() || null,
+                    LeftArmResponse: $('#txtsNeurologicalRecordLeftArmResponse').val() || null,
+                    LeftLegResponse: $('#txtsNeurologicalRecordLeftLegResponse').val() || null,
+                    OfficerSign: $('#txtsNeurologicalRecordOfficerSign').val() || null
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: "/supervisor/addneurologicalchart",
+                    contentType: "application/json",
+                    data: JSON.stringify(toPost),
+                    success: function (response) {
+                        if (response > 0) {
+                            $('#lblMessage').text("Patient Neurological Chart record added successfully").css('color', 'green');
+                            getNeurologicalRecordList();
+                            clearForm();
+                        } else {
+                            $('#lblMessage').text("Error saving record").css('color', 'red');
+                        }
+                    },
+                    error: function (jqXHR) {
+                        $('#lblMessage').text("Error occurred: " + jqXHR.responseText).css('color', 'red');
+                    }
+                });
+            });
+
+            // Get list
+            function getNeurologicalRecordList() {
+                $.ajax({
+                    url: "/supervisor/getpatientneurologicalchartlist",
+                    method: "GET",
+                    data: { labId: LabId, patientId: PatientId },
+                    success: function (response) {
+                        $('#divlstNeurologicalRecord').html(response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error loading the page:", error);
+                        $('#divlstNeurologicalRecord').html('<div class="alert alert-warning">No previous records found</div>');
+                    }
+                });
+            }
+
+            // Clear form
+            function clearForm() {
+                $('#txtsNeurologicalRecordDate').val('');
+                $('#txtsNeurologicalRecordTime').val('');
+                $('#txtsNeurologicalRecordEyesOpenScore').val('');
+                $('#txtsNeurologicalRecordVerbalResponseScore').val('');
+                $('#txtsNeurologicalRecordMotorResponseScore').val('');
+                $('#txtsNeurologicalRecordTotalGCS').val('');
+                $('#txtsNeurologicalRecordRightPupilSize').val('');
+                $('#txtsNeurologicalRecordRightPupilReaction').val('');
+                $('#txtsNeurologicalRecordLeftPupilSize').val('');
+                $('#txtsNeurologicalRecordLeftPupilReaction').val('');
+                $('#txtsNeurologicalRecordArmResponse').val('');
+                $('#txtsNeurologicalRecordLegResponse').val('');
+                $('#txtsNeurologicalRecordEndotrachealTube').val('');
+                $('#txtsNeurologicalRecordOfficerSign').val('');
+            }
+
+            // Initial load
+            getNeurologicalRecordList();
+        });
+    </script>

@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Models\ErrorViewModel - Copy.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Views\Patient\_BradenAddExtra.cshtml" />
+    <Content Remove="Views\Patient\_Bradenchart.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EMRSimulation.Application\EMRSimulation.Application.csproj" />
+    <ProjectReference Include="..\EMRSimulation.Domain\EMRSimulation.Domain.csproj" />
+    <ProjectReference Include="..\EMRSimulation.Infrastructure\EMRSimulation.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\images\" />
+    <Folder Include="wwwroot\Datepicker\" />
+  </ItemGroup>
+
+</Project>

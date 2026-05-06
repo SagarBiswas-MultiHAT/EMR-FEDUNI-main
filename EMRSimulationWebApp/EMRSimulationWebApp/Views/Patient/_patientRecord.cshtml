@@ -1,0 +1,38 @@
+﻿@{
+    ViewData["Title"] = "Patient List";
+}
+@using EMRSimulation.Domain.Dtos;
+@model PatientDto
+
+<div>
+    <div class="patient-card" id="patientCard">
+        <div class="patient-header">
+            <span id="patientName">@Model.FirstName @Model.LastName </span>
+        </div>
+        <div class="patient-info">
+            <div class="row">
+                <div class="col"><strong>URI:</strong> <span id="uri">@Model.UriNumber</span></div>
+                <div class="col"><strong>Date of Birth:</strong> <span id="dob">@Model.DateOfBirth?.ToString("yyyy-MM-dd")</span></div>
+                <div class="col"><strong>Weight:</strong> <span id="weight">@Model.Weight</span></div>
+                <div class="col"><strong>Height:</strong> <span id="height">@Model.Height</span></div>
+                <div class="col"><strong>Age:</strong> <span id="age">@Model.Age</span></div>
+                <div class="col"><strong>Gender:</strong> <span id="gender">@Model.Gender</span></div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <strong class="allergy">Allergy:</strong>
+                    <div id="allergy" class="allergy">@Model.Allergy</div>
+                </div>
+                <div class="col">
+                    <strong>Intolerance:</strong>
+                    <div id="intolerance">@Model.Intolerance</div>
+                </div>
+                <div class="col">
+                    <strong>Address:</strong>
+                    <div id="address">@Model.Address</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

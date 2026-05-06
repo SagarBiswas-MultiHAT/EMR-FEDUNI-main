@@ -1,0 +1,243 @@
+@using EMRSimulation.Domain.Dtos;
+@model PatientNeurologicalChartViewModel
+
+<div class="container">
+    <div class="row section">
+        <!-- Left Column -->
+        <!-- Right Column -->
+
+        <div class="col-md-8">
+
+            <div class="form-group row mb-1" style="background-color: black;color: white;">
+                <div class="col-sm-7">
+                    <label class="col-sm-5 col-form-label">NEUROLOGICAL RECORD</label>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Date</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNeurologicalRecordDate" value="@(Model.neurologicalChartDto.Date?.ToShortDateString() ?? "")" disabled>
+                </div>
+
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Eyes Open Score</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNeurologicalRecordEyesOpenScore" value="@Model.neurologicalChartDto.EyesOpenScore" disabled>
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Verbal Response Score</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNeurologicalRecordVerbalResponseScore" value="@Model.neurologicalChartDto.VerbalResponseScore" disabled>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Motor Response Score</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNeurologicalRecordMotorResponseScore" value="@Model.neurologicalChartDto.MotorResponseScore" disabled>
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label"><strong>Total GCS</strong></label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNeurologicalRecordTotalComaScale" value="@Model.neurologicalChartDto.TotalComaScale" disabled style="font-weight: bold;">
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Right Pupil Size (mm)</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNeurologicalRecordRightPupilSize" value="@Model.neurologicalChartDto.RightPupilSize" disabled>
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Right Pupil Reaction</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNeurologicalRecordRightPupilReaction" value="@Model.neurologicalChartDto.RightPupilReaction" disabled>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Left Pupil Size (mm)</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNeurologicalRecordLeftPupilSize" value="@Model.neurologicalChartDto.LeftPupilSize" disabled>
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Left Pupil Reaction</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNeurologicalRecordLeftPupilReaction" value="@Model.neurologicalChartDto.LeftPupilReaction" disabled>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Right Arm Response</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNeurologicalRecordRightArmResponse" value="@Model.neurologicalChartDto.RightArmResponse" disabled>
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Right Leg Response</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNeurologicalRecordRightLegResponse" value="@Model.neurologicalChartDto.RightLegResponse" disabled>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Left Arm Response</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNeurologicalRecordLeftArmResponse" value="@Model.neurologicalChartDto.LeftArmResponse" disabled>
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Left Leg Response</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNeurologicalRecordLeftLegResponse" value="@Model.neurologicalChartDto.LeftLegResponse" disabled>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Endotracheal Tube</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNeurologicalRecordEndotrachealTube" value="@(Model.neurologicalChartDto.EndotrachealTube == true ? "Yes" : "No")" disabled>
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Officer Signature</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNeurologicalRecordOfficerSign" value="@Model.neurologicalChartDto.OfficerSign" disabled>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+<!--
+    <div class="row section">
+        <div class="col-md-12">
+            <div id="divlstneurologicaladmin"></div>
+        </div>
+        <input type="hidden" id="hdnNeurologicalChartId" value="@Model.neurologicalChartDto.Id" />
+    </div>
+-->
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#txtNursingAdminStartDate").datepicker({
+            dateFormat: "yy-mm-dd" // Set the format here
+        });
+
+        $("#txtNursingAdminEndDate").datepicker({
+            dateFormat: "yy-mm-dd" // Set the format here
+        });
+
+        var LabId = $('#txtLabId').val();
+        var PatientId = $('#txtPatientId').val();
+
+        $("#btnSaveNeurologicalAdmin").on("click", function (e) {
+            e.preventDefault(); // Prevent default link behavior
+
+            var txtNursingAdminStartDate = $('#txtNursingAdminStartDate').val() + "T00:00:00";
+            var txtNursingAdminStartTime = $('#txtNursingAdminStartTime').val();
+            var txtNursingAdminEndDate = $('#txtNursingAdminEndDate').val();
+            var txtNursingAdminEndTime = $('#txtNursingAdminEndTime').val();
+
+            var txtNursingNurseSign = $('#txtNursingNurseSign').val();
+            var txtNursingCoSign = $('#txtNursingCoSign').val();
+
+            var txtNursingPharmacistReview = $('#txtNursingPharmacistReview').val();
+
+            if (txtNursingAdminStartDate === "" || txtNursingAdminStartDate === "T00:00:00" || txtNursingAdminStartTime === ""
+                || txtNursingNurseSign === "" || txtNursingPharmacistReview === "" || txtNursingCoSign === "") {
+
+                e.preventDefault();
+                $('#lblMessage').text("Please fill in the missing fields.").css('color', 'red');
+                return;
+            }
+
+            var toPost = {
+                Id: 0,
+                NeurologicalChartId: $('#hdnNeurologicalChartId').val(),
+                LabId: LabId,
+                PatientId: PatientId,
+                StartDate: txtNursingAdminStartDate,
+                StartTime: txtNursingAdminStartTime,
+                EndDate: txtNursingAdminEndDate === "" ? null : txtNursingAdminEndDate + "T00:00:00",
+                EndTime: txtNursingAdminEndTime === "" ? null : txtNursingAdminEndTime,
+                PharmacistReview: txtNursingPharmacistReview,
+                NurseSign: txtNursingNurseSign,
+                CoSign: txtNursingCoSign
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/patient/addpatientneurologicaladministration",
+                contentType: "application/json",
+                data: JSON.stringify(toPost), // Convert JavaScript object to JSON string
+                success: function (response) {
+                    if (response > 0) {
+                        $('#lblMessage').text("Patient Neurological Administration record added successfully").css('color', 'green');
+                        getneurologicaladministration();
+                        clearForm();
+                    } else {
+                        $('#lblMessage').text("Error").css('color', 'red');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $("#error-message").text("Error occurred").css('color', 'red');
+                }
+            });
+        });
+
+        getneurologicaladministration();
+
+        function getneurologicaladministration() {
+            $.ajax({
+                url: "/patient/getneurologicaladministration",
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId, neurologicalChartId: $('#hdnNeurologicalChartId').val() },
+                success: function (response) {
+                    // Load the response into the right-side content area
+                    $('#divlstneurologicaladmin').html("");
+                    $('#divlstneurologicaladmin').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        }
+
+        function clearForm() {
+            $('#txtNursingAdminStartDate').val('');
+            $('#txtNursingAdminStartTime').val('');
+            $('#txtNursingAdminEndDate').val('');
+            $('#txtNursingAdminEndTime').val('');
+            $('#txtNursingNurseSign').val('');
+            $('#txtNursingCoSign').val('');
+            $('#txtNursingPharmacistReview').val('');
+        }
+
+    });
+</script>

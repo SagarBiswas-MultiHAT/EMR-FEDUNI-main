@@ -1,0 +1,958 @@
+﻿@removeTagHelper Microsoft.AspNetCore.Mvc.TagHelpers.OptionTagHelper, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Html
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model EMRSimulation.Domain.Dtos.FoodIntakeDto
+
+@{
+    ViewData["Title"] = "Edit Food Intake";
+
+    // Helper to find an item by meal+label
+    EMRSimulation.Domain.Dtos.FoodIntakeItemDto? FindItem(string meal, string label)
+        => Model.Items.FirstOrDefault(x => x.Meal == meal && x.Label == label);
+
+    string AmtVal(string? amt) => string.IsNullOrWhiteSpace(amt) ? "0" : amt;
+
+    // --------------------
+    // Breakfast
+    // --------------------
+    var bfCereal = FindItem("Breakfast", "Cereal with milk");
+    var bfToast = FindItem("Breakfast", "Toast");
+    var bfHot = FindItem("Breakfast", "Hot breakfast");
+    var bfYoghurt = FindItem("Breakfast", "Yoghurt");
+    var bfFruit = FindItem("Breakfast", "Fruit");
+    var bfBeverage = FindItem("Breakfast", "Beverage");
+    var bfOtherFood = FindItem("Breakfast", "Other"); // NEW row
+
+    // Pre-tick breakfast comment checkboxes from BreakfastComment
+    var bc = Model.BreakfastComment ?? "";
+    bool cPoor = bc.Contains("poor appetite", StringComparison.OrdinalIgnoreCase);
+    bool cNausea = bc.Contains("nausea", StringComparison.OrdinalIgnoreCase);
+    bool cRefused = bc.Contains("patient refused meal", StringComparison.OrdinalIgnoreCase);
+    bool cInterrupted = bc.Contains("interrupted meal time", StringComparison.OrdinalIgnoreCase);
+
+    // Extract “other meal: …” text if present
+    string? otherMealTxt = null;
+    if (bc.Contains("other meal", StringComparison.OrdinalIgnoreCase))
+    {
+        var idx = bc.IndexOf("other meal", StringComparison.OrdinalIgnoreCase);
+        var seg = bc.Substring(idx);
+        var parts = seg.Split(';');
+        var piece = parts[0];
+        var colon = piece.IndexOf(':');
+        if (colon > -1) otherMealTxt = piece.Substring(colon + 1).Trim();
+    }
+
+    // LUNCH comment parsing (header level)
+    var lnC = Model.LunchComment ?? "";
+    bool lnPoor = lnC.Contains("poor appetite", StringComparison.OrdinalIgnoreCase);
+    bool lnNausea = lnC.Contains("nausea", StringComparison.OrdinalIgnoreCase);
+    bool lnRefused = lnC.Contains("patient refused meal", StringComparison.OrdinalIgnoreCase);
+    bool lnInterrupted = lnC.Contains("interrupted meal time", StringComparison.OrdinalIgnoreCase);
+
+    string? lnOtherMealTxt = null;
+    if (lnC.Contains("other meal", StringComparison.OrdinalIgnoreCase))
+    {
+        var idx = lnC.IndexOf("other meal", StringComparison.OrdinalIgnoreCase);
+        var seg = lnC.Substring(idx);
+        var parts = seg.Split(';');
+        var piece = parts[0];
+        var colon = piece.IndexOf(':');
+        if (colon > -1) lnOtherMealTxt = piece.Substring(colon + 1).Trim();
+    }
+
+    // DINNER comment parsing (header level)
+    var dnC = Model.DinnerComment ?? "";
+    bool dnPoor = dnC.Contains("poor appetite", StringComparison.OrdinalIgnoreCase);
+    bool dnNausea = dnC.Contains("nausea", StringComparison.OrdinalIgnoreCase);
+    bool dnRefused = dnC.Contains("patient refused meal", StringComparison.OrdinalIgnoreCase);
+    bool dnInterrupted = dnC.Contains("interrupted meal time", StringComparison.OrdinalIgnoreCase);
+
+    string? dnOtherMealTxt = null;
+    if (dnC.Contains("other meal", StringComparison.OrdinalIgnoreCase))
+    {
+        var idx = dnC.IndexOf("other meal", StringComparison.OrdinalIgnoreCase);
+        var seg = dnC.Substring(idx);
+        var parts = seg.Split(';');
+        var piece = parts[0];
+        var colon = piece.IndexOf(':');
+        if (colon > -1) dnOtherMealTxt = piece.Substring(colon + 1).Trim();
+    }
+
+
+    // --------------------
+    // Morning tea
+    // --------------------
+    var mtFood = FindItem("Morning tea", "Food");
+    var mtBeverage = FindItem("Morning tea", "Beverage");
+
+    // --------------------
+    // Lunch
+    // --------------------
+    var lnSoup = FindItem("Lunch", "Soup");
+    var lnBread = FindItem("Lunch", "Bread / Bread rolls");
+    var lnMain = FindItem("Lunch", "Main meal");
+    var lnCarb = FindItem("Lunch", "Potato/rice/pasta");
+    var lnSalad = FindItem("Lunch", "Salad/vegetables");
+    var lnSandwich = FindItem("Lunch", "Sandwiches");
+    var lnDessert = FindItem("Lunch", "Dessert");
+    var lnBeverage = FindItem("Lunch", "Beverage");
+    var lnOtherFood = FindItem("Lunch", "Other");
+
+    // --------------------
+    // Afternoon tea
+    // --------------------
+    var atFood = FindItem("Afternoon tea", "Food");
+    var atBeverage = FindItem("Afternoon tea", "Beverage");
+
+    // --------------------
+    // Dinner
+    // --------------------
+    var dnSoup = FindItem("Dinner", "Soup");
+    var dnBread = FindItem("Dinner", "Bread / Bread rolls");
+    var dnMain = FindItem("Dinner", "Main meal");
+    var dnCarb = FindItem("Dinner", "Potato/rice/pasta");
+    var dnSalad = FindItem("Dinner", "Salad/vegetables");
+    var dnSandwich = FindItem("Dinner", "Sandwiches");
+    var dnDessert = FindItem("Dinner", "Dessert");
+    var dnBeverage = FindItem("Dinner", "Beverage");
+    var dnOtherFood = FindItem("Dinner", "Other");
+
+    // --------------------
+    // Supper
+    // --------------------
+    var spFood = FindItem("Supper", "Food");
+    var spBeverage = FindItem("Supper", "Beverage");
+}
+
+<div class="container-fluid p-3">
+    <!-- Title -->
+    <div class="text-center text-white py-2 mb-4" style="background-color:#000000; border-radius:6px;">
+        <h4 class="mb-0">Food Intake Record – Edit</h4>
+    </div>
+
+    <!-- Hidden IDs -->
+    <input type="hidden" id="foodHeaderId" value="@Model.Id" />
+    <input type="hidden" id="foodLabId" value="@Model.LabId" />
+    <input type="hidden" id="foodPatientId" value="@Model.PatientId" />
+
+    <!-- Day / Date / Shift Signatures -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Day</label>
+                    <input type="text" id="fiDay" class="form-control" placeholder="e.g., Mon" value="@Model.DayText" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Date</label>
+                    <input type="date" id="fiDate" class="form-control" value="@Model.IntakeDate.ToString("yyyy-MM-dd")" />
+                </div>
+            </div>
+            <div class="row g-3 mt-1">
+                <div class="col-md-6">
+                    <label class="form-label"> Nurse Signature (1) </label>
+                    <input type="text" id="fiShift1Sig" class="form-control" maxlength="40" value="@Model.Shift1Signature" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label"> Nurse Designation (1)</label>
+                    <input type="text" id="fiShift1Des" class="form-control" maxlength="40" value="@Model.Shift1Designation" />
+                </div>
+            </div>
+            <div class="row g-3 mt-1">
+                <div class="col-md-6">
+                    <label class="form-label">Nurse Signature (2)</label>
+                    <input type="text" id="fiShift2Sig" class="form-control" maxlength="40" value="@Model.Shift2Signature" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label"> Nurse Designation (2)</label>
+                    <input type="text" id="fiShift2Des" class="form-control" maxlength="40" value="@Model.Shift2Designation" />
+                </div>
+            </div>
+            <div class="row g-3 mt-1">
+                <div class="col-md-6">
+                    <label class="form-label">Nurse Signature (3)</label>
+                    <input type="text" id="fiShift3Sig" class="form-control" maxlength="40" value="@Model.Shift3Signature" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label"> Nurse Designation (3)</label>
+                    <input type="text" id="fiShift3Des" class="form-control" maxlength="40" value="@Model.Shift3Designation" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive mb-4">
+        <table class="table table-bordered align-middle fi-table">
+            <thead class="table-light">
+                <tr>
+                    <th class="text-center align-middle" style="width:140px;">MEAL</th>
+                    <th class="align-middle">
+                        <div class="text-center">FOOD</div>
+                        <small class="text-muted d-block text-center">
+                            Please record all food and drink on patient tray. Include high-protein drinks, tea, coffee.
+                        </small>
+                    </th>
+                    <th class="text-center align-middle" style="width:180px;">AMOUNT CONSUMED</th>
+                    <th class="text-center align-middle" style="width:280px;">
+                        <div>COMMENTS</div>
+                        <small class="d-block">Reason for reduced intake</small>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Breakfast (7 rows now) -->
+                <tr>
+                    <td rowspan="7" class="fw-bold text-center align-middle">
+                        Breakfast<br /><small class="text-muted">meal size</small>
+                    </td>
+                    <td>
+                        <label class="form-label mb-1">Cereal with milk</label>
+                        <input type="text" class="form-control form-control-sm" id="bfCereal" value="@(bfCereal?.Notes ?? "")" placeholder="(optional notes)" />
+                    </td>
+                    <td>
+                        <select id="bfCerealAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(bfCereal?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(bfCereal?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(bfCereal?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(bfCereal?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(bfCereal?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+
+                    <!-- Breakfast comments (generic 'other' removed) -->
+                    <td rowspan="7" class="fi-comments">
+                        <div class="fi-comments-fill">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="cPoor" @(cPoor ? "checked" : "") />
+                                <label class="form-check-label" for="cPoor">poor appetite</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="cNausea" @(cNausea ? "checked" : "") />
+                                <label class="form-check-label" for="cNausea">nausea</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="cRefused" @(cRefused ? "checked" : "") />
+                                <label class="form-check-label" for="cRefused">patient refused meal</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="cInterrupted" @(cInterrupted ? "checked" : "") />
+                                <label class="form-check-label" for="cInterrupted">interrupted meal time</label>
+                            </div>
+
+                            <div class="fi-pair">
+                                <div class="form-check mb-0 me-2 d-flex align-items-center">
+                                    <input class="form-check-input" type="checkbox" id="cOtherMeal" @(string.IsNullOrWhiteSpace(otherMealTxt) ? "" : "checked") />
+                                    <label class="form-check-label ms-2" for="cOtherMeal">other meal provided</label>
+                                </div>
+                                <input type="text" id="cOtherMealTxt" class="form-control form-control-sm"
+                                       placeholder="please specify" value="@(otherMealTxt ?? "")" />
+                            </div>
+                            <!-- generic 'other' removed -->
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="form-label mb-1">Toast</label>
+                        <input type="text" class="form-control form-control-sm" id="bfToast" value="@(bfToast?.Notes ?? "")" placeholder="(optional notes)" />
+                    </td>
+                    <td>
+                        <select id="bfToastAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(bfToast?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(bfToast?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(bfToast?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(bfToast?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(bfToast?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="form-label mb-1">Hot breakfast</label>
+                        <input type="text" class="form-control form-control-sm" id="bfHot" value="@(bfHot?.Notes ?? "")" placeholder="(optional notes)" />
+                    </td>
+                    <td>
+                        <select id="bfHotAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(bfHot?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(bfHot?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(bfHot?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(bfHot?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(bfHot?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="form-label mb-1">Yoghurt</label>
+                        <input type="text" class="form-control form-control-sm" id="bfYoghurt" value="@(bfYoghurt?.Notes ?? "")" placeholder="(optional notes)" />
+                    </td>
+                    <td>
+                        <select id="bfYoghurtAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(bfYoghurt?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(bfYoghurt?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(bfYoghurt?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(bfYoghurt?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(bfYoghurt?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="form-label mb-1">Fruit</label>
+                        <input type="text" class="form-control form-control-sm" id="bfFruit" value="@(bfFruit?.Notes ?? "")" placeholder="(optional notes)" />
+                    </td>
+                    <td>
+                        <select id="bfFruitAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(bfFruit?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(bfFruit?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(bfFruit?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(bfFruit?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(bfFruit?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="form-label mb-1">Beverage</label>
+                        <input type="text" class="form-control form-control-sm" id="bfBeverage" value="@(bfBeverage?.Notes ?? "")" placeholder="(optional notes)" />
+                    </td>
+                    <td>
+                        <select id="bfBeverageAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(bfBeverage?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(bfBeverage?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(bfBeverage?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(bfBeverage?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(bfBeverage?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="form-label mb-1">Other</label>
+                        <input type="text" class="form-control form-control-sm" id="bfOther" value="@(bfOtherFood?.Notes ?? "")" placeholder="(optional notes)" />
+                    </td>
+                    <td>
+                        <select id="bfOtherAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(bfOtherFood?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(bfOtherFood?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(bfOtherFood?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(bfOtherFood?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(bfOtherFood?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <!-- Morning Tea -->
+                <tr class="fi-section-sep">
+                    <td rowspan="2" class="fw-bold text-center align-middle">Morning tea</td>
+                    <td>
+                        <label class="form-label mb-1">Food</label>
+                        <input type="text" class="form-control form-control-sm" id="mtFood" value="@(mtFood?.Notes ?? "")" placeholder="(optional notes)" />
+                    </td>
+                    <td>
+                        <select id="mtFoodAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(mtFood?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(mtFood?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(mtFood?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(mtFood?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(mtFood?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                    <td class="fi-comments fi-comments--center" rowspan="2">
+                        <div class="fi-centerbox">
+                            <input type="text" id="mtComment" class="form-control form-control-sm"
+                                   placeholder="comment (optional)" value="@(Model.MorningTeaComment ?? "")" />
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="form-label mb-1">Beverage</label>
+                        <input type="text" class="form-control form-control-sm" id="mtBeverage" value="@(mtBeverage?.Notes ?? "")" placeholder="(optional notes)" />
+                    </td>
+                    <td>
+                        <select id="mtBeverageAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(mtBeverage?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(mtBeverage?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(mtBeverage?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(mtBeverage?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(mtBeverage?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <!-- Lunch -->
+                <tr class="fi-section-sep">
+                    <td rowspan="9" class="fw-bold text-center align-middle">Lunch</td>
+                    <td>
+                        <label class="form-label mb-1">Soup</label>
+                        <input type="text" class="form-control form-control-sm" id="lnSoup" value="@(lnSoup?.Notes ?? "")" placeholder="(optional notes)" />
+                    </td>
+                    <td>
+                        <select id="lnSoupAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(lnSoup?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(lnSoup?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(lnSoup?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(lnSoup?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(lnSoup?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                    <td rowspan="9" class="fi-comments">
+                        <div class="fi-comments-fill">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="lnPoor" @(lnPoor ? "checked" : "") />
+                                <label class="form-check-label" for="lnPoor">poor appetite</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="lnNausea" @(lnNausea ? "checked" : "") />
+                                <label class="form-check-label" for="lnNausea">nausea</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="lnRefused" @(lnRefused ? "checked" : "") />
+                                <label class="form-check-label" for="lnRefused">patient refused meal</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="lnInterrupted" @(lnInterrupted ? "checked" : "") />
+                                <label class="form-check-label" for="lnInterrupted">interrupted meal time</label>
+                            </div>
+                            <div class="fi-pair">
+                                <div class="form-check d-flex align-items-center mb-0">
+                                    <input class="form-check-input" type="checkbox" id="lnOtherMeal" @(string.IsNullOrWhiteSpace(lnOtherMealTxt) ? "" : "checked") />
+                                    <label class="form-check-label ms-2" for="lnOtherMeal">other meal provided</label>
+                                </div>
+                                <input type="text" id="lnOtherMealTxt" class="form-control form-control-sm"
+                                       placeholder="please specify" value="@(lnOtherMealTxt ?? "")" />
+                            </div>
+                        </div>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Bread / Bread rolls</label><input type="text" class="form-control form-control-sm" id="lnBread" value="@(lnBread?.Notes ?? "")" placeholder="(optional notes)" /></td>
+                    <td>
+                        @* amount *@
+                        <select id="lnBreadAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(lnBread?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(lnBread?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(lnBread?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(lnBread?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(lnBread?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Main meal</label><input type="text" class="form-control form-control-sm" id="lnMain" value="@(lnMain?.Notes ?? "")" placeholder="(optional notes)" /></td>
+                    <td>
+                        <select id="lnMainAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(lnMain?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(lnMain?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(lnMain?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(lnMain?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(lnMain?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Potato/rice/pasta</label><input type="text" class="form-control form-control-sm" id="lnCarb" value="@(lnCarb?.Notes ?? "")" placeholder="(optional notes)" /></td>
+                    <td>
+                        <select id="lnCarbAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(lnCarb?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(lnCarb?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(lnCarb?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(lnCarb?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(lnCarb?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Salad/vegetables</label><input type="text" class="form-control form-control-sm" id="lnSalad" value="@(lnSalad?.Notes ?? "")" placeholder="(optional notes)" /></td>
+                    <td>
+                        <select id="lnSaladAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(lnSalad?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(lnSalad?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(lnSalad?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(lnSalad?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(lnSalad?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Sandwiches</label><input type="text" class="form-control form-control-sm" id="lnSandwich" value="@(lnSandwich?.Notes ?? "")" placeholder="(optional notes)" /></td>
+                    <td>
+                        <select id="lnSandwichAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(lnSandwich?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(lnSandwich?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(lnSandwich?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(lnSandwich?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(lnSandwich?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Dessert</label><input type="text" class="form-control form-control-sm" id="lnDessert" value="@(lnDessert?.Notes ?? "")" placeholder="(optional notes)" /></td>
+                    <td>
+                        <select id="lnDessertAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(lnDessert?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(lnDessert?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(lnDessert?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(lnDessert?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(lnDessert?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Beverage</label><input type="text" class="form-control form-control-sm" id="lnBeverage" value="@(lnBeverage?.Notes ?? "")" placeholder="(optional notes)" /></td>
+                    <td>
+                        <select id="lnBeverageAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(lnBeverage?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(lnBeverage?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(lnBeverage?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(lnBeverage?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(lnBeverage?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Other</label><input type="text" class="form-control form-control-sm" id="lnOtherFood" value="@(lnOtherFood?.Notes ?? "")" placeholder="(optional notes)" /></td>
+                    <td>
+                        <select id="lnOtherFoodAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(lnOtherFood?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(lnOtherFood?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(lnOtherFood?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(lnOtherFood?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(lnOtherFood?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <!-- Afternoon tea -->
+                <tr class="fi-section-sep">
+                    <td rowspan="2" class="fw-bold text-center align-middle">Afternoon tea</td>
+                    <td>
+                        <label class="form-label mb-1">Food</label>
+                        <input type="text" class="form-control form-control-sm" id="atFood" value="@(atFood?.Notes ?? "")" placeholder="(optional notes)" />
+                    </td>
+                    <td>
+                        <select id="atFoodAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(atFood?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(atFood?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(atFood?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(atFood?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(atFood?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                    <td class="fi-comments fi-comments--center" rowspan="2">
+                        <div class="fi-centerbox">
+                            <input type="text" id="atComment" class="form-control form-control-sm"
+                                   placeholder="comment (optional)" value="@(Model.AfternoonTeaComment ?? "")" />
+
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="form-label mb-1">Beverage</label>
+                        <input type="text" class="form-control form-control-sm" id="atBeverage" value="@(atBeverage?.Notes ?? "")" placeholder="(optional notes)" />
+                    </td>
+                    <td>
+                        <select id="atBeverageAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(atBeverage?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(atBeverage?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(atBeverage?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(atBeverage?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(atBeverage?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <!-- Dinner -->
+                <tr class="fi-section-sep">
+                    <td rowspan="9" class="fw-bold text-center align-middle">Dinner</td>
+                    <td>
+                        <label class="form-label mb-1">Soup</label>
+                        <input type="text" class="form-control form-control-sm" id="dnSoup" value="@(dnSoup?.Notes ?? "")" placeholder="(optional notes)" />
+                    </td>
+                    <td>
+                        <select id="dnSoupAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(dnSoup?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(dnSoup?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(dnSoup?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(dnSoup?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(dnSoup?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                    <td rowspan="9" class="fi-comments">
+                        <div class="fi-comments-fill">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="dnPoor" @(dnPoor ? "checked" : "") />
+                                <label class="form-check-label" for="dnPoor">poor appetite</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="dnNausea" @(dnNausea ? "checked" : "") />
+                                <label class="form-check-label" for="dnNausea">nausea</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="dnRefused" @(dnRefused ? "checked" : "") />
+                                <label class="form-check-label" for="dnRefused">patient refused meal</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="dnInterrupted" @(dnInterrupted ? "checked" : "") />
+                                <label class="form-check-label" for="dnInterrupted">interrupted meal time</label>
+                            </div>
+                            <div class="fi-pair">
+                                <div class="form-check d-flex align-items-center mb-0">
+                                    <input class="form-check-input" type="checkbox" id="dnOtherMeal" @(string.IsNullOrWhiteSpace(dnOtherMealTxt) ? "" : "checked") />
+                                    <label class="form-check-label ms-2" for="dnOtherMeal">other meal provided</label>
+                                </div>
+                                <input type="text" id="dnOtherMealTxt" class="form-control form-control-sm"
+                                       placeholder="please specify" value="@(dnOtherMealTxt ?? "")" />
+                            </div>
+                        </div>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Bread / Bread rolls</label><input type="text" class="form-control form-control-sm" id="dnBread" value="@(dnBread?.Notes ?? "")" placeholder="(optional notes)" /></td>
+                    <td>
+                        <select id="dnBreadAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(dnBread?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(dnBread?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(dnBread?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(dnBread?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(dnBread?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Main meal</label><input type="text" class="form-control form-control-sm" id="dnMain" value="@(dnMain?.Notes ?? "")" placeholder="(optional notes)" /></td>
+                    <td>
+                        <select id="dnMainAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(dnMain?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(dnMain?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(dnMain?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(dnMain?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(dnMain?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Potato/rice/pasta</label><input type="text" class="form-control form-control-sm" id="dnCarb" value="@(dnCarb?.Notes ?? "")" placeholder="(optional notes)" /></td>
+                    <td>
+                        <select id="dnCarbAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(dnCarb?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(dnCarb?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(dnCarb?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(dnCarb?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(dnCarb?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Salad/vegetables</label><input type="text" class="form-control form-control-sm" id="dnSalad" value="@(dnSalad?.Notes ?? "")" placeholder="(optional notes)" /></td>
+                    <td>
+                        <select id="dnSaladAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(dnSalad?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(dnSalad?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(dnSalad?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(dnSalad?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(dnSalad?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Sandwiches</label><input type="text" class="form-control form-control-sm" id="dnSandwich" value="@(dnSandwich?.Notes ?? "")" placeholder="(optional notes)" /></td>
+                    <td>
+                        <select id="dnSandwichAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(dnSandwich?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(dnSandwich?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(dnSandwich?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(dnSandwich?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(dnSandwich?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Dessert</label><input type="text" class="form-control form-control-sm" id="dnDessert" value="@(dnDessert?.Notes ?? "")" placeholder="(optional notes)" /></td>
+                    <td>
+                        <select id="dnDessertAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(dnDessert?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(dnDessert?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(dnDessert?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(dnDessert?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(dnDessert?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Beverage</label><input type="text" class="form-control form-control-sm" id="dnBeverage" value="@(dnBeverage?.Notes ?? "")" placeholder="(optional notes)" /></td>
+                    <td>
+                        <select id="dnBeverageAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(dnBeverage?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(dnBeverage?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(dnBeverage?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(dnBeverage?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(dnBeverage?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Other</label><input type="text" class="form-control form-control-sm" id="dnOtherFood" value="@(dnOtherFood?.Notes ?? "")" placeholder="(optional notes)" /></td>
+                    <td>
+                        <select id="dnOtherFoodAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(dnOtherFood?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(dnOtherFood?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(dnOtherFood?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(dnOtherFood?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(dnOtherFood?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <!-- Supper -->
+                <tr class="fi-section-sep">
+                    <td rowspan="2" class="fw-bold text-center align-middle">Supper</td>
+                    <td>
+                        <label class="form-label mb-1">Food</label>
+                        <input type="text" class="form-control form-control-sm" id="spFood" value="@(spFood?.Notes ?? "")" placeholder="(optional notes)" />
+                    </td>
+                    <td>
+                        <select id="spFoodAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(spFood?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(spFood?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(spFood?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(spFood?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(spFood?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                    <td class="fi-comments fi-comments--center" rowspan="2">
+                        <div class="fi-centerbox">
+                            <input type="text" id="spComment" class="form-control form-control-sm"
+                                   placeholder="comment (optional)" value="@(Model.SupperComment ?? "")" />
+
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="form-label mb-1">Beverage</label>
+                        <input type="text" class="form-control form-control-sm" id="spBeverage" value="@(spBeverage?.Notes ?? "")" placeholder="(optional notes)" />
+                    </td>
+                    <td>
+                        <select id="spBeverageAmt" class="form-select form-select-sm">
+                            <option value="0" @(AmtVal(spBeverage?.Amount) == "0" ? "selected" : "")>0</option>
+                            <option value="¼" @(AmtVal(spBeverage?.Amount) == "¼" ? "selected" : "")>¼</option>
+                            <option value="½" @(AmtVal(spBeverage?.Amount) == "½" ? "selected" : "")>½</option>
+                            <option value="¾" @(AmtVal(spBeverage?.Amount) == "¾" ? "selected" : "")>¾</option>
+                            <option value="all" @(AmtVal(spBeverage?.Amount) == "all" ? "selected" : "")>all</option>
+                        </select>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Actions -->
+    <div class="row mt-4">
+        <div class="col-md-12 d-flex justify-content-end gap-2">
+            <a href="javascript:void(0);" id="btnFoodCancel" class="btn btn-outline-secondary">Cancel</a>
+            <button type="button" id="btnFoodUpdate" class="btn btn-primary" style="background-color:#FF8A30; color:#fff;">Save</button>
+        </div>
+    </div>
+
+    <!-- Message -->
+    <div class="row mt-2">
+        <div class="col-md-12">
+            <label id="lblFoodMessage" style="display:none;"></label>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="foodModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" id="foodModalHeader">
+                <h5 class="modal-title">Notice</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="foodModalMessage"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+      $("#btnFoodUpdate").off("click").on("click", function () {
+        const labId     = $("#foodLabId").val();
+        const patientId = $("#foodPatientId").val();
+        const headerId  = $("#foodHeaderId").val();
+        const dateIso   = $("#fiDate").val(); // keep yyyy-MM-dd
+        const $msg      = $("#lblFoodMessage").css("color","red").hide();
+
+        if (!labId || !patientId || !headerId) { $msg.text("Missing context.").show(); return; }
+        if (!dateIso) { $msg.text("Please select Date.").show(); return; }
+
+        // Breakfast comment (no generic 'other')
+        const bc = [];
+        if ($("#cPoor").is(":checked"))        bc.push("poor appetite");
+        if ($("#cNausea").is(":checked"))      bc.push("nausea");
+        if ($("#cRefused").is(":checked"))     bc.push("patient refused meal");
+        if ($("#cInterrupted").is(":checked")) bc.push("interrupted meal time");
+        if ($("#cOtherMeal").is(":checked")) {
+          const t = ($("#cOtherMealTxt").val() || "").trim();
+          bc.push("other meal" + (t ? ": " + t : ""));
+        }
+        const breakfastComment = bc.length ? bc.join("; ") : null;
+
+        // Lunch / Dinner comments (UI only, not persisted server-side today)
+        const lnParts = [];
+        if ($("#lnPoor").is(":checked"))        lnParts.push("poor appetite");
+        if ($("#lnNausea").is(":checked"))      lnParts.push("nausea");
+        if ($("#lnRefused").is(":checked"))     lnParts.push("patient refused meal");
+        if ($("#lnInterrupted").is(":checked")) lnParts.push("interrupted meal time");
+        if ($("#lnOtherMeal").is(":checked")) {
+          const t = ($("#lnOtherMealTxt").val() || "").trim();
+          lnParts.push("other meal" + (t ? ": " + t : ""));
+        }
+        const lunchComment = lnParts.length ? lnParts.join("; ") : null;
+
+        const dnParts = [];
+        if ($("#dnPoor").is(":checked"))        dnParts.push("poor appetite");
+        if ($("#dnNausea").is(":checked"))      dnParts.push("nausea");
+        if ($("#dnRefused").is(":checked"))     dnParts.push("patient refused meal");
+        if ($("#dnInterrupted").is(":checked")) dnParts.push("interrupted meal time");
+        if ($("#dnOtherMeal").is(":checked")) {
+          const t = ($("#dnOtherMealTxt").val() || "").trim();
+          dnParts.push("other meal" + (t ? ": " + t : ""));
+        }
+        const dinnerComment = dnParts.length ? dnParts.join("; ") : null;
+
+        // Afternoon tea / Supper comments (textboxes; not persisted on server currently)
+        const afternoonTeaComment = ($("#atComment").val() || "").trim() || null;
+        const supperComment       = ($("#spComment").val() || "").trim() || null;
+
+        // Items
+        const items = [];
+        function addItem(meal, label, notesId, amtId) {
+          const amt   = $("#" + amtId).val();
+          const notes = ($("#" + notesId).val() || "").trim();
+          if ((amt && amt !== "") || notes !== "") {
+            items.push({ Meal: meal, Label: label, Notes: notes || null, Amount: amt || "0" });
+          }
+        }
+
+        // Breakfast rows (including Other)
+        addItem("Breakfast", "Cereal with milk", "bfCereal",   "bfCerealAmt");
+        addItem("Breakfast", "Toast",            "bfToast",    "bfToastAmt");
+        addItem("Breakfast", "Hot breakfast",    "bfHot",      "bfHotAmt");
+        addItem("Breakfast", "Yoghurt",          "bfYoghurt",  "bfYoghurtAmt");
+        addItem("Breakfast", "Fruit",            "bfFruit",    "bfFruitAmt");
+        addItem("Breakfast", "Beverage",         "bfBeverage", "bfBeverageAmt");
+        addItem("Breakfast", "Other",            "bfOther",    "bfOtherAmt");
+
+        // Morning tea
+        addItem("Morning tea", "Food",     "mtFood",     "mtFoodAmt");
+        addItem("Morning tea", "Beverage", "mtBeverage", "mtBeverageAmt");
+
+        // Lunch
+        addItem("Lunch", "Soup",                 "lnSoup",      "lnSoupAmt");
+        addItem("Lunch", "Bread / Bread rolls",  "lnBread",     "lnBreadAmt");
+        addItem("Lunch", "Main meal",            "lnMain",      "lnMainAmt");
+        addItem("Lunch", "Potato/rice/pasta",    "lnCarb",      "lnCarbAmt");
+        addItem("Lunch", "Salad/vegetables",     "lnSalad",     "lnSaladAmt");
+        addItem("Lunch", "Sandwiches",           "lnSandwich",  "lnSandwichAmt");
+        addItem("Lunch", "Dessert",              "lnDessert",   "lnDessertAmt");
+        addItem("Lunch", "Beverage",             "lnBeverage",  "lnBeverageAmt");
+        addItem("Lunch", "Other",                "lnOtherFood", "lnOtherFoodAmt");
+
+        // Afternoon tea
+        addItem("Afternoon tea", "Food",     "atFood",     "atFoodAmt");
+        addItem("Afternoon tea", "Beverage", "atBeverage", "atBeverageAmt");
+
+        // Dinner
+        addItem("Dinner", "Soup",                 "dnSoup",      "dnSoupAmt");
+        addItem("Dinner", "Bread / Bread rolls",  "dnBread",     "dnBreadAmt");
+        addItem("Dinner", "Main meal",            "dnMain",      "dnMainAmt");
+        addItem("Dinner", "Potato/rice/pasta",    "dnCarb",      "dnCarbAmt");
+        addItem("Dinner", "Salad/vegetables",     "dnSalad",     "dnSaladAmt");
+        addItem("Dinner", "Sandwiches",           "dnSandwich",  "dnSandwichAmt");
+        addItem("Dinner", "Dessert",              "dnDessert",   "dnDessertAmt");
+        addItem("Dinner", "Beverage",             "dnBeverage",  "dnBeverageAmt");
+        addItem("Dinner", "Other",                "dnOtherFood", "dnOtherFoodAmt");
+
+        // Supper
+        addItem("Supper", "Food",     "spFood",     "spFoodAmt");
+        addItem("Supper", "Beverage", "spBeverage", "spBeverageAmt");
+
+        if (items.length === 0) { $msg.text("Please add at least one meal line.").show(); return; }
+
+        const dto = {
+          Id: parseInt(headerId, 10),
+          LabId: parseInt(labId, 10),
+          PatientId: parseInt(patientId, 10),
+          DayText: ($("#fiDay").val() || "").trim() || null,
+          IntakeDate: dateIso, // keep raw yyyy-MM-dd
+          Shift1Signature: ($("#fiShift1Sig").val() || "").trim() || null,
+          Shift1Designation: ($("#fiShift1Des").val() || "").trim() || null,
+          Shift2Signature: ($("#fiShift2Sig").val() || "").trim() || null,
+          Shift2Designation: ($("#fiShift2Des").val() || "").trim() || null,
+          Shift3Signature: ($("#fiShift3Sig").val() || "").trim() || null,
+          Shift3Designation: ($("#fiShift3Des").val() || "").trim() || null,
+
+          // Persisted today
+          BreakfastComment: breakfastComment,
+          MorningTeaComment: ($("#mtComment").val() || "").trim() || null,
+
+          // Sent for future use (ignored by server if not mapped)
+          LunchComment:           lunchComment,
+          AfternoonTeaComment:    afternoonTeaComment,
+          DinnerComment:          dinnerComment,
+          SupperComment:          supperComment,
+
+          Items: items
+        };
+
+        $.ajax({
+          type: "POST",
+          url: "/Patient/UpdateFoodIntake",
+          contentType: "application/json",
+          data: JSON.stringify(dto),
+          success: function (res) {
+            if (Number(res) === 1) {
+              $("#foodModalHeader").removeClass("bg-danger text-white").addClass("bg-success text-white");
+              $("#foodModalMessage").text("Food Intake updated successfully!");
+              const modalEl = document.getElementById("foodModal");
+              const modal   = new bootstrap.Modal(modalEl);
+              modal.show();
+              modalEl.addEventListener('hidden.bs.modal', function () {
+                $.get("/Patient/GetFoodIntakeList",
+                      { labId: labId, patientId: patientId },
+                      function (html) { $("#content-area").html(html); });
+              }, { once: true });
+            } else {
+              $("#lblFoodMessage").text("Update failed.").css("color","red").show();
+            }
+          },
+          error: function () { $("#lblFoodMessage").text("Server error.").css("color","red").show(); }
+        });
+      });
+
+      // Cancel → back to list (same as View page's Back to List)
+      $("#btnFoodCancel").off("click").on("click", function (e) {
+        e.preventDefault();
+        const labId     = $("#foodLabId").val();
+        const patientId = $("#foodPatientId").val();
+        if (!labId || !patientId) return;
+
+        $.get("/Patient/GetFoodIntakeList",
+              { labId: labId, patientId: patientId },
+              function (html) { $("#content-area").html(html); });
+      });
+
+    });
+</script>

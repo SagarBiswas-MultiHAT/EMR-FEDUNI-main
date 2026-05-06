@@ -1,0 +1,77 @@
+﻿/* ===== Riskman Add Styles (scoped to this page) ===== */
+#riskman-page .riskman-card {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    max-width: 3110px; /* keep the form at a nice readable width */
+    margin: 20px auto 24px; /* center the card itself */
+}
+
+/* black strip header */
+#riskman-page .riskman-card-header {
+    background: #000000;
+    color: #FF8A30; /* matches Save button */
+    font-weight: 700;
+    font-size: 1.4rem;
+    text-align: center;
+    padding: 12px 16px;
+    border-radius: 10px 10px 0 0;
+}
+
+/* white body */
+#riskman-page .riskman-card-body {
+    padding: 16px 20px;
+    border-radius: 0 0 10px 10px;
+    border-top: 1px solid rgba(0,0,0,.06); /* subtle divider */
+}
+
+/* IMPORTANT: remove the extra white panel look coming from the template's .section */
+#riskman-page .section {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* expanding textareas look tidy and start at input height */
+#riskman-page textarea.autogrow {
+    overflow: hidden;
+    resize: none; /* change to 'vertical' if you want manual drag too */
+    min-height: 38px; /* about the same as a single-line input */
+    line-height: 1.4;
+}
+
+/* ============================ */
+/* NEW: mandatory field styling */
+/* ============================ */
+
+/* add red star automatically */
+#riskman-page .form-label.required::after {
+    content: " *";
+    color: #dc3545; /* bootstrap danger red */
+    margin-left: 4px;
+}
+
+/* helper text under the form header */
+#riskman-page .required-note {
+    font-size: .925rem;
+    color: #6c757d; /* muted grey */
+    margin: 4px 0 12px;
+}
+
+/* invalid fields and feedback messages */
+#riskman-page .is-invalid {
+    border-color: #dc3545;
+}
+
+#riskman-page .invalid-feedback {
+    display: none;
+    color: #dc3545;
+    font-size: .875rem;
+    margin-top: 4px;
+}
+
+#riskman-page .is-invalid + .invalid-feedback {
+    display: block;
+}

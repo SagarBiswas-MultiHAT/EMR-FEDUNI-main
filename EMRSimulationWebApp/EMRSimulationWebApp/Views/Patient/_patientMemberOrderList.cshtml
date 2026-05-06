@@ -1,0 +1,116 @@
+﻿@{
+    ViewData["Title"] = "Patient List";
+}
+@using EMRSimulation.Domain.Dtos;
+@model IEnumerable<IvFluidChartDto>
+
+<div class="form-group row mb-1" style="background-color: black;color: white;">
+    <div class="col-sm-7">
+        <label class="col-sm-5 col-form-label">MEMBER ORDER LIST</label>
+    </div>
+</div>
+<div class="text-left">
+    <table id="patientsMemberOrderTable" class="display">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Flask Vol</th>
+                <th>IV Fluid including strength</th>
+                <th>Rate</th>
+                <th>Additives</th>
+                <th>Officer Sign</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@Convert.ToDateTime(item.Date).ToShortDateString()</td>
+                    <td>@item.FlaskVol</td>
+                    <td>@item.Strength</td>
+                    <td>@item.Rate</td>
+                    <td>@item.Dose</td>
+                    <td>@item.OfficerSign</td>
+                    <td>
+                        <a href="javascript:void(0);" class="btn btn-primary deleteMemberOrder" data-custom="@item.Id" style="background-color:#FF8A30;">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <label id="lblMessage" style="color:green"></label>
+</div>
+
+<script>
+    var LabId = null;
+    var PatientId = null;
+
+    $(document).ready(function () {
+        var table = $('#patientsMemberOrderTable').DataTable({
+            "paging": true, // Remove paging control
+            "info": false, // Remove "Showing 1 to X" information
+            "searching": false, // Remove search box
+            "ordering": true, // Enable column ordering (if needed)
+            "autoWidth": false, // Prevent auto width
+            "lengthChange": false,  // Hide the entries per page dropdown
+            // "pageLength": 3,  // Set the default number of entries per page (optional)
+            "columnDefs": [
+                {
+                    "targets": [0],
+                    "visible": false
+                } // Disable sorting for the action column
+            ]
+        });
+
+        LabId = $('#txtLabId').val();
+        PatientId = $('#txtPatientId').val();
+
+        $('#patientsMemberOrderTable').on('click', '.deleteMemberOrder', function() {
+        
+            var addsId = $(this).attr("data-custom");
+
+            $.ajax({
+                type: "GET",
+                url: "/supervisor/deleteivfluidchart",
+                contentType: "application/json",
+                data: { Id: addsId }, // Wrap Id in an object
+                success: function (response) {
+                    if (response.id > 0) {
+
+                        alert("Mermber Order record deleted successfully")
+
+                        $.ajax({
+                            url: "/supervisor/getpatientivfluidchartlist",
+                            method: "GET",
+                            data: { labId: LabId, patientId: PatientId }, // Wrap Id in an object
+                            success: function (response) {
+                                // Load the response into the right-side content area
+                                $('#divlstMemberOrder').html("");
+                                $('#divlstMemberOrder').html(response);
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error loading the page:", error);
+                            }
+                        });
+
+                    } else {
+                        $('#lblMessage').text(response.resultMessage).css('color', 'red');
+                    }
+                
+
+                    console.log("Success:", response);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log("Error:", textStatus);
+                }
+            });
+        });
+    });
+    
+
+</script>

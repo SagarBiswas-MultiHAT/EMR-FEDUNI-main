@@ -1,0 +1,112 @@
+@using EMRSimulation.Domain.Dtos;
+@model PatientFluidBalanceChartViewModel
+
+<div class="form-group row mb-1" style="background-color: black;color: white;">
+    <div class="col-sm-7">
+        <label class="col-sm-5 col-form-label">FLUID RECORD LIST</label>
+    </div>
+</div>
+
+<div class="text-left">
+    <table id="patientsFluidBalanceAdminTable" class="display">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>IV Fluids (ml)</th>
+                <th>Oral Intake (ml)</th>
+                <th>Enteric Intake (ml)</th>
+                <th>Urine Output (ml)</th>
+                <th>Faecal Output (ml)</th>
+                <th>Bladder Scan (ml)</th>
+                <th>Vomit (ml)</th>
+                <th>Drainage (ml)</th>
+                <th>Cumulative Intake (ml)</th>
+                <th>Cumulative Output (ml)</th>
+                <th>Difference (ml)</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var patient in Model.FluidBalanceChartDtoList)
+            {
+                <tr>
+                    <td>@patient.Id</td>
+                    <td>@Convert.ToDateTime(patient.Date).ToShortDateString()</td>
+                    <td>@patient.IV_Fluids</td>
+                    <td>@patient.Oral_Intake</td>
+                    <td>@patient.Enteric_Intake</td>
+                    <td>@patient.Urine_Output</td>
+                    <td>@patient.Faecal_Output</td>
+                    <td>@patient.Bladder_Scan</td>
+                    <td>@patient.Vomitus</td>
+                    <td>@patient.Drainage</td>
+                    <td>@patient.Cumulative_Intake</td>
+                    <td>@patient.Cumulative_Output</td>
+                    <td>@patient.Difference</td>
+                    @{
+                        var actionType = "";
+
+                        if (User.HasClaim(c => c.Value == "student"))
+                        {
+                            actionType = "Add Record";
+                        }
+                        else if (User.HasClaim(c => c.Value == "supervisor"))
+                        {
+                            actionType = "View Record";
+                        }
+                    }
+                    <td>
+                        <a href="javascript:void(0);" class="btn btn-primary addFluidBalanceAdmin" data-custom="@patient.Id" style="background-color:#FF8A30;">@actionType</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <label id="lblMessage" style="color:green"></label>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var table = $('#patientsFluidBalanceAdminTable').DataTable({
+            "paging": true,
+            "info": false,
+            "searching": false,
+            "ordering": true,
+            "autoWidth": false,
+            "lengthChange": false,
+            "columnDefs": [
+                {
+                    "targets": [0],
+                    "visible": false
+                }
+            ]
+        });
+
+        $('#patientsFluidBalanceAdminTable').on('click', '.addFluidBalanceAdmin', function () {
+
+            var fluidBalanceId = $(this).attr("data-custom");
+
+            var LabId = $('#txtLabId').val();
+            var PatientId = $('#txtPatientId').val();
+
+            var pageUrl = "/patient/getpatientfluidbalancechart";
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { Id: fluidBalanceId, labId: LabId, patientId: PatientId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+    });
+
+</script>

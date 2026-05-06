@@ -1,0 +1,161 @@
+﻿@{
+    ViewData["Title"] = "Patient List";
+}
+@using EMRSimulation.Domain.Dtos;
+@model IEnumerable<ProgressNotesDto>
+
+<div class="form-group row mb-1" style="background-color: black;color: white;">
+    <div class="col-sm-7">
+        <label class="col-sm-5 col-form-label">PROGRESS NOTES</label>
+    </div>
+</div>
+<div class="text-left">
+    <table id="patientsProgressNoteTable" class="display">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Notes</th>
+                <th>&nbsp;</th>
+                <th>Sign</th>
+                <th>Notes Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var patient in Model)
+            {
+                <tr>
+                    <td>@patient.Id</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(patient.Notes) && patient.Notes.Length > 50)
+                        {
+                            <span class="truncated-text">@patient.Notes.Substring(0, 70)...</span>                            
+                        }
+                        else
+                        {
+                            <span>@patient.Notes</span>
+                        }
+                    </td>
+                    <td><a href="#" class="read-more" data-bs-toggle="modal" data-bs-target="#notesModal" data-fulltext="@patient.Notes">Read More</a></td>
+                    <td>@patient.Sign</td>
+                    <td>@patient.NotesDate</td>
+
+                    <td>
+                    @if (User.HasClaim(c => c.Value == "student"))
+                    {
+                        if(patient.NotesFrom == "student")
+                        {
+                        
+                            <a href="javascript:void(0);" class="btn btn-primary deleteProgressNote" data-custom="@patient.Id" style="background-color:#FF8A30;">Delete</a>
+                        
+                        }
+                    }
+                    else if (User.HasClaim(c => c.Value == "supervisor"))
+                    {
+                        if (patient.NotesFrom == "supervisor")
+                        {
+                        
+                                <a href="javascript:void(0);" class="btn btn-primary deleteProgressNote" data-custom="@patient.Id" style="background-color:#FF8A30;">Delete</a>
+                        
+                        }
+                    }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <label id="lblMessage" style="color:green"></label>
+</div>
+
+<div class="modal fade" id="notesModal" tabindex="-1" role="dialog" aria-labelledby="notesModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notesModalLabel">Full Notes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="word-wrap: break-word; white-space: pre-line;">
+                <!-- Full text will be dynamically added here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" style="background-color:black" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var LabId = null;
+    var PatientId = null;
+
+    $(document).ready(function () {
+        var table = $('#patientsProgressNoteTable').DataTable({
+            "paging": true, // Remove paging control
+            "info": false, // Remove "Showing 1 to X" information
+            "searching": false, // Remove search box
+            "ordering": false, // Enable column ordering (if needed)
+            "autoWidth": false, // Prevent auto width
+            "lengthChange": false,  // Hide the entries per page dropdown
+            // "pageLength": 3,  // Set the default number of entries per page (optional)
+            "columnDefs": [
+                {
+                    "targets": [0],
+                    "visible": false
+                } // Disable sorting for the action column
+            ]
+        });
+
+        $('#patientsProgressNoteTable').on('click', '.read-more', function() {
+            var fullText = $(this).attr('data-fulltext');
+            $('#notesModal .modal-body').text(fullText);
+        });
+
+        LabId = $('#txtLabId').val();
+        PatientId = $('#txtPatientId').val();
+
+        $('#patientsProgressNoteTable').on('click', '.deleteProgressNote', function() {
+
+            var addsId = $(this).attr("data-custom");
+
+            $.ajax({
+                type: "GET",
+                url: "/patient/deleteprogressnote",
+                contentType: "application/json",
+                data: { Id: addsId }, // Wrap Id in an object
+                success: function (response) {
+                    if (response > 0) {
+
+                        alert("Progress Note record deleted successfully")
+
+                        $.ajax({
+                            url: "/patient/GetProgressNoteList",
+                            method: "GET",
+                            data: { labId: LabId, patientId: PatientId }, // Wrap Id in an object
+                            success: function (response) {
+                                // Load the response into the right-side content area
+                                $('#content-area').html("");
+                                $('#content-area').html(response);
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error loading the page:", error);
+                            }
+                        });
+
+                    } else {
+                        $('#lblMessage').text("Error").css('color', 'red');
+                    }
+                
+
+                    console.log("Success:", response);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log("Error:", textStatus);
+                }
+            });
+        });
+    });
+    
+
+</script>

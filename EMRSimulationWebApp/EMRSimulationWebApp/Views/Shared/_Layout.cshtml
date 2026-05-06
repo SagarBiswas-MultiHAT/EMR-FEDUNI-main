@@ -1,0 +1,911 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - EMRSimulationWebApp</title>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link href="~/datepicker/jquery-ui.css" rel="stylesheet" />
+    <script src="~/datepicker/jquery-ui.js"></script>
+
+    <link href="~/datatables/datatables.min.css" rel="stylesheet" />
+    <script src="~/datatables/datatables.min.js"></script>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/EMRSimulationWebApp.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/braden.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/foodintake.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/riskman-add.css" />
+</head>
+
+<body>
+    <header>
+        <!-- ADDED id + changed mb-3 -> mb-0 -->
+        <nav id="appHeader" class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-0">
+            <div class="container-fluid">
+                <img src="~/images/unilogo.png" alt="Federation University" style="height:50px">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div>
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <button type="button" id="btnHome" class="btn btn-primary load-patient-list" data-url="@Url.Action("GetPatientList", "Patient")" style="background-color:#000000; width:100px">HOME</button>
+                        </li>
+                        &nbsp;
+                        <li class="nav-item">
+                            <button type="button" id="btnLogout" class="btn btn-primary load-logout" style="background-color:#000000; width:100px">LOGOUT</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar (ADDED id) -->
+            <nav id="appSidebar" class="col-md-2 sidebar bg-dark">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a href="javascript:void(0);" class="nav-link text-light load-patient-list" data-url="@Url.Action("GetPatientList", "Patient")">Patient List</a>
+                    </li>
+
+                    <!-- RISKMAN (global-only; visibility controlled by JS) -->
+                    <li id="toggleRiskmanMenu">
+                        <button id="toggleRiskman" class="menu-btn">
+                            RISKMAN <span class="arrow">▼</span>
+                        </button>
+                        <ul id="riskmanMenu" class="submenu">
+                            <li><a href="javascript:void(0);" class="load-riskman-list" data-url="@Url.Action("GetRiskmanIncidentList", "Patient")">Incident - List</a></li>
+                            <li><a href="javascript:void(0);" class="load-riskman-add" data-url="@Url.Action("GetRiskmanIncident", "Patient")">Incident - Add</a></li>
+                        </ul>
+                    </li>
+
+                    <li id="toggleRecordMenu" style="display: none;">
+                        <button id="toggleFlowSheet" class="menu-btn">
+                            Flow Sheet <span class="arrow">▼</span>
+                        </button>
+                        <ul id="flowSheetMenu" class="submenu">
+
+                            <li><a href="javascript:void(0);" class="load-patient-adds" data-url="@Url.Action("GetPatientADDSList", "Patient")">ADDS Chart</a></li>
+                            <li><a href="javascript:void(0);" class="load-patient-ivfluid" data-url="@Url.Action("GetPatientIvFluidChartList", "Patient")">IV Fluid Charts</a></li>
+                            <!-- Neurological Chart with nested items -->
+                            <li>
+                                <button id="toggleNeurologicalChart" class="menu-btn">
+                                    Neurological Charts <span class="arrow">▼</span>
+                                </button>
+                                <ul id="neurologicalChartMenu" class="submenu">
+                                    <li><a href="javascript:void(0);" class="load-patient-neurological" data-url="@Url.Action("GetPatientNeurologicalChartList", "Patient")">View Charts</a></li>
+                                    <li><a href="javascript:void(0);" class="load-patient-neurological-add" data-url="@Url.Action("GetPatientNeurologicalChartAdd", "Patient")">Add Neuroligcal Chart</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- Fluid Balance Chart with nested items -->
+                            <!--
+                            <li>
+                                <button id="toggleFluidBalanceChart" class="menu-btn">
+                                    Fluid Balance Charts <span class="arrow">▼</span>
+                                </button>
+                                <ul id="fluidBalanceChartMenu" class="submenu">
+                                    <li><a href="javascript:void(0);" class="load-patient-fluidbalance" data-url="@Url.Action("GetPatientFluidBalanceChartList", "Patient")">View Charts</a></li>
+                                    <li><a href="javascript:void(0);" class="load-patient-fluidbalance-add" data-url="@Url.Action("GetPatientFluidBalanceChartAdd", "Patient")">Add FluidBalance Chart</a></li>
+                                </ul>
+                            </li>
+                            -->
+
+
+
+                            <!-- FRAT (added) -->
+                            <li>
+                                <a href="javascript:void(0);" class="load-patient-frat"
+                                   data-url='@Url.Action("GetPatientFallRiskChart", "Patient")'>Fall Risk (FRAT)</a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="load-patient-frat-list"
+                                   data-url='@Url.Action("GetPatientFallRiskList", "Patient")'>FRAT List</a>
+                            </li>
+
+                            <!-- Medication Chart with nested items -->
+                            <li>
+                                <button id="toggleMedicationChart" class="menu-btn">
+                                    Medication Chart <span class="arrow">▼</span>
+                                </button>
+                                <ul id="medicationChartMenu" class="submenu">
+                                    <li><a href="javascript:void(0);" class="load-patient-prn" data-url="@Url.Action("GetPatientMedicationPrnList", "Patient")">PRN</a></li>
+                                    <li><a href="javascript:void(0);" class="load-patient-regular" data-url="@Url.Action("GetPatientMedicationRegularList", "Patient")">REGULAR</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- Braden Scale with nested items -->
+                            <li>
+                                <button id="toggleBraden" class="menu-btn">
+                                    Braden Scale <span class="arrow">▼</span>
+                                </button>
+                                <ul id="bradenMenu" class="submenu">
+                                    <li><a href="javascript:void(0);" class="load-braden-view" data-url="@Url.Action("GetBradenAssessmentList", "Patient")">View Braden Scale</a></li>
+                                    <li><a href="javascript:void(0);" class="load-braden-add" data-url="@Url.Action("GetBradenAdd", "Patient")">Add Braden Scale</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- Food Intake with nested items -->
+                            <li>
+                                <button id="toggleFoodIntake" class="menu-btn">
+                                    Food Intake <span class="arrow">▼</span>
+                                </button>
+                                <ul id="foodIntakeMenu" class="submenu">
+                                    <li>
+                                        <a href="javascript:void(0);" class="load-foodintake-view"
+                                           data-url="@Url.Action("GetFoodIntakeList", "Patient")">
+                                            View Food Intake
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);" class="load-foodintake-add"
+                                           data-url="@Url.Action("GetFoodIntakeAdd", "Patient")">
+                                            Add Food Intake
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+
+
+                    <li id="toggleProgressMenu" style="display: none;">
+                        <button id="toggleProgressNote" class="menu-btn">
+                            Progress Note <span class="arrow">▼</span>
+                        </button>
+
+                        <ul id="progressMenu" class="submenu">
+                            <li><a href="javascript:void(0);" class="load-patient-note" data-url="@Url.Action("GetProgressNoteList", "Patient")">Progress Note - List</a></li>
+                            <li><a href="javascript:void(0);" class="load-patient-addnote" data-url="@Url.Action("GetProgressNote", "Patient")">Progress Note - Add</a></li>
+                        </ul>
+
+                    </li>
+
+                    @if (User.HasClaim(c => c.Value == "supervisor"))
+                    {
+                        <li id="togglePatientUsecaseMenu" style="display: none;">
+                            <button id="toggleUsecase" class="menu-btn">
+                                Patient Use Cases <span class="arrow">▼</span>
+                            </button>
+
+                            <ul id="usecaseMenu" class="submenu">
+                                <li><a href="javascript:void(0);" class="load-neurological-record" data-url="@Url.Action("GetNeurologicalRecord", "Supervisor")">Add Neurological Record </a></li>
+                                <li><a href="javascript:void(0);" class="load-fluid-record" data-url="@Url.Action("GetFluidRecord", "Supervisor")">Add Fluid Balance Record</a></li>
+                                <li><a href="javascript:void(0);" class="load-member-order" data-url="@Url.Action("GetMemberOrder", "Supervisor")">Add IV Fluid Order</a></li>
+                                <li><a href="javascript:void(0);" class="load-medication-prn" data-url="@Url.Action("GetMedicationPrn", "Supervisor")">Add Medication - PRN</a></li>
+                                <li><a href="javascript:void(0);" class="load-medication-regular" data-url="@Url.Action("GetMedicationRegular", "Supervisor")">Add Medication - REGULAR</a></li>
+
+                            </ul>
+                        </li>
+
+                        <li id="toggleSettingsMenu">
+                            <button id="toggleSettings" class="menu-btn">
+                                Settings <span class="arrow">▼</span>
+                            </button>
+
+                            <ul id="settingsMenu" class="submenu">
+                                <li><a href="javascript:void(0);" class="load-add-patient" data-url="@Url.Action("GetPatient", "Supervisor")">Add Patient</a></li>
+                                <li><a href="javascript:void(0);" class="load-add-medication" data-url="@Url.Action("GetMedication", "Supervisor")">Add Medication Name</a></li>
+                                <li><a href="javascript:void(0);" class="load-supervisor-patient" data-url="@Url.Action("GetSupervisorPatientList", "Supervisor")">Clear Student Data</a></li>
+                                <li><a href="javascript:void(0);" class="load-supervisor-lab" data-url="@Url.Action("GetSupervisorLabList", "Supervisor")">Clear Lab Data</a></li>
+                            </ul>
+                        </li>
+                    }
+
+                </ul>
+            </nav>
+
+            <!-- Main content (ADDED id) -->
+            <main role="main" id="appMain" class="col-md-10 pb-3">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+    <!-- Global EMR context (used by all modules) -->
+    <input type="hidden" id="txtLabId" />
+    <input type="hidden" id="txtPatientId" />
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+<script>
+    window.addEventListener("beforeunload", function () {
+        fetch('/Account/Logout', {
+            method: 'POST',
+            credentials: 'same-origin'
+        });
+    });
+
+    $(document).ready(function () {
+
+        // --- RISKMAN visibility controller (added) ---
+        function updateRiskmanVisibility() {
+            const hasPatient = ($('#txtPatientId').val() || '').trim() !== '';
+            if (hasPatient) {
+                $('#toggleRiskmanMenu').hide();   // hide RISKMAN in patient context
+            } else {
+                $('#toggleRiskmanMenu').show();   // show RISKMAN on global/home
+            }
+        }
+        // Run on load
+        updateRiskmanVisibility();
+        // Re-check on any AJAX completion (keeps it in sync after loads)
+        $(document).ajaxComplete(function () {
+            updateRiskmanVisibility();
+        });
+        // If any code elsewhere sets patient id directly, this will catch it too
+        $(document).on('change keyup', '#txtPatientId', updateRiskmanVisibility);
+        // --- end RISKMAN visibility controller ---
+
+        $("#toggleFlowSheet").on("click", function () {
+            $("#flowSheetMenu").toggleClass("show");
+        });
+
+        $("#toggleMedicationChart").on("click", function () {
+            $("#medicationChartMenu").toggleClass("show");
+        });
+
+        $("#toggleNeurologicalChart").on("click", function () {
+            $("#neurologicalChartMenu").toggleClass("show");
+        });
+
+        $("#toggleFluidBalanceChart").on("click", function () {
+            $("#fluidBalanceChartMenu").toggleClass("show");
+        });
+
+        $("#toggleProgressNote").on("click", function () {
+            $("#progressMenu").toggleClass("show");
+        });
+
+        $("#toggleUsecase").on("click", function () {
+            $("#usecaseMenu").toggleClass("show");
+        });
+
+        $("#toggleSettings").on("click", function () {
+            $("#settingsMenu").toggleClass("show");
+        });
+
+        // Core loads
+        $('.load-patient-list').on('click', function (e) {
+            e.preventDefault();
+            $("#toggleRecordMenu").hide();
+            $("#toggleProgressMenu").hide();
+            $("#togglePatientUsecaseMenu").hide();
+
+            $('#txtPatientId').val("");
+            updateRiskmanVisibility();
+
+            var pageUrl = $(this).data('url');
+            var LabId = $('#txtLabId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#patient-header').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-patient-adds').on('click', function (e) {
+            e.preventDefault();
+            var pageUrl = $(this).data('url');
+            var LabId = $('#txtLabId').val();
+            var PatientId = $('#txtPatientId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-patient-ivfluid').on('click', function (e) {
+            e.preventDefault();
+            var pageUrl = $(this).data('url');
+            var LabId = $('#txtLabId').val();
+            var PatientId = $('#txtPatientId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-patient-fluidbalance').on('click', function (e) {
+            e.preventDefault();
+            var pageUrl = $(this).data('url');
+
+            var LabId = $('#txtLabId').val();
+            var PatientId = $('#txtPatientId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-patient-fluidbalance-add').on('click', function (e) {
+            e.preventDefault();
+            var pageUrl = $(this).data('url');
+
+            var LabId = $('#txtLabId').val();
+            var PatientId = $('#txtPatientId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-patient-neurological').on('click', function (e) {
+            e.preventDefault();
+            var pageUrl = $(this).data('url');
+
+            var LabId = $('#txtLabId').val();
+            var PatientId = $('#txtPatientId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-patient-neurological-add').on('click', function (e) {
+            e.preventDefault();
+            var pageUrl = $(this).data('url');
+
+            var LabId = $('#txtLabId').val();
+            var PatientId = $('#txtPatientId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-patient-prn').on('click', function (e) {
+            e.preventDefault();
+            var pageUrl = $(this).data('url');
+            var LabId = $('#txtLabId').val();
+            var PatientId = $('#txtPatientId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-patient-regular').on('click', function (e) {
+            e.preventDefault();
+            var pageUrl = $(this).data('url');
+            var LabId = $('#txtLabId').val();
+            var PatientId = $('#txtPatientId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-patient-note').on('click', function (e) {
+            e.preventDefault();
+            var pageUrl = $(this).data('url');
+            var LabId = $('#txtLabId').val();
+            var PatientId = $('#txtPatientId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-patient-addnote').on('click', function (e) {
+            e.preventDefault();
+            var pageUrl = $(this).data('url');
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-member-order').on('click', function (e) {
+            e.preventDefault();
+            var pageUrl = $(this).data('url');
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-fluid-record').on('click', function (e) {
+            e.preventDefault();
+            var pageUrl = $(this).data('url');
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-neurological-record').on('click', function (e) {
+            e.preventDefault();
+            var pageUrl = $(this).data('url');
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-medication-prn').on('click', function (e) {
+            e.preventDefault();
+            var pageUrl = $(this).data('url');
+            var LabId = $('#txtLabId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-medication-regular').on('click', function (e) {
+            e.preventDefault();
+            var pageUrl = $(this).data('url');
+            var LabId = $('#txtLabId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-supervisor-patient').on('click', function (e) {
+            e.preventDefault();
+            $("#toggleRecordMenu").hide();
+            $("#toggleProgressMenu").hide();
+            $("#togglePatientUsecaseMenu").hide();
+
+            $('#txtPatientId').val("");
+            updateRiskmanVisibility();
+
+            var pageUrl = $(this).data('url');
+            var LabId = $('#txtLabId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#patient-header').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-supervisor-lab').on('click', function (e) {
+            e.preventDefault();
+            $("#toggleRecordMenu").hide();
+            $("#toggleProgressMenu").hide();
+            $("#togglePatientUsecaseMenu").hide();
+
+            $('#txtPatientId').val("");
+            updateRiskmanVisibility();
+
+            var pageUrl = $(this).data('url');
+            var LabId = $('#txtLabId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#patient-header').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-add-patient').on('click', function (e) {
+            e.preventDefault();
+            $("#toggleRecordMenu").hide();
+            $("#toggleProgressMenu").hide();
+            $("#togglePatientUsecaseMenu").hide();
+
+            $('#txtPatientId').val("");
+            updateRiskmanVisibility();
+
+            var pageUrl = $(this).data('url');
+            var LabId = $('#txtLabId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#patient-header').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-add-medication').on('click', function (e) {
+            e.preventDefault();
+            $("#toggleRecordMenu").hide();
+            $("#toggleProgressMenu").hide();
+            $("#togglePatientUsecaseMenu").hide();
+
+            $('#txtPatientId').val("");
+            updateRiskmanVisibility();
+
+            var pageUrl = $(this).data('url');
+            var LabId = $('#txtLabId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-logout').on('click', function () {
+            $('#txtPatientId').val("");
+            $('#txtLabId').val("");
+            updateRiskmanVisibility();
+            window.location.href = "/account/emrlogin";
+        });
+
+        // ---------------- FRAT HANDLERS (added) ----------------
+        $('.load-patient-frat').on('click', function (e) {
+            e.preventDefault();
+            var pageUrl   = $(this).data('url');   // /Patient/GetPatientFallRiskChart
+            var LabId     = $('#txtLabId').val();
+            var PatientId = $('#txtPatientId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                    $('#flowSheetMenu a').removeClass('active');
+                    $('.load-patient-frat').addClass('active');
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading FRAT:", error);
+                }
+            });
+        });
+
+        $('.load-patient-frat-list').on('click', function (e) {
+            e.preventDefault();
+            var pageUrl   = $(this).data('url');   // /Patient/GetPatientFallRiskList
+            var LabId     = $('#txtLabId').val();
+            var PatientId = $('#txtPatientId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                    $('#flowSheetMenu a').removeClass('active');
+                    $('.load-patient-frat-list').addClass('active');
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading FRAT List:", error);
+                }
+            });
+        });
+        // --------------------------------------------------------
+    });
+
+    // Existing RISKMAN handlers (unchanged)
+    $("#toggleRiskman").on("click", function () {
+        $("#riskmanMenu").toggleClass("show");
+    });
+
+    $('.load-riskman-add').on('click', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: $(this).data('url'),
+            method: "GET",
+            success: function (response) {
+                $('#content-area').html(response);
+            }
+        });
+    });
+
+    $('.load-riskman-list').on('click', function (e) {
+        e.preventDefault();
+        let LabId = $('#txtLabId').val();
+        let PatientId = $('#txtPatientId').val();
+        $.ajax({
+            url: $(this).data('url'),
+            method: "GET",
+            data: { labId: LabId, patientId: PatientId },
+            success: function (response) {
+                $('#content-area').html(response);
+            }
+        });
+    });
+
+    // REPLACE your existing $('.load-braden-add') handler with this version
+    $('.load-braden-add').on('click', function (e) {
+        e.preventDefault();
+
+        var addUrl    = $(this).data('url');           // /Patient/GetBradenAdd
+        var LabId     = $('#txtLabId').val();
+        var PatientId = $('#txtPatientId').val();
+
+        // Pre-check: do any Braden rows already exist?
+        $.get("/Patient/GetBradenAssessmentList", { labId: LabId, patientId: PatientId })
+          .done(function (html) {
+              var $tmp = $('<div>').html(html);
+              var hasRows = $tmp.find('#bradenTable tbody tr').length > 0;
+
+              if (hasRows) {
+                  // Initial exists → show list + info modal
+                  $('#content-area').html(html);
+
+                  // If the list’s modal is present, show a clear message
+                  var $hdr = $('#bradenInfoHeader');
+                  if ($hdr.length) {
+                      $hdr.removeClass("bg-success bg-danger text-white text-dark")
+                          .addClass("bg-warning text-dark");
+                      $('#bradenInfoMessage').text(
+                          "An initial Braden assessment already exists. Use ‘Add Assessment’ to record follow-ups."
+                      );
+                      new bootstrap.Modal(document.getElementById('bradenInfoModal')).show();
+                  }
+              } else {
+                  // No initial → proceed to Add form (original behavior)
+                  $.ajax({
+                      url: addUrl,
+                      method: "GET",
+                      data: { labId: LabId, patientId: PatientId },
+                      success: function (response) { $('#content-area').html(response); },
+                      error: function (xhr, status, error) {
+                          console.error("Error loading Braden Add:", error);
+                      }
+                  });
+              }
+          })
+          .fail(function () {
+              // If pre-check fails, fall back to original Add load (don’t block the user)
+              $.ajax({
+                  url: addUrl,
+                  method: "GET",
+                  data: { labId: LabId, patientId: PatientId },
+                  success: function (response) { $('#content-area').html(response); },
+                  error: function (xhr, status, error) {
+                      console.error("Error loading Braden Add:", error);
+                  }
+              });
+          });
+    });
+
+    $("#toggleBraden").on("click", function () {
+        $("#bradenMenu").toggleClass("show");
+    });
+
+    $('.load-braden-view').on('click', function (e) {
+        e.preventDefault();
+
+        var pageUrl   = $(this).data('url');
+        var LabId     = $('#txtLabId').val();
+        var PatientId = $('#txtPatientId').val();
+
+        $.ajax({
+            url: pageUrl,
+            method: "GET",
+            data: { labId: LabId, patientId: PatientId },
+            success: function (response) {
+                $('#content-area').html(response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error loading Braden list:", error);
+            }
+        });
+    });
+
+    $("#toggleFoodIntake").on("click", function () {
+        $("#foodIntakeMenu").toggleClass("show");
+    });
+
+    // VIEW Food Intake (list)
+    $('.load-foodintake-view').on('click', function (e) {
+        e.preventDefault();
+
+        var pageUrl   = $(this).data('url'); // /Patient/GetFoodIntakeList
+        var LabId     = $('#txtLabId').val();
+        var PatientId = $('#txtPatientId').val();
+
+        $.ajax({
+            url: pageUrl,
+            method: "GET",
+            data: { labId: LabId, patientId: PatientId },
+            success: function (response) {
+                $('#content-area').html(response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error loading Food Intake list:", error);
+            }
+        });
+    });
+
+    // ADD Food Intake (form)
+    $('.load-foodintake-add').on('click', function (e) {
+        e.preventDefault();
+
+        var pageUrl   = $(this).data('url'); // /Patient/GetFoodIntakeAdd
+        var LabId     = $('#txtLabId').val();
+        var PatientId = $('#txtPatientId').val();
+
+        $.ajax({
+            url: pageUrl,
+            method: "GET",
+            data: { labId: LabId, patientId: PatientId },
+            success: function (response) {
+                $('#content-area').html(response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error loading Food Intake add:", error);
+            }
+        });
+    });
+</script>

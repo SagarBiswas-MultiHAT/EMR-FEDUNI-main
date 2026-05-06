@@ -1,0 +1,934 @@
+﻿@model EMRSimulationWebApp.Models.BradenAddViewModel
+@{
+    ViewData["Title"] = "Add Braden Scale";
+}
+
+<div class="container-fluid p-3">
+
+    <!-- Black header bar -->
+    <div class="text-center text-white py-2 mb-4" style="background-color:#000000; border-radius:6px;">
+        <h4 class="mb-0">Braden Scale – Pressure Injury Risk Assessment</h4>
+    </div>
+
+    <!-- Hidden IDs for later save -->
+    <input type="hidden" id="bradenLabId" value="@Model.LabId" />
+    <input type="hidden" id="bradenPatientId" value="@Model.PatientId" />
+
+    <!-- ===== NEW: Boxed Guidance Block ===== -->
+    <div class="border rounded p-3 mb-4 shadow-sm" style="background-color:#f9f9f9;">
+        <div class="fw-bold mb-2" style="color:#C62828; font-size:1.1rem;">
+            PRESSURE INJURY – Prevention and Management
+        </div>
+        <ol class="mb-0 ps-3">
+            <li>Complete BRADEN Scale on admission, TDS, on change of condition &amp; transfer/discharge</li>
+            <li>Use Risk Score &amp; clinical judgement (consider Age, co-morbidities &amp; past history of PI) to determine Risk Level</li>
+            <li>Complete skin check on admission noting existing Pressure Injury, follow-up skin checks to be repeated TDS</li>
+            <li>Patients with existing Pressure Injury, risk level automatically defaults to Very High</li>
+            <li>For High and Very High risk patients – initiate Pressure Injury Prevention &amp; Management Plan MR/202.5</li>
+        </ol>
+    </div>
+
+    <!-- ===== END NEW ===== -->
+    <!-- ===== BRADEN SCALE TABLE (Initial single assessment) ===== -->
+    <div class="table-responsive mb-4">
+        <table class="br-table">
+            <thead>
+                <tr>
+                    <th class="br-factor">Risk Factor</th>
+                    <th class="br-desc">Score / Description</th>
+                    <th class="br-assess">
+                        <div class="mb-1">Date of Assessment</div>
+                        <input type="date" id="brDate1" class="form-control form-control-sm"
+                               value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        <div class="mt-2">Shift</div>
+                        <select id="brShift1" class="form-select form-select-sm mt-1">
+                            <option value="">-- Select Shift --</option>
+                            <option value="Morning">Morning</option>
+                            <option value="Afternoon">Afternoon</option>
+                            <option value="Night">Night</option>
+                        </select>
+
+
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <!-- 1) Sensory Perception -->
+                <tr>
+                    <td class="br-factor" rowspan="4">
+                        <strong>Sensory perception</strong>
+                        <div class="br-muted">Ability to respond meaningfully to pressure-related discomfort</div>
+                    </td>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="sensory" value="1" data-factor="sensory" data-score="1" id="sensory1" />
+                            <label for="sensory1" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Unresponsive (does not moan, flinch or grasp) to painful stimuli due to diminished level of consciousness or sedation.<br><b>OR</b><br>Limited ability to feel pain or discomfort over most of body surface.">
+                                <strong>1 – Completely limited</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="br-assess" rowspan="4">
+                        <div id="assess-sensory" class="br-assess-box">&nbsp;</div>
+                        <div class="br-qiline">
+                            <small class="text-muted">Quick intervention:</small>
+                            <span id="qi-sensory" class="br-qi-text">—</span>
+                        </div>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="sensory" value="2" data-factor="sensory" data-score="2" id="sensory2" />
+                            <label for="sensory2" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Responds only to painful stimuli; cannot communicate discomfort except by moaning or restlessness.<br><b>OR</b><br>Has a sensory impairment which limits ability to feel pain/discomfort in ≥ 1/2 of body.">
+                                <strong>2 – Very limited</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="sensory" value="3" data-factor="sensory" data-score="3" id="sensory3" />
+                            <label for="sensory3" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Responds to verbal commands but cannot always communicate discomfort or need to be turned.<br><b>OR</b><br>Has some sensory impairment that limits ability to feel pain or discomfort in 1–2 extremities.">
+                                <strong>3 – Slightly limited</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="sensory" value="4" data-factor="sensory" data-score="4" id="sensory4" />
+                            <label for="sensory4" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Responds to verbal commands. No sensory deficit which would limit ability to feel or voice pain/discomfort.">
+                                <strong>4 – No impairment</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- 2) Moisture -->
+                <tr>
+                    <td class="br-factor" rowspan="4">
+                        <strong>Moisture</strong>
+                        <div class="br-muted">Degree skin is exposed to moisture</div>
+                    </td>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="moisture" value="1" data-factor="moisture" data-score="1" id="moisture1" />
+                            <label for="moisture1" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Skin is kept moist almost constantly by perspiration, urine, etc. Dampness is detected every time patient is moved or turned.">
+                                <strong>1 – Constantly moist</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="br-assess" rowspan="4">
+                        <div id="assess-moisture" class="br-assess-box">&nbsp;</div>
+                        <div class="br-qiline">
+                            <small class="text-muted">Quick intervention:</small>
+                            <span id="qi-moisture" class="br-qi-text">—</span>
+                        </div>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="moisture" value="2" data-factor="moisture" data-score="2" id="moisture2" />
+                            <label for="moisture2" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Skin is often but not always moist. Linen must be changed at least once per shift.">
+                                <strong>2 – Very moist</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="moisture" value="3" data-factor="moisture" data-score="3" id="moisture3" />
+                            <label for="moisture3" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Skin is occasionally moist, requiring an extra linen change approximately once a day.">
+                                <strong>3 – Occasionally moist</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="moisture" value="4" data-factor="moisture" data-score="4" id="moisture4" />
+                            <label for="moisture4" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Skin is usually dry. Linen only requires changing at routine intervals.">
+                                <strong>4 – Rarely moist</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- 3) Activity -->
+                <tr>
+                    <td class="br-factor" rowspan="4">
+                        <strong>Activity</strong>
+                        <div class="br-muted">Degree of physical activity</div>
+                    </td>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="activity" value="1" data-factor="activity" data-score="1" id="activity1" />
+                            <label for="activity1" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Confined to bed.">
+                                <strong>1 – Bedfast</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="br-assess" rowspan="4">
+                        <div id="assess-activity" class="br-assess-box">&nbsp;</div>
+                        <div class="br-qiline">
+                            <small class="text-muted">Quick intervention:</small>
+                            <span id="qi-activity" class="br-qi-text">—</span>
+                        </div>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="activity" value="2" data-factor="activity" data-score="2" id="activity2" />
+                            <label for="activity2" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Ability to walk severely limited or nonexistent. Cannot bear own weight and/or must be assisted into chair or wheelchair.">
+                                <strong>2 – Chair fast</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="activity" value="3" data-factor="activity" data-score="3" id="activity3" />
+                            <label for="activity3" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Walks occasionally during day, but for very short distances, with or without assistance. Spends majority of each shift in bed or chair.">
+                                <strong>3 – Walks occasionally</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="activity" value="4" data-factor="activity" data-score="4" id="activity4" />
+                            <label for="activity4" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Walks outside the room at least twice a day and inside room at least once every 2 hours during waking hours.">
+                                <strong>4 – Walks frequently</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- 4) Mobility -->
+                <tr>
+                    <td class="br-factor" rowspan="4">
+                        <strong>Mobility</strong>
+                        <div class="br-muted">Ability to change and control body position</div>
+                    </td>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="mobility" value="1" data-factor="mobility" data-score="1" id="mobility1" />
+                            <label for="mobility1" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Does not make even slight changes in body or extremity position without assistance.">
+                                <strong>1 – Completely immobile</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="br-assess" rowspan="4">
+                        <div id="assess-mobility" class="br-assess-box">&nbsp;</div>
+                        <div class="br-qiline">
+                            <small class="text-muted">Quick intervention:</small>
+                            <span id="qi-mobility" class="br-qi-text">—</span>
+                        </div>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="mobility" value="2" data-factor="mobility" data-score="2" id="mobility2" />
+                            <label for="mobility2" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Makes occasional slight changes in body or extremity position but unable to make frequent or significant changes independently.">
+                                <strong>2 – Very limited</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="mobility" value="3" data-factor="mobility" data-score="3" id="mobility3" />
+                            <label for="mobility3" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Makes frequent though slight changes in body or extremity position independently.">
+                                <strong>3 – Slightly limited</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="mobility" value="4" data-factor="mobility" data-score="4" id="mobility4" />
+                            <label for="mobility4" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Makes major and frequent changes in position without assistance.">
+                                <strong>4 – No limitations</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- 5) Nutrition -->
+                <tr>
+                    <td class="br-factor" rowspan="4">
+                        <strong>Nutrition</strong>
+                        <div class="br-muted">Usual food intake pattern</div>
+                    </td>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="nutrition" value="1" data-factor="nutrition" data-score="1" id="nutrition1" />
+                            <label for="nutrition1" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Never eats a complete meal. Rarely eats more than &lt; 1/3 of food offered. Eats ≤ 2 servings of protein/day (meat or dairy). Takes fluids poorly; does not take a liquid dietary supplement.<br><b>OR</b><br>Is NPO and/or on clear liquids or IV fluids for more than 5 days.">
+                                <strong>1 – Very poor</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="br-assess" rowspan="4">
+                        <div id="assess-nutrition" class="br-assess-box">&nbsp;</div>
+                        <div class="br-qiline">
+                            <small class="text-muted">Quick intervention:</small>
+                            <span id="qi-nutrition" class="br-qi-text">—</span>
+                        </div>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="nutrition" value="2" data-factor="nutrition" data-score="2" id="nutrition2" />
+                            <label for="nutrition2" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Rarely eats a complete meal and generally eats only about 1/2 of any food offered. Protein intake includes only 3 servings/day of meat or dairy products. Occasionally will take a supplement if offered.<br><b>OR</b><br>Receives less than optimum amount of liquid diet or tube feeding.">
+                                <strong>2 – Probably inadequate</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="nutrition" value="3" data-factor="nutrition" data-score="3" id="nutrition3" />
+                            <label for="nutrition3" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Eats more than half of most meals. Eats 4 servings of protein (meat, dairy) each day. May occasionally refuse a meal but will usually take a supplement if offered.<br><b>OR</b><br>On a tube feeding or TPN regimen that probably meets most nutritional needs.">
+                                <strong>3 – Adequate</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="nutrition" value="4" data-factor="nutrition" data-score="4" id="nutrition4" />
+                            <label for="nutrition4" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Eats most of every meal and never refuses a meal. Usually eats a total of 4 or more servings of meat and dairy products. Occasionally eats between meals; does not require supplementation.">
+                                <strong>4 – Excellent</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- 6) Friction & Shear -->
+                <tr>
+                    <td class="br-factor" rowspan="3">
+                        <strong>Friction &amp; Shear</strong>
+                    </td>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="friction" value="1" data-factor="friction" data-score="1" id="friction1" />
+                            <label for="friction1" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Requires moderate to maximum assistance in moving. Complete lifting without sliding against sheets is impossible. Frequently slides down in bed or chair; requires frequent repositioning with maximum assistance. Spasticity, contractures or agitation lead to almost constant friction.">
+                                <strong>1 – Problem</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="br-assess" rowspan="3">
+                        <div id="assess-friction" class="br-assess-box">&nbsp;</div>
+                        <div class="br-qiline">
+                            <small class="text-muted">Quick intervention:</small>
+                            <span id="qi-friction" class="br-qi-text">—</span>
+                        </div>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="friction" value="2" data-factor="friction" data-score="2" id="friction2" />
+                            <label for="friction2" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Moves feebly or requires minimum assistance. During a move, skin probably slides to some extent against sheets, chair restraints, or other devices. Maintains relatively good position in chair or bed most of the time but occasionally slides down.">
+                                <strong>2 – Potential problem</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="br-desc">
+                        <div class="br-option">
+                            <input type="radio" name="friction" value="3" data-factor="friction" data-score="3" id="friction3" />
+                            <label for="friction3" class="br-pop" tabindex="0"
+                                   data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                   data-bs-placement="right" data-bs-html="true"
+                                   data-bs-content="Moves in bed and in chair independently and has sufficient muscle strength to lift up completely during movement. Maintains good position in bed or chair at all times.">
+                                <strong>3 – No apparent problem</strong><span class="info-icon ms-1">ⓘ</span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Total & Risk -->
+                <tr class="br-total-row">
+                    <td colspan="2" class="text-end"><strong>Total Score:</strong></td>
+                    <td class="text-center">
+                        <div id="brTotal" class="br-assess-box">&nbsp;</div>
+                        <div id="brKey" class="mt-2" style="display:none;">
+                            <span class="br-key-pill">Risk: <span id="brRiskText"></span></span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="text-end"><strong>Nurse Initials:</strong></td>
+                    <td><input type="text" id="brNurseInitials" class="form-control form-control-sm" maxlength="6" placeholder="e.g., C.W" /></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Save Button -->
+    <div class="row mt-4">
+        <div class="col-md-12 text-end">
+            <button type="button" id="btnSubmitBraden" class="btn btn-primary"
+                    style="background-color:#FF8A30; color:#fff;">
+                Save
+            </button>
+        </div>
+    </div>
+    <!-- Message Label -->
+    <div class="row mt-2">
+        <div class="col-md-12">
+            <label id="lblBradenMessage" style="color:green"></label>
+        </div>
+    </div>
+    <!-- ===== Intervention Guidelines Collapsible ===== -->
+    <div class="accordion mt-4" id="interventionGuidelines">
+
+        <!-- Main Collapse Trigger -->
+        <div class="accordion-item shadow-sm">
+            <h2 class="accordion-header" id="headingMain">
+                <button class="accordion-button collapsed fw-bold text-white"
+                        style="background-color:#FF8A30;"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseMain"
+                        aria-expanded="false"
+                        aria-controls="collapseMain">
+                    Intervention Guidelines
+                </button>
+            </h2>
+            <div id="collapseMain" class="accordion-collapse collapse"
+                 aria-labelledby="headingMain"
+                 data-bs-parent="#interventionGuidelines">
+                <div class="accordion-body">
+
+                    <!-- Inner Accordion for 6 Factors -->
+                    <div class="accordion" id="accordionFactors">
+
+                        <!-- Sensory Perception -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingSensory">
+                                <button class="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapseSensory"
+                                        aria-expanded="false"
+                                        aria-controls="collapseSensory">
+                                    Sensory Perception
+                                </button>
+                            </h2>
+                            <div id="collapseSensory" class="accordion-collapse collapse"
+                                 aria-labelledby="headingSensory"
+                                 data-bs-parent="#accordionFactors">
+                                <div class="accordion-body">
+                                    <ul class="mb-0">
+                                        <li><strong>4 – No Impairment:</strong> Encourage client to report pain over bony prominences. Check heels daily.</li>
+                                        <li><strong>3 – Slightly Limited:</strong> Assess and inspect skin every shift (pay special attention to heels). Elevate heels and use protectors.</li>
+                                        <li><strong>2 – Very Limited:</strong> All interventions in <em>3 – Slightly Limited</em> plus: consider specialty mattress or bed.</li>
+                                        <li><strong>1 – Completely Limited:</strong> All interventions in <em>2 – Very Limited</em> plus: use pillows between knees and bony prominences to avoid direct contact.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Moisture -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingMoisture">
+                                <button class="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapseMoisture"
+                                        aria-expanded="false"
+                                        aria-controls="collapseMoisture">
+                                    Moisture
+                                </button>
+                            </h2>
+                            <div id="collapseMoisture" class="accordion-collapse collapse"
+                                 aria-labelledby="headingMoisture"
+                                 data-bs-parent="#accordionFactors">
+                                <div class="accordion-body">
+                                    <ul class="mb-0">
+                                        <li><strong>4 – Rarely Moist:</strong> Encourage the client to use lotion to prevent skin cracks. Encourage reporting of any moisture problem (e.g., under breasts).</li>
+                                        <li>
+                                            <strong>3 – Occasionally Moist:</strong> All interventions in <em>4 – Rarely Moist</em> plus:
+                                            <ul>
+                                                <li>Use moisture barrier ointments.</li>
+                                                <li>Moisturize dry unbroken skin.</li>
+                                                <li>Avoid hot water; use mild soap and cloths.</li>
+                                                <li>Routinely check incontinence pads.</li>
+                                                <li>Avoid diapers or change every 2–3 hours.</li>
+                                                <li>If stool incontinence, consider bowel training/toileting after meals.</li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <strong>2 – Often Moist:</strong> All interventions in <em>3 – Occasionally Moist</em> plus:
+                                            <ul>
+                                                <li>Check incontinence pads every 2–3 hours.</li>
+                                                <li>Consider a low air loss bed.</li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <strong>1 – Constantly Moist:</strong> All interventions in <em>2 – Often Moist</em> plus:
+                                            <ul>
+                                                <li>Inspect skin every shift.</li>
+                                                <li>Check incontinence pads every 2–3 hours.</li>
+                                                <li>Apply condom catheter if appropriate.</li>
+                                                <li>If stool incontinence, consider bowel training or rectal tubes.</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Activity -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingActivity">
+                                <button class="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapseActivity"
+                                        aria-expanded="false"
+                                        aria-controls="collapseActivity">
+                                    Activity
+                                </button>
+                            </h2>
+                            <div id="collapseActivity" class="accordion-collapse collapse"
+                                 aria-labelledby="headingActivity"
+                                 data-bs-parent="#accordionFactors">
+                                <div class="accordion-body">
+                                    <ul class="mb-0">
+                                        <li><strong>4 – Walks Frequently:</strong> Encourage ambulation outside the room. Check skin daily. Monitor balance and endurance.</li>
+                                        <li><strong>3 – Walks Occasionally:</strong> Provide structured mobility plan. Consider a chair cushion. Consider PT consult.</li>
+                                        <li><strong>2 – Chair Fast:</strong> Specialty chair pad. Ensure postural alignment &amp; stability. Reposition q15min in chair. Stand hourly. Pad bony prominences. PT consult.</li>
+                                        <li><strong>1 – Bedfast:</strong> Skin check every shift. Elevate head &le;30&deg;. Use pillows for pressure relief. Specialty beds. Elevate heels. PT consult. Turn/reposition q1–2 hrs. Post turning schedule. Teach frequent small shifts.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mobility -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingMobility">
+                                <button class="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapseMobility"
+                                        aria-expanded="false"
+                                        aria-controls="collapseMobility">
+                                    Mobility
+                                </button>
+                            </h2>
+                            <div id="collapseMobility" class="accordion-collapse collapse"
+                                 aria-labelledby="headingMobility"
+                                 data-bs-parent="#accordionFactors">
+                                <div class="accordion-body">
+                                    <ul class="mb-0">
+                                        <li><strong>4 – No Limitations:</strong> Check skin daily. Encourage ambulation twice daily. No interventions required.</li>
+                                        <li><strong>3 – Slightly Limited:</strong> Check skin daily. Turn/reposition frequently. Teach frequent small shifts. PT consult. Use gait belt.</li>
+                                        <li><strong>2 – Very Limited:</strong> Skin check every shift. Turn/reposition q1–2 hrs. Post turning schedule. Elevate heels. Specialty bed consideration.</li>
+                                        <li><strong>1 – Completely Immobile:</strong> Same interventions as <em>2 – Very Limited</em>.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nutrition -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingNutrition">
+                                <button class="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapseNutrition"
+                                        aria-expanded="false"
+                                        aria-controls="collapseNutrition">
+                                    Nutrition
+                                </button>
+                            </h2>
+                            <div id="collapseNutrition" class="accordion-collapse collapse"
+                                 aria-labelledby="headingNutrition"
+                                 data-bs-parent="#accordionFactors">
+                                <div class="accordion-body">
+                                    <ul class="mb-0">
+                                        <li><strong>4 – Excellent:</strong> Move out of bed for meals. Offer food choices. Offer supplements. Plan with provider if NPO &gt;24 hrs. Record dietary intake.</li>
+                                        <li><strong>3 – Adequate:</strong> Monitor intake. Plan with provider if NPO &gt;24 hrs. Record intake/I&amp;O.</li>
+                                        <li><strong>2 – Probably Inadequate:</strong> All interventions of <em>3 – Adequate</em> plus: Encourage fluids. Dietary consult. Offer supplements. Encourage family food. Provide small, frequent meals.</li>
+                                        <li><strong>1 – Very Poor:</strong> All interventions of <em>2 – Probably Inadequate</em> plus: Skin assessment every shift.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Friction & Shear -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingFriction">
+                                <button class="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapseFriction"
+                                        aria-expanded="false"
+                                        aria-controls="collapseFriction">
+                                    Friction &amp; Shear
+                                </button>
+                            </h2>
+                            <div id="collapseFriction" class="accordion-collapse collapse"
+                                 aria-labelledby="headingFriction"
+                                 data-bs-parent="#accordionFactors">
+                                <div class="accordion-body">
+                                    <ul class="mb-0">
+                                        <li><strong>3 – No Apparent Problem:</strong> Keep bed linens clean, dry, wrinkle-free.</li>
+                                        <li><strong>2 – Potential Problem:</strong> All interventions of <em>3 – No Apparent Problem</em> plus: Avoid massaging pressure points. Transparent dressings/elbow-heel protectors.</li>
+                                        <li><strong>1 – Problem:</strong> All interventions of <em>2 – Potential Problem</em> plus: Skin check every shift. 2-person + draw sheet for repositioning. Linens wrinkle-free. Apply elbow/heel protectors. Elevate head &le;30&deg; when feasible.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div><!-- end inner accordion -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="bradenModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" id="bradenModalHeader">
+                <h5 class="modal-title">Notice</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="bradenModalMessage">
+                <!-- message injected here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+            // --- Early guard: if an initial already exists, don’t let the user fill this page ---
+    (function earlyGuard() {
+      var labId     = $("#bradenLabId").val();
+      var patientId = $("#bradenPatientId").val();
+
+      if (!labId || !patientId) return; // no context — skip guard
+
+      $.get("/Patient/GetBradenAssessmentList", { labId: labId, patientId: patientId })
+        .done(function (html) {
+          var hasRows = $('<div>').html(html).find('#bradenTable tbody tr').length > 0;
+          if (!hasRows) return; // no initial — allow Add page
+
+          // Initial exists — show this page's modal first
+          $("#bradenModalHeader").removeClass("bg-success text-white").addClass("bg-danger text-white");
+          $("#bradenModalMessage").text(
+            "An initial Braden assessment already exists. Use View Braden Scale → Add Assessment to record follow-ups."
+          );
+
+          var modalEl = document.getElementById("bradenModal");
+          var modal   = new bootstrap.Modal(modalEl);
+          modal.show();
+
+          // After close, load the list and show a gentle reminder there too
+          modalEl.addEventListener('hidden.bs.modal', function () {
+            $("#content-area").html(html);
+
+            var $hdr = $("#bradenInfoHeader");
+            if ($hdr.length) {
+              $hdr.removeClass("bg-success bg-danger text-white text-dark").addClass("bg-warning text-dark");
+              $("#bradenInfoMessage").text("Initial exists — use ‘Add Assessment’ to add follow-ups.");
+              new bootstrap.Modal(document.getElementById("bradenInfoModal")).show();
+            }
+          }, { once: true });
+        });
+    })();
+
+      // Enable Bootstrap popovers
+      var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+      popoverTriggerList.map(function (el) { return new bootstrap.Popover(el); });
+
+          // Quick-intervention one-liners per (factor, score)
+
+    const QI = {
+      sensory: {
+        4: "Report pain over bony areas; daily heel check; routine skin care.",
+        3: "Skin check each shift (focus heels); elevate/offload heels; use protectors.",
+        2: "All of 3 + turn/reposition q2h; consider specialty mattress/bed.",
+        1: "All of 2 + pillows between knees/bony points; initiate PI prevention plan."
+      },
+      moisture: {
+        4: "Moisturize; teach to report damp areas (skin folds, under breasts).",
+        3: "All of 4 + barrier ointment; gentle cleanse; pad checks; avoid hot water/harsh soap; change q2–3h; bowel training PRN.",
+        2: "All of 3 + check/change incontinence q2–3h; consider low air-loss bed.",
+        1: "All of 2 + inspect skin each shift; frequent pad changes; condom cath PRN; bowel training/rectal tube PRN."
+      },
+      activity: {
+        4: "Ambulate outside room; daily skin check; monitor balance/endurance.",
+        3: "Mobility plan; short walks; chair cushion; PT consult.",
+        2: "Specialty chair pad; align posture; reposition q15min; stand hourly; pad bony points; PT.",
+        1: "Turn/reposition q1–2h; HOB ≤30°; pillows; specialty bed; elevate heels; PT; posted schedule; frequent micro-shifts."
+      },
+      mobility: {
+        4: "Independent position changes; daily skin check; encourage ambulation BID.",
+        3: "Cue frequent small shifts; assist turns PRN; PT + gait belt; daily skin check.",
+        2: "Reposition q1–2h; elevate heels; consider specialty bed; skin check each shift; turning schedule.",
+        1: "Same as ‘Very limited’ with full assistance for all moves."
+      },
+      nutrition: {
+        4: "OOB for meals; offer choices/supplements; plan if NPO >24h; record intake.",
+        3: "Monitor intake; plan if NPO >24h; record I&O.",
+        2: "All of ‘3’ + dietary consult; encourage fluids; supplements; small frequent meals; family food if allowed.",
+        1: "All of ‘2’ + skin assessment each shift; escalate if poor intake persists."
+      },
+      friction: {
+        3: "Linens clean, dry, wrinkle-free; lift—don’t slide.",
+        2: "All of ‘3’ + avoid massaging pressure points; add elbow/heel protectors.",
+        1: "All of ‘2’ + two-person with draw sheet; protectors; linens smooth; HOB ≤30°."
+      }
+    };
+
+    function setQuick(factor, score){
+      $('#qi-' + factor).text(QI[factor]?.[score] || '—');
+    }
+
+
+      // Update factor scores + total
+      $('input[type=radio][data-factor]').on('change', function () {
+        const factor = $(this).data('factor');
+        const score  = parseInt($(this).data('score'), 10);
+        $('#assess-' + factor).text(score);
+         setQuick(factor, score);
+        recomputeTotal();
+      });
+          ['sensory','moisture','activity','mobility','nutrition','friction'].forEach(f=>{
+      const v = parseInt($(`input[type=radio][name='${f}']:checked`).val(),10);
+      if (!isNaN(v)) setQuick(f, v);
+    });
+
+
+      function recomputeTotal() {
+        const needed = ['sensory','moisture','activity','mobility','nutrition','friction'];
+        let sum = 0, complete = true;
+        needed.forEach(f => {
+          const txt = $('#assess-' + f).text().trim();
+          if (txt === '' || txt === '\u00A0') complete = false;
+          sum += parseInt(txt || '0', 10);
+        });
+        if (complete) {
+          $('#brTotal').text(sum);
+          $('#brRiskText').text(getRisk(sum));
+          $('#brKey').show();
+        } else {
+          $('#brTotal').html('&nbsp;');
+          $('#brKey').hide();
+        }
+      }
+
+      function getRisk(total) {
+        if (total <= 9) return 'Very high (<9)';
+        if (total <= 12) return 'High (10–12)';
+        if (total <= 14) return 'Moderate (13–14)';
+        if (total <= 18) return 'Mild (15–18)';
+        return 'No risk (19–23)';
+      }
+
+      // message label helpers
+      const $msg = $("#lblBradenMessage");
+      $msg.hide(); // start hidden
+
+      function clearMsg() {
+        $msg.text("").hide(); // wipe old messages
+      }
+
+      // Save
+      $("#btnSubmitBraden").on("click", function (e) {
+        e.preventDefault();
+
+        const labId     = $("#bradenLabId").val();
+        const patientId = $("#bradenPatientId").val();
+        const date1     = $("#brDate1").val();
+        const initials  = $("#brNurseInitials").val().trim();
+        const shift     = $("#brShift1").val();
+
+        const selections = {
+          sensory:   parseInt($('#assess-sensory').text())   || null,
+          moisture:  parseInt($('#assess-moisture').text())  || null,
+          activity:  parseInt($('#assess-activity').text())  || null,
+          mobility:  parseInt($('#assess-mobility').text())  || null,
+          nutrition: parseInt($('#assess-nutrition').text()) || null,
+          friction:  parseInt($('#assess-friction').text())  || null
+        };
+
+        if (!labId || !patientId) {
+          $msg.text("Missing Lab/Patient context").css("color","red").show();
+          return;
+        }
+        if (!date1) {
+          $msg.text("Please select Date of Assessment.").css("color","red").show();
+          return;
+        }
+        if (Object.values(selections).some(v => v === null)) {
+          $msg.text("Please complete all six factors.").css("color","red").show();
+          return;
+        }
+        if (!initials) {
+          $msg.text("Please enter Nurse Initials.").css("color","red").show();
+          return;
+        }
+        if (!shift) {
+          $msg.text("Please select Shift.").css("color","red").show();
+          return;
+        }
+
+        const dto = {
+          LabId: parseInt(labId, 10),
+          PatientId: parseInt(patientId, 10),
+          DateOfAssessment: new Date(date1).toISOString(),
+          NurseInitials: initials,
+          Sensory: selections.sensory,
+          Moisture: selections.moisture,
+          Activity: selections.activity,
+          Mobility: selections.mobility,
+          Nutrition: selections.nutrition,
+          Friction: selections.friction,
+          TotalScore: parseInt($('#brTotal').text()) || 0,
+          RiskKey: $('#brRiskText').text(),
+          Shift: shift
+        };
+
+        $.ajax({
+          type: "POST",
+          url: "/Patient/AddBradenAssessment",
+          contentType: "application/json",
+          data: JSON.stringify(dto),
+          success: function (response) {
+            const code = Number(response);
+
+            if (code === -1) {
+              clearMsg();
+              $("#bradenModalHeader").removeClass("bg-success text-white").addClass("bg-danger text-white");
+              $("#bradenModalMessage").text(
+                "An assessment already exists for this patient. Go to View Braden Scale to add more dates."
+              );
+              new bootstrap.Modal(document.getElementById("bradenModal")).show();
+              return;
+            }
+
+            if (code > 0) {
+              clearMsg();
+              $("#bradenModalHeader").removeClass("bg-danger text-white").addClass("bg-success text-white");
+              $("#bradenModalMessage").text("Assessment saved successfully!");
+              var modalEl = document.getElementById("bradenModal");
+              var modal = new bootstrap.Modal(modalEl);
+              modal.show();
+
+              // 🔑 Redirect back to list after user closes the success modal
+              modalEl.addEventListener('hidden.bs.modal', function () {
+                $.get("/Patient/GetBradenAssessmentList",
+                      { labId: labId, patientId: patientId },
+                      function (html) {
+                          $("#content-area").html(html);
+                      });
+              }, { once: true });
+            } else {
+              $msg.text("Error saving assessment.").css("color","red").show();
+            }
+          },
+          error: function () {
+            $msg.text("Server error.").css("color","red").show();
+          }
+        });
+      });
+    });
+</script>

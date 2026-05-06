@@ -1,0 +1,868 @@
+﻿@using EMRSimulation.Domain.Dtos;
+@model PatientDto
+
+<style>
+    /* Style the select element */
+    select {
+        width: 150px;
+        padding: 5px;
+        font-size: 16px;
+    }
+
+    /* Style the individual options based on their value */
+    option.purple {
+        background-color: #A020F0;
+        color: white;
+    }
+
+    option.orange {
+        background-color: #FFA500;
+        color: black;
+    }
+
+    option.lightorange {
+        background-color: #FFDBBB;
+        color: black;
+    }
+
+    option.yellow {
+        background-color: #FFFF00;
+        color: black;
+    }
+
+    option.white {
+        background-color: #FFFFFF;
+        color: black;
+    }
+    
+
+    .color-box {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        margin-left: 10px;
+        vertical-align: middle;
+    }
+
+    .purple-zone { background-color: #A020F0; }
+    .orange-zone { background-color: #FFA500; }
+    .light-orange-zone { background-color: #FFDBBB; }
+    .yellow-zone { background-color: #FFFF00; }
+    .white-zone { background-color: #FFFFFF; }
+
+</style>
+
+<div class="container">
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-md-5">
+            <!-- Section 1 -->
+            <div class="section mb-4">
+
+                <div class="form-group row mb-1">
+                    <label for="patientUri" class="col-sm-4 col-form-label">URI Number:</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="patientUri" placeholder="Enter URI" disabled value="@Model.UriNumber">
+                    </div>
+                </div>
+                <div class="form-group row mb-1">
+                    <label for="patientName" class="col-sm-4 col-form-label">Patient Name:</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="patientName" disabled value="@Model.FirstName">
+                    </div>
+                </div>
+                <div class="form-group row mb-1">
+                    <label for="dob" class="col-sm-4 col-form-label">Date of Birth:</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="dob" disabled value="@Model.DateOfBirth">
+                    </div>
+                </div>
+                <div class="form-group row mb-1">
+                    <label for="sex" class="col-sm-4 col-form-label">Sex:</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="sex" disabled value="@Model.Gender">
+                    </div>
+                </div>
+                <div class="form-group row mb-1">
+                    <label for="admitDate" class="col-sm-4 col-form-label">Admit Date:</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="admitDate" disabled value="@Model.AdmitDate">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section mb-4">
+                <div class="form-group row mb-1">
+                    <label for="enteredDate" class="col-sm-4 col-form-label">Date Entered:</label>
+                    <div class="col-sm-8">
+                        <input type="date" class="form-control" id="enteredDate" />
+                    </div>
+                </div>
+
+                <div class="form-group row mb-1">
+                    <label for="enteredTime" class="col-sm-4 col-form-label">Time Entered:</label>
+                    <div class="col-sm-8">
+                        <input type="time" class="form-control" id="enteredTime" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2 -->
+            <div class="section">
+                <table id="data-table-body" class="table table-bordered" style="font-weight:bold">
+                    <thead>
+                        <tr class="purple-zone">
+                            <td style="align-content: center; width:50%; height:64px;">Purple Zone</td>
+                            <td style="align-content: center;"></td>
+                        </tr>
+                        <tr class="orange-zone">
+                            <td style="align-content: center; width:50%; height:64px;">Orange Zone</td>
+                            <td style="align-content: center;"></td>
+                        </tr>
+                        <tr class="light-orange-zone">
+                            <td style="align-content: center; width:50%; height:64px;">Light Orange Zone</td>
+                            <td style="align-content: center;"></td>
+                        </tr>
+                        <tr class="yellow-zone">
+                            <td style="align-content: center; width:50%; height:64px;">Yellow Zone</td>
+                            <td style="align-content: center;"></td>
+                        </tr>
+                        <tr class="white-zone">
+                            <td style="align-content: center; width:50%; height:64px;">White Zone</td>
+                            <td style="align-content: center;"></td>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-md-7">
+            <div class="section">
+
+                <div class="form-group row mb-1">
+                    <label for="ddlRespiratory" class="col-sm-5 col-form-label nav-link data-label" style="cursor:pointer">Respiratory Rate (breaths/ min)</label>
+                    <div class="col-sm-7">
+                        <select id="ddlRespiratory">
+                            <option value="" data-color="#FFFFFF" data-score="" class="white"></option>
+                            <option value="Write >= 35" data-color="#A020F0" data-score="4" class="purple">Write >= 35</option>
+                            <option value="30-34" data-color="#FFA500" data-score="3" class="orange">30-34</option>
+                            <option value="25-29" data-color="#FFDBBB" data-score="2" class="lightorange">25-29</option>
+                            <option value="20-24" data-color="#FFFF00" data-score="1" class="yellow">20-24</option>
+                            <option value="15-19" data-color="#FFFFFF" data-score="0" class="white">15-19</option>
+                            <option value="10-14" data-color="#FFFFFF" data-score="0" class="white">10-14</option>
+                            <option value="5-9" data-color="#FFA500" data-score="3" class="orange">5-9</option>
+                            <option value="Write <= 4" data-color="#A020F0" data-score="4" class="purple">Write <= 4</option>
+                        </select>
+                        <div class="color-box" id="colorBoxRespiratory"></div>
+                        <input type="text" id="txtRespiratoryRateValue" style="width:20%; display:none" autocomplete="off" />
+                    </div>
+                </div>
+                <div class="form-group row mb-1">
+                    <label for="ddlO2Sat" class="col-sm-5 col-form-label nav-link data-label" style="cursor:pointer">O2 Saturation(%)</label>
+                    <div class="col-sm-7">
+                        <select id="ddlO2Sat">
+                            <option value="" data-color="#FFFFFF" data-score="" class="white"></option>
+                            <option value="98-100" data-color="#FFFFFF" data-score="0" class="white">98-100</option>
+                            <option value="95-97" data-color="#FFFFFF" data-score="0" class="white">95-97</option>
+                            <option value="93-94" data-color="#FFFF00" data-score="1" class="yellow">93-94</option>
+                            <option value="90-92" data-color="#FFDBBB" data-score="2" class="lightorange">90-92</option>
+                            <option value="87-89" data-color="#FFA500" data-score="3" class="orange">87-89</option>
+                            <option value="85-86" data-color="#FFA500" data-score="3" class="orange">85-86</option>
+                            <option value="Write <= 84" data-color="#A020F0" data-score="4" class="purple">Write <= 84</option>
+                        </select>
+                        <div class="color-box" id="colorBoxO2Sat"></div>
+                        <input type="text" id="txtOxygenSaturationValue" style="width:20%; display:none" autocomplete="off" />
+                    </div>
+                </div>
+                <div class="form-group row mb-1">
+                    <label for="ddlO2Flow" class="col-sm-5 col-form-label nav-link data-label" style="cursor:pointer">O2 Flow Rate(L/min)</label>
+                    <div class="col-sm-7">
+                        <select id="ddlO2Flow">
+                            <option value="" data-color="#FFFFFF" data-score="" class="white"></option>
+                            <option value=">= 13" data-color="#FFA500" data-score="3" class="orange">>= 13</option>
+                            <option value="10-12" data-color="#FFDBBB" data-score="2" class="lightorange">10-12</option>
+                            <option value="7-9" data-color="#FFFF00" data-score="1" class="yellow">7-9</option>
+                            <option value="4-6" data-color="#FFFFFF" data-score="0" class="white">4-6</option>
+                            <option value="<=3" data-color="#FFFFFF" data-score="0" class="white"><=3</option>
+                        </select>
+                        <div class="color-box" id="colorBoxO2Flow"></div>
+                    </div>
+                </div>
+                <div class="form-group row mb-1">
+                    <label for="ddlBpRate" class="col-sm-5 col-form-label nav-link data-label" style="cursor:pointer">Blood Pressure Systolic (mmHg)</label>
+                    <div class="col-sm-7">
+                        <select id="ddlBpRate">
+                            <option value="" data-color="#FFFFFF" data-score="" class="white"></option>
+                            <option value="Write >= 200" data-color="#FFA500" data-score="3" class="orange">Write >= 200</option>
+                            <option value="190s" data-color="#FFDBBB" data-score="2" class="lightorange">190s</option>
+                            <option value="180s" data-color="#FFDBBB" data-score="2" class="lightorange">180s</option>
+                            <option value="170s" data-color="#FFDBBB" data-score="2" class="lightorange">170s</option>
+                            <option value="160s" data-color="#FFFF00" data-score="1" class="yellow">160s</option>
+                            <option value="150s" data-color="#FFFFFF" data-score="0" class="white">150s</option>
+                            <option value="140s" data-color="#FFFFFF" data-score="0" class="white">140s</option>
+                            <option value="130s" data-color="#FFFFFF" data-score="0" class="white">130s</option>
+                            <option value="120s" data-color="#FFFFFF" data-score="0" class="white">120s</option>
+                            <option value="110s" data-color="#FFFFFF" data-score="0" class="white">110s</option>
+                            <option value="100s" data-color="#FFDBBB" data-score="2" class="lightorange">100s</option>
+                            <option value="90s" data-color="#FFA500" data-score="3" class="orange">90s</option>
+                            <option value="80s" data-color="#A020F0" data-score="4" class="purple">80s</option>
+                            <option value="70s" data-color="#A020F0" data-score="4" class="purple">70s</option>
+                            <option value="60s" data-color="#A020F0" data-score="4" class="purple">60s</option>
+                            <option value="50s" data-color="#A020F0" data-score="4" class="purple">50s</option>
+                            <option value="40s" data-color="#A020F0" data-score="4" class="purple">40s</option>
+                        </select>
+                        <div class="color-box" id="colorBoxBpRate"></div>
+                        <input type="text" id="txtBloodPressureValue" style="width:20%; display:none" autocomplete="off" />
+                    </div>
+                </div>
+                <div class="form-group row mb-1">
+                    <label for="ddlBpRateDiastolic" class="col-sm-5 col-form-label nav-link data-label" style="cursor:pointer">Blood Pressure Diastolic (mmHg)</label>
+                    <div class="col-sm-7">
+                         <select id="ddlBpRateDiastolic">
+                            <option value="" ></option>
+                            <option value="Write >= 200" data-color="#FFFFFF" class="white">Write >= 200</option>
+                            <option value="190s" data-color="#FFFFFF" class="white">190s</option>
+                            <option value="180s" data-color="#FFFFFF" class="white">180s</option>
+                            <option value="170s" data-color="#FFFFFF" class="white">170s</option>
+                            <option value="160s" data-color="#FFFFFF" class="white">160s</option>
+                            <option value="150s" data-color="#FFFFFF" class="white">150s</option>
+                            <option value="140s" data-color="#FFFFFF" class="white">140s</option>
+                            <option value="130s" data-color="#FFFFFF" class="white">130s</option>
+                            <option value="120s" data-color="#FFFFFF" class="white">120s</option>
+                            <option value="110s" data-color="#FFFFFF" class="white">110s</option>
+                            <option value="100s" data-color="#FFFFFF" class="white">100s</option>
+                            <option value="90s" data-color="#FFFFFF" class="white">90s</option>
+                            <option value="80s" data-color="#FFFFFF" class="white">80s</option>
+                            <option value="70s" data-color="#FFFFFF" class="white">70s</option>
+                            <option value="60s" data-color="#FFFFFF" class="white">60s</option>
+                            <option value="50s" data-color="#FFFFFF" class="white">50s</option>
+                            <option value="40s" data-color="#FFFFFF" class="white">40s</option>
+                        </select>
+                        <div class="color-box" id="colorBoxBpRateDiastolic"></div>
+                        <input type="text" id="txtBloodPressureDiastolicValue" style="width:20%; display:none" autocomplete="off" />
+                    </div>
+                </div>
+                <div class="form-group row mb-1">
+                    <label for="ddlHeartRate" class="col-sm-5 col-form-label nav-link data-label" style="cursor:pointer">Heart Rate (beats/min)</label>
+                    <div class="col-sm-7">
+                        <select id="ddlHeartRate">
+                            <option value="" data-color="#FFFFFF" data-score="" class="white"></option>
+                            <option value="Write >= 140" data-color="#A020F0" data-score="4" class="purple">Write >= 140</option>
+                            <option value="130s" data-color="#FFA500" data-score="3" class="orange">130s</option>
+                            <option value="120s" data-color="#FFDBBB" data-score="2" class="lightorange">120s</option>
+                            <option value="110s" data-color="#FFDBBB" data-score="2" class="lightorange">110s</option>
+                            <option value="100s" data-color="#FFFF00" data-score="1" class="yellow">100s</option>
+                            <option value="90s" data-color="#FFFFFF" data-score="0" class="white">90s</option>
+                            <option value="80s" data-color="#FFFFFF" data-score="0" class="white">80s</option>
+                            <option value="70s" data-color="#FFFFFF" data-score="0" class="white">70s</option>
+                            <option value="60s" data-color="#FFFFFF" data-score="0" class="white">60s</option>
+                            <option value="50s" data-color="#FFFFFF" data-score="0" class="white">50s</option>
+                            <option value="40s" data-color="#FFFF00" data-score="1" class="yellow">40s</option>
+                            <option value="Write >= 30s" data-color="#A020F0" data-score="4" class="purple">Write >= 30s</option>
+                        </select>
+                        <div class="color-box" id="colorBoxHeartRate"></div>
+                        <input type="text" id="txtHeartRateValue" style="width:20%; display:none" autocomplete="off" />
+                    </div>
+                </div>
+                <div class="form-group row mb-1">
+                    <label for="ddlTemperatureC" class="col-sm-5 col-form-label nav-link data-label" style="cursor:pointer">Temperature (C)</label>
+                    <div class="col-sm-7">
+                        <select id="ddlTemperatureC">
+                            <option value="" data-color="#FFFFFF" data-score="" class="white"></option>
+                            <option value="Write >= 39.1" data-color="#FFDBBB" data-score="2" class="lightorange">Write >= 39.1</option>
+                            <option value="38.5-39.0" data-color="#FFDBBB" data-score="2" class="lightorange">38.5-39.0</option>
+                            <option value="38.0-38.4" data-color="#FFFF00" data-score="1" class="yellow">38.0-38.4</option>
+                            <option value="37.5-37.9" data-color="#FFFFFF" data-score="0" class="white">37.5-37.9</option>
+                            <option value="37.0-37.4" data-color="#FFFFFF" data-score="0" class="white">37.0-37.4</option>
+                            <option value="36.5-36.9" data-color="#FFFFFF" data-score="0" class="white">36.5-36.9</option>
+                            <option value="36.0-36.4" data-color="#FFFFFF" data-score="0" class="white">36.0-36.4</option>
+                            <option value="35.5-35.9" data-color="#FFFFFF" data-score="0" class="white">35.5-35.9</option>
+                            <option value="Write <= 35.4" data-color="#FFA500" data-score="3" class="orange">Write <= 35.4</option>
+                        </select>
+                        <div class="color-box" id="colorBoxTemperatureC"></div>
+                        <input type="text" id="txtTemperatureC" style="width:20%; display:none" autocomplete="off" />
+                    </div>
+                </div>
+                <div class="form-group row mb-1">
+                    <label for="ddlConsciousness" class="col-sm-5 col-form-label nav-link data-label" style="cursor:pointer">Consciousness</label>
+                    <div class="col-sm-7">
+                        <select id="ddlConsciousness">
+                            <option selected></option>
+                            <option data-color="#FFFFFF" data-score="0" class="white" value="Alert">Alert</option>
+                            <option data-color="#FFDBBB" data-score="2" class="lightorange" value="To Voice">To Voice</option>
+                            <option data-color="#FFA500" data-score="3" class="orange" value="To Pain">To Pain</option>
+                            <option data-color="#A020F0" data-score="4" class="purple" value="Unresponsive">Unresponsive</option>
+                        </select>
+                        <div class="color-box" id="colorBoxConsciousness"></div>
+                    </div>
+                </div>
+
+                
+                <div class="form-group row" style="background-color:#F2F2F3">
+                    <div class="col-sm-5">
+                        <div class="row">
+                            <div class="col">
+                                <label class="col-form-label nav-link" data-bs-toggle="modal" data-bs-target="#addsscoreModal" style="cursor:pointer">ADDS SCORES:</label>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <img src="~/images/addsscore.png" style="width: 50%; cursor:pointer" data-bs-toggle="modal" data-bs-target="#addsscoreModal"/>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+
+                    <div class="col-sm-7">
+                        <div class="form-group row">
+                            <div class="col-sm-6 inner-border">
+                                Respiratory Rate
+                            </div>
+                            <div class="col-sm-6 inner-border respiratoryscore">
+                                
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-6 inner-border">
+                                O2 Saturation
+                            </div>
+                            <div class="col-sm-6 inner-border saturationscore">
+                                
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-6 inner-border">
+                                O2 Flow Rate
+                            </div>
+                            <div class="col-sm-6 inner-border flowratescore">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-6 inner-border">
+                                Systolic BP
+                            </div>
+                            <div class="col-sm-6 inner-border bpscore">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-6 inner-border">
+                                Heart Rate
+                            </div>
+                            <div class="col-sm-6 inner-border heartratescore">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-6 inner-border">
+                                Temperature
+                            </div>
+                            <div class="col-sm-6 inner-border temperaturescore">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-6 inner-border">
+                                Consciousness
+                            </div>
+                            <div class="col-sm-6 inner-border consciousnessscore">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-6 inner-border">
+                                TOTAL ADDS
+                            </div>
+                            <div class="col-sm-6 inner-border totaladdsscore">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* <div class="form-group row mb-1">
+                    <label for="intervention" class="col-sm-5 col-form-label">Intervention</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" id="intervention" placeholder="Enter Intervention">
+                    </div>
+                </div>
+
+                <div class="form-group row mb-1">
+                    <label for="comments" class="col-sm-5 col-form-label">Additional Comments</label>
+                    <div class="col-sm-7">
+                        <textarea style="width:100%"></textarea>
+                    </div>
+                </div> *@
+
+            </div>
+        </div>
+
+        <div>
+            <label id="lblMessage" style="color:green"></label>
+            <button type="button" id="btnSave" class="btn btn-primary" style="background-color:#FF8A30;float: right;">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="addsscoreModal" tabindex="-1" aria-labelledby="addsscoreModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addsscoreModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="~/images/addsscore.png" style="width: 60%;" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+
+    const modalData = [
+    {
+    name: "Respiratory Rate (breaths/ min)",
+    range: {
+        "Purple Zone": ">= 35 or <= 4",
+        "Orange Zone": "30-34 or 5-9",
+        "Light Orange Zone": "25-29",
+        "Yellow Zone": "20 - 24",
+        "White Zone": "10-19"
+    },
+    actions: {
+        "Purple Zone": "Call an emergency number",
+        "Orange Zone": "Immediate review",
+        "Light Orange Zone": "Close monitoring",
+        "Yellow Zone": "Consider review",
+        "White Zone": "Routine observation"
+    }
+    },
+    {
+    name: "O2 Saturation(%)",
+    range: {
+        "Purple Zone": "<= 84 ",
+        "Orange Zone": "85 - 89 ",
+        "Light Orange Zone": "90 - 92 ",
+        "Yellow Zone": "93 - 94",
+        "White Zone": "95 - 100"
+    },
+    actions: {
+        "Purple Zone": "Emergency Call",
+        "Orange Zone": "Score 3, 4 & 5",
+        "Light Orange Zone": "Score 2",
+        "Yellow Zone": "Score 1",
+        "White Zone": "Score 0"
+    }
+    },
+    {
+    name: "O2 Flow Rate(L/min)",
+    range: {
+        "Orange Zone": ">= 13",
+        "Light Orange Zone": "10 - 12",
+        "Yellow Zone": "93 - 94",
+        "White Zone": "95 - 100"
+    },
+    actions: {
+        "Orange Zone": "Score 3, 4 & 5",
+        "Light Orange Zone": "Score 2",
+        "Yellow Zone": "Score 1",
+        "White Zone": "Score 0"
+    }
+    },
+    {
+    name: "Blood Pressure (mmHg)",
+    range: {
+        "Purple Zone": ">= 200",
+    },
+    actions: {
+        "Purple Zone": "Score 3, 4 & 5",
+    }
+    },
+    {
+    name: "Heart Rate (beats/min)",
+    range: {
+        "Purple Zone": ">= 140s or <= 30s",
+        "Orange Zone": "130s ",
+        "Light Orange Zone": "110s - 120s ",
+        "Yellow Zone": "100s or 40s",
+        "White Zone": "50s - 90s"
+    },
+    actions: {
+        "Purple Zone": "Emergency Call",
+        "Orange Zone": "Score 3, 4 & 5",
+        "Light Orange Zone": "Score 2",
+        "Yellow Zone": "Score 1",
+        "White Zone": "Score 0"
+    }
+    },
+    {
+    name: "Temperature (C)",
+    range: {
+        "Orange Zone": "<= 35.4 ",
+        "Light Orange Zone": "38.5 - 39.0 0r >= 39.1",
+        "Yellow Zone": "38.0 - 38.4",
+        "White Zone": "35.5 - 37.9"
+    },
+    actions: {
+        "Orange Zone": "Score 3, 4 & 5",
+        "Light Orange Zone": "Score 2",
+        "Yellow Zone": "Score 1",
+        "White Zone": "Score 0"
+    }
+    },
+    {
+    name: "Consciousness",
+    range: {
+        "Purple Zone": "Unresponsive",
+        "Orange Zone": "To pain",
+        "Light Orange Zone": "To voice",
+    },
+    actions: {
+        "Purple Zone": "",
+        "Orange Zone": "",
+        "Light Orange Zone": "",
+    }
+    },
+    {
+    name: "Actions Required",
+    range: {},
+    actions: {}
+
+    }
+
+    ];
+
+$('.data-label').on('click', function() {
+        const labelName = $(this).text();
+        const data = modalData.find(item => item.name === labelName);
+
+        // Clear previous table data
+        $('#data-table-body').empty();
+
+        // Populate table with the selected data
+        if (data) {
+            for (const zone in data.range) {
+                const rangeValue = data.range[zone];
+                const actionValue = data.actions[zone];
+                
+                // Determine the appropriate class for the zone
+                let zoneClass = '';
+                switch (zone) {
+                    case 'Purple Zone':
+                        zoneClass = 'purple-zone';
+                        break;
+                    case 'Orange Zone':
+                        zoneClass = 'orange-zone';
+                        break;
+                    case 'Light Orange Zone':
+                        zoneClass = 'light-orange-zone';
+                        break;
+                    case 'Yellow Zone':
+                        zoneClass = 'yellow-zone';
+                        break;
+                    case 'White Zone':
+                        zoneClass = 'white-zone';
+                        break;
+                }
+
+                $('#data-table-body').append(`
+                    <tr class="${zoneClass}">
+                        <td style='align-content: center; width:50%; height:64px;'>${rangeValue}</td>
+                        <td style='align-content: center;''>${actionValue}</td>
+                    </tr>
+                `);
+            }
+        }
+    });
+
+        
+        $(".lbladds-scores").on("click", function () { 
+            alert();
+        });
+
+
+        var RespiratoryAlert = 0;
+        var OxygenSaturationAlert = 0;
+        var BloodPressureAlert = 0;
+        var HeartRateAlert = 0;
+        var ConsciousnessAlert = 0;
+    
+        document.getElementById('ddlRespiratory').addEventListener('change', function() {
+            var selectedOption = this.options[this.selectedIndex];
+            var color = selectedOption.getAttribute('data-color');
+            var score = selectedOption.getAttribute('data-score');
+
+            if ($('#ddlRespiratory').val().indexOf("Write") !== -1) {
+                $("#txtRespiratoryRateValue").show();
+            }
+            else {
+                $("#txtRespiratoryRateValue").val("");
+                $("#txtRespiratoryRateValue").hide();
+            }
+
+            // Change the background color of the color box
+            document.getElementById('colorBoxRespiratory').style.backgroundColor = color;
+            $(".respiratoryscore").html(score);
+            updateTotalScore();
+        });
+
+        document.getElementById('ddlRespiratory').dispatchEvent(new Event('change'));
+
+        document.getElementById('ddlO2Sat').addEventListener('change', function () {
+            var selectedOption = this.options[this.selectedIndex];
+            var color = selectedOption.getAttribute('data-color');
+            var score = selectedOption.getAttribute('data-score');
+
+            if ($('#ddlO2Sat').val().indexOf("Write") !== -1) {
+                $("#txtOxygenSaturationValue").show();
+            }
+            else {
+                $("#txtOxygenSaturationValue").val("");
+                $("#txtOxygenSaturationValue").hide();
+            }
+
+            // Change the background color of the color box
+            document.getElementById('colorBoxO2Sat').style.backgroundColor = color;
+            $(".saturationscore").html(score);
+            updateTotalScore();
+        });
+
+        document.getElementById('ddlO2Sat').dispatchEvent(new Event('change'));
+
+        document.getElementById('ddlO2Flow').addEventListener('change', function () {
+            var selectedOption = this.options[this.selectedIndex];
+            var color = selectedOption.getAttribute('data-color');
+            var score = selectedOption.getAttribute('data-score');
+
+            // Change the background color of the color box
+            document.getElementById('colorBoxO2Flow').style.backgroundColor = color;
+            $(".flowratescore").html(score);
+            updateTotalScore();
+        });
+
+        document.getElementById('ddlO2Flow').dispatchEvent(new Event('change'));
+
+        document.getElementById('ddlBpRate').addEventListener('change', function () {
+            var selectedOption = this.options[this.selectedIndex];
+            var color = selectedOption.getAttribute('data-color');
+            var score = selectedOption.getAttribute('data-score');
+
+            if ($('#ddlBpRate').val().indexOf("Write") !== -1) {
+                $("#txtBloodPressureValue").show();
+            }
+            else {
+                $("#txtBloodPressureValue").val("");
+                $("#txtBloodPressureValue").hide();
+            }
+
+            // Change the background color of the color box
+            document.getElementById('colorBoxBpRate').style.backgroundColor = color;
+            $(".bpscore").html(score);
+            updateTotalScore();
+        });
+
+        document.getElementById('ddlBpRate').dispatchEvent(new Event('change'));
+
+        document.getElementById('ddlBpRateDiastolic').addEventListener('change', function () {
+            var selectedOption = this.options[this.selectedIndex];
+            var color = selectedOption.getAttribute('data-color');
+
+            if ($('#ddlBpRateDiastolic').val().indexOf("Write") !== -1) {
+                $("#txtBloodPressureDiastolicValue").show();
+            }
+            else {
+                $("#txtBloodPressureDiastolicValue").val("");
+                $("#txtBloodPressureDiastolicValue").hide();
+            }
+
+            // Change the background color of the color box
+            document.getElementById('colorBoxBpRateDiastolic').style.backgroundColor = color;
+        });
+
+        document.getElementById('ddlBpRateDiastolic').dispatchEvent(new Event('change'));
+
+        document.getElementById('ddlHeartRate').addEventListener('change', function () {
+            var selectedOption = this.options[this.selectedIndex];
+            var color = selectedOption.getAttribute('data-color');
+            var score = selectedOption.getAttribute('data-score');
+
+            if ($('#ddlHeartRate').val().indexOf("Write") !== -1) {
+                $("#txtHeartRateValue").show();
+            }
+            else {
+                $("#txtHeartRateValue").val("");
+                $("#txtHeartRateValue").hide();
+            }
+
+            // Change the background color of the color box
+            document.getElementById('colorBoxHeartRate').style.backgroundColor = color;
+            $(".heartratescore").html(score);
+            updateTotalScore();
+        });
+
+        document.getElementById('ddlHeartRate').dispatchEvent(new Event('change'));
+
+        document.getElementById('ddlTemperatureC').addEventListener('change', function () {
+            var selectedOption = this.options[this.selectedIndex];
+            var color = selectedOption.getAttribute('data-color');
+            var score = selectedOption.getAttribute('data-score');
+
+            if ($('#ddlTemperatureC').val().indexOf("Write") !== -1) {
+                $("#txtTemperatureC").show();
+            }
+            else {
+                $("#txtTemperatureC").val("");
+                $("#txtTemperatureC").hide();
+            }
+
+            // Change the background color of the color box
+            document.getElementById('colorBoxTemperatureC').style.backgroundColor = color;
+            $(".temperaturescore").html(score);
+            updateTotalScore();
+        });
+
+        document.getElementById('ddlTemperatureC').dispatchEvent(new Event('change'));
+
+        document.getElementById('ddlConsciousness').addEventListener('change', function () {
+            var selectedOption = this.options[this.selectedIndex];
+            var color = selectedOption.getAttribute('data-color');
+            var score = selectedOption.getAttribute('data-score');
+
+            // Change the background color of the color box
+            document.getElementById('colorBoxConsciousness').style.backgroundColor = color;
+            $(".consciousnessscore").html(score);
+            updateTotalScore();
+        });
+
+        document.getElementById('ddlConsciousness').dispatchEvent(new Event('change'));
+
+        
+
+        function updateTotalScore() {
+            var respiratoryScore = parseInt($(".respiratoryscore").html()) || 0;
+            var saturationScore = parseInt($(".saturationscore").html()) || 0;
+            var flowratescore = parseInt($(".flowratescore").html()) || 0;
+
+            var bpscore = parseInt($(".bpscore").html()) || 0;
+            var heartratescore = parseInt($(".heartratescore").html()) || 0;
+            var temperaturescore = parseInt($(".temperaturescore").html()) || 0;
+
+            var consciousnessscore = parseInt($(".consciousnessscore").html()) || 0;
+
+            RespiratoryAlert = 0;
+            OxygenSaturationAlert = 0;
+            BloodPressureAlert = 0;
+            HeartRateAlert = 0;
+            ConsciousnessAlert = 0;
+
+            if (respiratoryScore == 4) {
+                RespiratoryAlert = 1;
+            }
+
+            if (saturationScore == 4) {
+                OxygenSaturationAlert = 1;
+            }
+
+            if (bpscore == 4) {
+                BloodPressureAlert = 1;
+            }
+
+            if (heartratescore == 4) {
+                HeartRateAlert = 1;
+            }
+
+            if (consciousnessscore == 4) {
+                ConsciousnessAlert = 1;
+            }
+            
+            var totalScore = respiratoryScore + saturationScore + flowratescore + bpscore + heartratescore + temperaturescore + consciousnessscore;
+            $(".totaladdsscore").html(totalScore);
+        }
+
+        $("#btnSave").on("click", function (e) {
+            e.preventDefault(); // Prevent default link behavior
+
+            var ddlRespiratory = $('#ddlRespiratory').val();
+            var ddlO2Sat = $('#ddlO2Sat').val();
+            var ddlO2Flow = $('#ddlO2Flow').val();
+            var ddlBpRate = $('#ddlBpRate').val();
+            var ddlBpRateDiastolic = $('#ddlBpRateDiastolic').val();
+            var ddlHeartRate = $('#ddlHeartRate').val();
+            var ddlTemperatureC = $('#ddlTemperatureC').val();
+            var ddlConsciousness = $('#ddlConsciousness').val();
+
+            var enteredDate = $('#enteredDate').val().trim();
+            var enteredTime = $('#enteredTime').val().trim();
+
+            if (ddlRespiratory === "" || ddlO2Sat === "" || ddlO2Flow === "" 
+                || ddlBpRate === "" || ddlBpRateDiastolic === "" || ddlHeartRate === ""
+                || ddlTemperatureC === "" || ddlConsciousness === ""
+                || enteredDate === "" || enteredTime === "") {
+                e.preventDefault();
+                $('#lblMessage').text("Please fill in the missing fields.").css('color', 'red');
+                return;
+            }
+
+            var toPost = {
+                LabId: $('#txtLabId').val(),
+                PatientId: $('#txtPatientId').val(),
+                EnteredDate: enteredDate,
+                EnteredTime: enteredTime,
+
+                RespiratoryRate: ddlRespiratory,
+                HeartRate: ddlHeartRate,
+                Temperature: ddlTemperatureC,
+                Consciousness: ddlConsciousness,
+                OxygenSaturation: ddlO2Sat,
+                OxygenFlow: ddlO2Flow,
+                BloodPressure: ddlBpRate,
+                BloodPressureDiastolic: ddlBpRateDiastolic,
+
+                RespiratoryRateValue: parseInt($("#txtRespiratoryRateValue").val()) || 0,
+                OxygenSaturationValue: parseInt($("#txtOxygenSaturationValue").val()) || 0,
+                BloodPressureValue: parseInt($("#txtBloodPressureValue").val()) || 0,                
+                BloodPressureDiastolicValue: parseInt($("#txtBloodPressureDiastolicValue").val()) || 0,
+                HeartRateValue: parseInt($("#txtHeartRateValue").val()) || 0,
+                TemperatureValue: parseInt($("#txtTemperatureC").val()) || 0,
+
+                RespiratoryAlert: RespiratoryAlert,
+                OxygenSaturationAlert: OxygenSaturationAlert,
+                BloodPressureAlert: BloodPressureAlert,
+                HeartRateAlert: HeartRateAlert,
+                ConsciousnessAlert : ConsciousnessAlert,
+                TotalScore: $(".totaladdsscore").html()
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/patient/addpatientadds",
+                contentType: "application/json",
+                data: JSON.stringify(toPost), // Convert JavaScript object to JSON string
+                success: function (response) {
+                    if (response > 0) {
+                        $('#lblMessage').text("Patient ADDS record added successfully").css('color', 'green');
+                    } else {
+                        $('#lblMessage').text("Error").css('color', 'red');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $("#error-message").text("Error occurred");
+                }
+            });
+        });
+
+    });
+</script>

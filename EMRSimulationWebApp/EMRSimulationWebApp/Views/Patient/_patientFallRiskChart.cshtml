@@ -1,0 +1,331 @@
+﻿@{
+    Layout = null;
+    var labId = ViewBag.LabId ?? 0;
+    var patientId = ViewBag.PatientId ?? 0;
+}
+
+<div class="container-fluid" id="fratRoot">
+    <h4 class="mb-3">Fall Risk Assessment (FRAT)</h4>
+    <p class="text-muted">Lab ID: <strong>@labId</strong> | Patient ID: <strong>@patientId</strong></p>
+
+    <!-- =========================
+         PART 1: RISK FACTOR TABLE
+         ========================= -->
+    <div class="card mb-3">
+        <div class="card-header bg-dark text-white">Part 1 – Risk Factor Status</div>
+        <div class="card-body p-0">
+            <table class="table table-bordered align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 220px;">Risk Factor</th>
+                        <th>Description</th>
+                        <th style="width: 260px;">Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Recent Falls -->
+                    <tr>
+                        <td class="fw-semibold">Recent Falls</td>
+                        <td>History of falls within last 12 months</td>
+                        <td>
+                            <select id="recentFalls" class="form-select">
+                                <option value="2">No falls in last 12 months (2)</option>
+                                <option value="4">One or more 3–12 months ago (4)</option>
+                                <option value="6">One or more in last 3 months (6)</option>
+                                <option value="8">Fall in last 3 months while inpatient/resident (8)</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <!-- Medications -->
+                    <tr>
+                        <td class="fw-semibold">Medications</td>
+                        <td>
+                            Sedatives, Anti-Depressants, Anti-Parkinson’s, Diuretics, Anti-Hypertensives, Hypnotics
+                        </td>
+                        <td>
+                            <select id="medications" class="form-select">
+                                <option value="1">None (1)</option>
+                                <option value="2">One medication (2)</option>
+                                <option value="3">Two medications (3)</option>
+                                <option value="4">More than two (4)</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <!-- Psychological -->
+                    <tr>
+                        <td class="fw-semibold">Psychological</td>
+                        <td>
+                            Anxiety, Depression, ↓Cooperation, ↓Insight, ↓Judgement (esp. re: mobility)
+                        </td>
+                        <td>
+                            <select id="psychological" class="form-select">
+                                <option value="1">Not affected (1)</option>
+                                <option value="2">Mildly affected (2)</option>
+                                <option value="3">Moderately affected (3)</option>
+                                <option value="4">Severely affected (4)</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <!-- Cognitive -->
+                    <tr>
+                        <td class="fw-semibold">Cognitive</td>
+                        <td>Orientation / mental state</td>
+                        <td>
+                            <select id="cognitive" class="form-select">
+                                <option value="0">Oriented to time/place (0)</option>
+                                <option value="2">Occasional confusion (2)</option>
+                                <option value="4">Always confused (4)</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ===============================
+         PART 1b: AUTOMATIC HIGH RISK
+         =============================== -->
+    <div class="card mb-3">
+        <div class="card-header bg-dark text-white">Automatic High Risk (any of the below)</div>
+        <div class="card-body">
+            <div class="form-check mb-2">
+                <input type="checkbox" id="autoCondChange" class="form-check-input">
+                <label for="autoCondChange" class="form-check-label">
+                    Recent change in condition and/or medications affecting safe mobility (or anticipated)
+                </label>
+            </div>
+            <div class="form-check mb-2">
+                <input type="checkbox" id="autoDizziness" class="form-check-input">
+                <label for="autoDizziness" class="form-check-label">
+                    Dizziness / postural hypotension
+                </label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" id="autoAnaesthetic" class="form-check-input">
+                <label for="autoAnaesthetic" class="form-check-label">
+                    Anaesthetic / major operation in last 24h / PCA
+                </label>
+            </div>
+        </div>
+    </div>
+    <!-- FRAT Intervention Reference (Collapsible) -->
+<hr class="mt-4" />
+<div class="text-center mt-3 mb-4">
+  <h5>Reference: FRAT Intervention Checklist</h5>
+  <p class="text-muted">
+    This chart is provided as a visual reference for identifying and documenting interventions.
+  </p>
+
+  <!-- Button to show/hide image -->
+  <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#fratReferenceImage">
+    📋 FRAT Reference
+  </button>
+
+        <!-- Collapsible image -->
+        <div id="fratReferenceImage" class="collapse mt-3">
+            <img src='@Url.Content("~/images/frat_intervention_reference.jpg")'
+                 alt="FRAT Intervention Checklist Reference"
+                 style="max-width:100%; border:1px solid #ccc; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.1);" />
+        </div>
+</div>
+
+
+    <!-- ==========================
+         PART 2: INTERVENTIONS
+         ========================== -->
+    <div class="card mb-3 border-warning">
+        <div class="card-header bg-warning text-dark fw-bold">Intervention Guidelines </div>
+        <div class="card-body p-0">
+            <table class="table table-bordered mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 260px;">Problem</th>
+                        <th>Intervention Strategies / Referrals</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Vision / Orientation</td>
+                        <td><textarea class="form-control" rows="2" placeholder="e.g., ensure glasses fitted; large-print signage; orient to ward layout"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Mobility / Gait</td>
+                        <td><textarea class="form-control" rows="2" placeholder="e.g., gait aid within reach; physio referral; supervised ambulation"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Transfers</td>
+                        <td><textarea class="form-control" rows="2" placeholder="e.g., bed/chair height adjusted; staff assist x2; educate on slow position changes"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Medication Related</td>
+                        <td><textarea class="form-control" rows="2" placeholder="e.g., review meds; monitor for sedation/hypotension; medication timing"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Environment / ADLs</td>
+                        <td><textarea class="form-control" rows="2" placeholder="e.g., declutter; call bell in reach; non-slip footwear; night light"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td>Other</td>
+                        <td><textarea id="interventionNotes" class="form-control" rows="3" placeholder="Additional strategies / referrals"></textarea></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ==========================
+         RESULTS + ACTIONS
+         ========================== -->
+    <div class="alert alert-info" id="resultPanel">
+        <strong>Total Score:</strong> <span id="totalScore">0</span><br />
+        <strong>Risk Level:</strong> <span id="riskLevel">Low</span>
+    </div>
+
+    <button id="btnSaveFrat" class="btn btn-primary">Save Assessment</button>
+    <div id="fratSaveMsg" class="mt-3"></div>
+</div>
+
+<script>
+    /* Immediate execution so it works when this partial is injected via AJAX */
+    (function () {
+        const root = document.getElementById('fratRoot') || document;
+
+        const val = (id) => {
+            const el = root.querySelector('#' + id);
+            return el ? parseInt(el.value || '0', 10) : 0;
+        };
+        const on = (sel, evt, fn) =>
+            root.querySelectorAll(sel).forEach(el => el.addEventListener(evt, fn));
+
+        function calculate() {
+            // Sum section scores from dropdowns (Braden-style)
+            let score = 0;
+            score += val('recentFalls');
+            score += val('medications');
+            score += val('psychological');
+            score += val('cognitive');
+
+            // Display total
+            const totalEl = root.querySelector('#totalScore');
+            if (totalEl) totalEl.textContent = String(score);
+
+            // Risk bands (keep your FRAT mapping)
+            let risk = 'Low';
+            if (score >= 12 && score <= 15) risk = 'Medium';
+            if (score >= 16) risk = 'High';
+
+            // Automatic High Risk override
+            const autoCondChange  = !!root.querySelector('#autoCondChange')?.checked;
+            const autoDizziness   = !!root.querySelector('#autoDizziness')?.checked;
+            const autoAnaesthetic = !!root.querySelector('#autoAnaesthetic')?.checked;
+            if (autoCondChange || autoDizziness || autoAnaesthetic) risk = 'High';
+
+            const riskEl = root.querySelector('#riskLevel');
+            if (riskEl) riskEl.textContent = risk;
+
+            // 🔸 NEW: aggregate ALL intervention textareas (not just #interventionNotes)
+            let interventionNotes = '';
+            const interventionsCard = root.querySelector('.card.border-warning') || root; // scope to the orange card if present
+            const texts = Array.from(interventionsCard.querySelectorAll('textarea'))
+                .map(t => t.value.trim())
+                .filter(Boolean);
+            if (texts.length) {
+                // bullet each line so it renders nicely in tooltip / list column
+                interventionNotes = texts.map(t => `• ${t}`).join('\n');
+            }
+
+            // Return model for saving
+            return {
+                recentFallsScore: val('recentFalls'),
+                medicationsScore: val('medications'),
+                psychologicalScore: val('psychological'),
+                cognitiveScore: val('cognitive'),
+                totalScore: score,
+                riskLevel: risk,
+                autoCondChange,
+                autoDizziness,
+                autoAnaesthetic,
+                interventionNotes
+            };
+        }
+
+        // Recalculate on user interaction
+        on('select, input[type="checkbox"]', 'change', calculate);
+        on('textarea', 'input', calculate);
+        calculate(); // initial
+
+        // Save handler (uses your existing pattern)
+        const saveBtn = root.querySelector('#btnSaveFrat');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', function () {
+                const model = calculate();
+
+                const labId = @labId;
+                const patientId = @patientId;
+
+                if (!labId || !patientId) {
+                    window.jQuery && $('#fratSaveMsg').html('<div class="alert alert-warning">⚠ Please select a patient first.</div>');
+                    return;
+                }
+
+                const payload = {
+                    labId,
+                    patientId,
+                    recentFallsScore: model.recentFallsScore,
+                    medicationsScore: model.medicationsScore,
+                    psychologicalScore: model.psychologicalScore,
+                    cognitiveScore: model.cognitiveScore,
+                    totalScore: model.totalScore,
+                    riskLevel: model.riskLevel,
+                    autoCondChange: model.autoCondChange,
+                    autoDizziness: model.autoDizziness,
+                    autoAnaesthetic: model.autoAnaesthetic,
+                    interventionNotes: model.interventionNotes,
+                    assessedAt: new Date().toISOString()
+                };
+
+                $.ajax({
+                    url: '@Url.Action("AddPatientFallRisk", "Patient")',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function () {
+                        $('#fratSaveMsg').html(
+                            '<div class="alert alert-success">✅ Assessment saved. ' +
+                            '(Score: ' + payload.totalScore + ', Risk: ' + payload.riskLevel + ')</div>' +
+                            '<button type="button" id="btnViewFratList" class="btn btn-outline-primary btn-sm mt-2">View FRAT List</button>'
+                        );
+
+                        // Go to list after save
+                        $('#btnViewFratList').off('click').on('click', function () {
+                            $.ajax({
+                                url: '@Url.Action("GetPatientFallRiskList", "Patient")',
+                                method: 'GET',
+                                data: { labId: @labId, patientId: @patientId },
+                                success: function (html) {
+                                    $('#content-area').html(html);
+                                    $('#flowSheetMenu a').removeClass('active');
+                                    $('.load-patient-frat-list').addClass('active');
+                                },
+                                error: function (xhr) {
+                                    console.error("Error loading FRAT List:", xhr.status, xhr.responseText);
+                                }
+                            });
+                        });
+                    },
+                    error: function (xhr) {
+                        $('#fratSaveMsg').html('<div class="alert alert-danger">❌ Save failed: ' + (xhr.responseText || 'Server error') + '</div>');
+                    }
+                });
+            });
+        }
+
+        // Expose for quick console checks
+        window.fratCalculate = calculate;
+    })();
+</script>
+

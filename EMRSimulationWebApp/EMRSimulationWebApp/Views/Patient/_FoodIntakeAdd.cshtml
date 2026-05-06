@@ -1,0 +1,591 @@
+﻿@using Microsoft.AspNetCore.Html
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model EMRSimulationWebApp.Models.FoodIntakeAddViewModel
+@{
+    ViewData["Title"] = "Add Food Intake";
+}
+
+<div class="container-fluid p-3">
+
+    <!-- Title -->
+    <div class="text-center text-white py-2 mb-4" style="background-color:#000000; border-radius:6px;">
+        <h4 class="mb-0">Food Intake Record</h4>
+    </div>
+
+    <!-- Hidden IDs -->
+    <input type="hidden" id="foodLabId" value="@Model.LabId" />
+    <input type="hidden" id="foodPatientId" value="@Model.PatientId" />
+
+    <!-- Day / Date / Shift Signatures -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <!-- Row 1: Day | Date -->
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Day</label>
+                    <input type="text" id="fiDay" class="form-control" placeholder="e.g., Mon" value="@Model.Day" required />
+
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Date</label>
+                    <input type="date" id="fiDate" class="form-control" value="@Model.Date?.ToString("yyyy-MM-dd")" />
+                </div>
+            </div>
+
+            <!-- Row 2: Shift 1 Signature | Designation -->
+            <div class="row g-3 mt-1">
+                <div class="col-md-6">
+                    <label class="form-label"> Nurse Signature (1) </label>
+                    <input type="text" id="fiShift1Sig" class="form-control" maxlength="40" value="@Model.Shift1Signature" />
+                    <div class="invalid-feedback" id="errSig1">Please enter Nurse Signature (1).</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label"> Nurse Designation (1) </label>
+                    <input type="text" id="fiShift1Des" class="form-control" maxlength="40" value="@Model.Shift1Designation" />
+                    <div class="invalid-feedback" id="errDes1">Please enter Nurse Designation (1).</div>
+                </div>
+            </div>
+
+            <!-- Row 3: Shift 2 Signature | Designation -->
+            <div class="row g-3 mt-1">
+                <div class="col-md-6">
+                    <label class="form-label">Nurse Signature (2)</label>
+                    <input type="text" id="fiShift2Sig" class="form-control" maxlength="40" value="@Model.Shift2Signature" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label"> Nurse Designation (2)</label>
+                    <input type="text" id="fiShift2Des" class="form-control" maxlength="40" value="@Model.Shift2Designation" />
+                </div>
+            </div>
+
+            <!-- Row 4: Shift 3 Signature | Designation -->
+            <div class="row g-3 mt-1">
+                <div class="col-md-6">
+                    <label class="form-label">Nurse Signature (3)</label>
+                    <input type="text" id="fiShift3Sig" class="form-control" maxlength="40" value="@Model.Shift3Signature" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label"> Nurse Designation (3)</label>
+                    <input type="text" id="fiShift3Des" class="form-control" maxlength="40" value="@Model.Shift3Designation" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive mb-4">
+        <table class="table table-bordered align-middle fi-table">
+
+            <thead class="table-light">
+                <tr>
+                    <th class="text-center align-middle fi-th" style="width:140px;">MEAL</th>
+                    <th class="align-middle fi-th">
+                        <div class="text-center">FOOD</div>
+                        <small class="text-muted d-block text-center">Please record all food and drink on patient tray. Include high-protein drinks, tea, coffee.</small>
+                    </th>
+                    <th class="text-center align-middle fi-th" style="width:180px;">
+                        <div>AMOUNT CONSUMED</div>
+                    </th>
+                    <th class="text-center align-middle fi-th" style="width:280px;">
+                        <div>COMMENTS</div>
+                        <small class="d-block">Reason for reduced intake</small>
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <!-- Breakfast -->
+                <tr>
+                    <td rowspan="7" class="fw-bold text-center align-middle">Breakfast<br /><small class="text-muted">meal size</small></td>
+                    <td>
+                        <label class="form-label mb-1">Cereal with milk</label>
+                        <input type="text" class="form-control form-control-sm" id="bfCereal" placeholder="(optional notes)" />
+                    </td>
+                    <td>@DropAmt("bfCerealAmt")</td>
+                    <td rowspan="7" class="fi-comments">
+                        <div class="fi-comments-fill">
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="cPoor"><label class="form-check-label" for="cPoor">poor appetite</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="cNausea"><label class="form-check-label" for="cNausea">nausea</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="cRefused"><label class="form-check-label" for="cRefused">patient refused meal</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="cInterrupted"><label class="form-check-label" for="cInterrupted">interrupted meal time</label></div>
+                            <div class="fi-pair">
+                                <div class="form-check mb-0 me-2 d-flex align-items-center">
+                                    <input class="form-check-input" type="checkbox" id="cOtherMeal">
+                                    <label class="form-check-label ms-2" for="cOtherMeal">other meal provided</label>
+                                </div>
+                                <input type="text" id="cOtherMealTxt" class="form-control form-control-sm" placeholder="please specify" />
+                            </div>
+                            <!-- removed generic 'other + add a note' per requirement -->
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Toast</label><input type="text" class="form-control form-control-sm" id="bfToast" placeholder="(optional notes)" /></td>
+                    <td>@DropAmt("bfToastAmt")</td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Hot breakfast</label><input type="text" class="form-control form-control-sm" id="bfHot" placeholder="(optional notes)" /></td>
+                    <td>@DropAmt("bfHotAmt")</td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Yoghurt</label><input type="text" class="form-control form-control-sm" id="bfYoghurt" placeholder="(optional notes)" /></td>
+                    <td>@DropAmt("bfYoghurtAmt")</td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Fruit</label><input type="text" class="form-control form-control-sm" id="bfFruit" placeholder="(optional notes)" /></td>
+                    <td>@DropAmt("bfFruitAmt")</td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Beverage</label><input type="text" class="form-control form-control-sm" id="bfBeverage" placeholder="(optional notes)" /></td>
+                    <td>@DropAmt("bfBeverageAmt")</td>
+                </tr>
+                <tr>
+                    <td><label class="form-label mb-1">Other</label><input type="text" class="form-control form-control-sm" id="bfOther" placeholder="(optional notes)" /></td>
+                    <td>@DropAmt("bfOtherAmt")</td>
+                </tr>
+
+                <!-- Morning Tea (unchanged) -->
+                <tr class="fi-section-sep">
+                    <td rowspan="2" class="fw-bold text-center align-middle">Morning tea</td>
+                    <td>
+                        <label class="form-label mb-1">Food</label>
+                        <input type="text" class="form-control form-control-sm" id="mtFood" placeholder="(optional notes)" />
+                    </td>
+                    <td>@DropAmt("mtFoodAmt")</td>
+                    <td class="fi-comments fi-comments--center" rowspan="2">
+                        <div class="fi-centerbox">
+                            <input type="text" id="mtComment" class="form-control form-control-sm" placeholder="comment (optional)" />
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="form-label mb-1">Beverage</label>
+                        <input type="text" class="form-control form-control-sm" id="mtBeverage" placeholder="(optional notes)" />
+                    </td>
+                    <td>@DropAmt("mtBeverageAmt")</td>
+                </tr>
+
+                <!-- Lunch -->
+                <tr class="fi-section-sep">
+                    <td rowspan="9" class="fw-bold text-center align-middle">Lunch</td>
+                    <td><label class="form-label mb-1">Soup</label><input type="text" class="form-control form-control-sm" id="lnSoup" placeholder="(optional notes)" /></td>
+                    <td>@DropAmt("lnSoupAmt")</td>
+                    <td rowspan="9" class="fi-comments">
+                        <div class="fi-comments-fill">
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="lnPoor"><label class="form-check-label" for="lnPoor">poor appetite</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="lnNausea"><label class="form-check-label" for="lnNausea">nausea</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="lnRefused"><label class="form-check-label" for="lnRefused">patient refused meal</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="lnInterrupted"><label class="form-check-label" for="lnInterrupted">interrupted meal time</label></div>
+                            <div class="fi-pair">
+                                <div class="form-check d-flex align-items-center mb-0"><input class="form-check-input" type="checkbox" id="lnOtherMeal"><label class="form-check-label ms-2" for="lnOtherMeal">other meal provided</label></div>
+                                <input type="text" id="lnOtherMealTxt" class="form-control form-control-sm" placeholder="please specify" />
+                            </div>
+                            <!-- removed generic 'other + add a note' per requirement -->
+                        </div>
+                    </td>
+                </tr>
+                <tr><td><label class="form-label mb-1">Bread / Bread rolls</label><input type="text" class="form-control form-control-sm" id="lnBread" placeholder="(optional notes)" /></td><td>@DropAmt("lnBreadAmt")</td></tr>
+                <tr><td><label class="form-label mb-1">Main meal</label><input type="text" class="form-control form-control-sm" id="lnMain" placeholder="(optional notes)" /></td><td>@DropAmt("lnMainAmt")</td></tr>
+                <tr><td><label class="form-label mb-1">Potato/rice/pasta</label><input type="text" class="form-control form-control-sm" id="lnCarb" placeholder="(optional notes)" /></td><td>@DropAmt("lnCarbAmt")</td></tr>
+                <tr><td><label class="form-label mb-1">Salad/vegetables</label><input type="text" class="form-control form-control-sm" id="lnSalad" placeholder="(optional notes)" /></td><td>@DropAmt("lnSaladAmt")</td></tr>
+                <tr><td><label class="form-label mb-1">Sandwiches</label><input type="text" class="form-control form-control-sm" id="lnSandwich" placeholder="(optional notes)" /></td><td>@DropAmt("lnSandwichAmt")</td></tr>
+                <tr><td><label class="form-label mb-1">Dessert</label><input type="text" class="form-control form-control-sm" id="lnDessert" placeholder="(optional notes)" /></td><td>@DropAmt("lnDessertAmt")</td></tr>
+                <tr><td><label class="form-label mb-1">Beverage</label><input type="text" class="form-control form-control-sm" id="lnBeverage" placeholder="(optional notes)" /></td><td>@DropAmt("lnBeverageAmt")</td></tr>
+                <tr><td><label class="form-label mb-1">Other</label><input type="text" class="form-control form-control-sm" id="lnOtherFood" placeholder="(optional notes)" /></td><td>@DropAmt("lnOtherFoodAmt")</td></tr>
+
+                <!-- Afternoon tea (unchanged) -->
+                <tr class="fi-section-sep">
+                    <td rowspan="2" class="fw-bold text-center align-middle">Afternoon tea</td>
+                    <td><label class="form-label mb-1">Food</label><input type="text" class="form-control form-control-sm" id="atFood" placeholder="(optional notes)" /></td>
+                    <td>@DropAmt("atFoodAmt")</td>
+                    <td rowspan="2" class="fi-comments fi-comments--center">
+                        <div class="fi-centerbox">
+                            <input type="text" id="atComment" class="form-control form-control-sm" placeholder="comment (optional)" />
+                        </div>
+                    </td>
+                </tr>
+                <tr><td><label class="form-label mb-1">Beverage</label><input type="text" class="form-control form-control-sm" id="atBeverage" placeholder="(optional notes)" /></td><td>@DropAmt("atBeverageAmt")</td></tr>
+
+                <!-- Dinner -->
+                <tr class="fi-section-sep">
+                    <td rowspan="9" class="fw-bold text-center align-middle">Dinner</td>
+                    <td><label class="form-label mb-1">Soup</label><input type="text" class="form-control form-control-sm" id="dnSoup" placeholder="(optional notes)" /></td>
+                    <td>@DropAmt("dnSoupAmt")</td>
+                    <td rowspan="9" class="fi-comments">
+                        <div class="fi-comments-fill">
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="dnPoor"><label class="form-check-label" for="dnPoor">poor appetite</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="dnNausea"><label class="form-check-label" for="dnNausea">nausea</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="dnRefused"><label class="form-check-label" for="dnRefused">patient refused meal</label></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="dnInterrupted"><label class="form-check-label" for="dnInterrupted">interrupted meal time</label></div>
+                            <div class="fi-pair"><div class="form-check d-flex align-items-center mb-0"><input class="form-check-input" type="checkbox" id="dnOtherMeal"><label class="form-check-label ms-2" for="dnOtherMeal">other meal provided</label></div><input type="text" id="dnOtherMealTxt" class="form-control form-control-sm" placeholder="please specify" /></div>
+                            <!-- removed generic 'other + add a note' per requirement -->
+                        </div>
+                    </td>
+                </tr>
+                <tr><td><label class="form-label mb-1">Bread / Bread rolls</label><input type="text" class="form-control form-control-sm" id="dnBread" placeholder="(optional notes)" /></td><td>@DropAmt("dnBreadAmt")</td></tr>
+                <tr><td><label class="form-label mb-1">Main meal</label><input type="text" class="form-control form-control-sm" id="dnMain" placeholder="(optional notes)" /></td><td>@DropAmt("dnMainAmt")</td></tr>
+                <tr><td><label class="form-label mb-1">Potato/rice/pasta</label><input type="text" class="form-control form-control-sm" id="dnCarb" placeholder="(optional notes)" /></td><td>@DropAmt("dnCarbAmt")</td></tr>
+                <tr><td><label class="form-label mb-1">Salad/vegetables</label><input type="text" class="form-control form-control-sm" id="dnSalad" placeholder="(optional notes)" /></td><td>@DropAmt("dnSaladAmt")</td></tr>
+                <tr><td><label class="form-label mb-1">Sandwiches</label><input type="text" class="form-control form-control-sm" id="dnSandwich" placeholder="(optional notes)" /></td><td>@DropAmt("dnSandwichAmt")</td></tr>
+                <tr><td><label class="form-label mb-1">Dessert</label><input type="text" class="form-control form-control-sm" id="dnDessert" placeholder="(optional notes)" /></td><td>@DropAmt("dnDessertAmt")</td></tr>
+                <tr><td><label class="form-label mb-1">Beverage</label><input type="text" class="form-control form-control-sm" id="dnBeverage" placeholder="(optional notes)" /></td><td>@DropAmt("dnBeverageAmt")</td></tr>
+                <tr><td><label class="form-label mb-1">Other</label><input type="text" class="form-control form-control-sm" id="dnOtherFood" placeholder="(optional notes)" /></td><td>@DropAmt("dnOtherFoodAmt")</td></tr>
+
+                <!-- Supper (unchanged) -->
+                <tr class="fi-section-sep">
+                    <td rowspan="2" class="fw-bold text-center align-middle">Supper</td>
+                    <td><label class="form-label mb-1">Food</label><input type="text" class="form-control form-control-sm" id="spFood" placeholder="(optional notes)" /></td>
+                    <td>@DropAmt("spFoodAmt")</td>
+                    <td rowspan="2" class="fi-comments fi-comments--center">
+                        <div class="fi-centerbox"><input type="text" id="spComment" class="form-control form-control-sm" placeholder="comment (optional)" /></div>
+                    </td>
+                </tr>
+                <tr><td><label class="form-label mb-1">Beverage</label><input type="text" class="form-control form-control-sm" id="spBeverage" placeholder="(optional notes)" /></td><td>@DropAmt("spBeverageAmt")</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Actions -->
+    <div class="row mt-4">
+        <div class="col-md-12 d-flex justify-content-end gap-2">
+            <button type="button" id="btnFoodCancel" class="btn btn-outline-secondary">Cancel</button>
+            <button type="button" id="btnFoodSave" class="btn btn-primary" style="background-color:#FF8A30; color:#fff;">Save</button>
+        </div>
+    </div>
+
+    <!-- Message -->
+    <div class="row mt-2">
+        <div class="col-md-12">
+            <label id="lblFoodMessage" style="display:none;"></label>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="foodModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" id="foodModalHeader">
+                <h5 class="modal-title">Notice</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="foodModalMessage"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    // Small helper to render the 0 / ¼ / ½ / ¾ / all dropdown
+    public static IHtmlContent DropAmt(string id)
+    {
+        var select = new TagBuilder("select");
+        select.Attributes["id"] = id;
+        select.AddCssClass("form-select form-select-sm");
+        foreach (var opt in new[] { "0", "¼", "½", "¾", "all" })
+        {
+            var o = new TagBuilder("option");
+            o.Attributes["value"] = opt;
+            o.InnerHtml.Append(opt);
+            select.InnerHtml.AppendHtml(o);
+        }
+        return select;
+    }
+}
+
+<script>
+    // Converts yyyy-MM-dd → dd-MMM-yyyy exactly like the List page (e.g., 08-Sept-2025)
+    function toDmy(iso) {
+      const d = new Date(iso);
+      if (isNaN(d)) return "";
+      const day = String(d.getDate()).padStart(2,'0');
+      // IMPORTANT: 'Sept' (not 'Sep') to match your table format
+      const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sept","Oct","Nov","Dec"][d.getMonth()];
+      const yr  = d.getFullYear();
+      return `${day}-${mon}-${yr}`;
+    }
+</script>
+
+<script>
+    $(function () {
+      const labId     = $("#foodLabId").val();
+      const patientId = $("#foodPatientId").val();
+
+      function checkDuplicateForDate(dateIso) {
+        if (!dateIso || !labId || !patientId) return;
+
+        const target = toDmy(dateIso); // "dd-MMM-yyyy" (e.g., 08-Sept-2025)
+        $.get("/Patient/GetFoodIntakeList", { labId: labId, patientId: patientId })
+          .done(function (html) {
+            const $dom = $('<div>').html(html);
+            // Date is column 3 in your list
+            const exists = $dom.find('#foodTable tbody tr td:nth-child(3)')
+                               .filter(function(){ return $(this).text().trim() === target; })
+                               .length > 0;
+
+            if (exists) {
+              $("#foodModalHeader").removeClass("bg-success text-white").addClass("bg-danger text-white");
+              $("#foodModalMessage").html(
+                'A Food Intake record already exists for <strong>' + target + '</strong>.<br>' +
+                'Please open it from the list and use <em>Edit</em>.'
+              );
+              const modalEl = document.getElementById("foodModal");
+              const modal   = new bootstrap.Modal(modalEl);
+              modal.show();
+
+              // After closing, go to the list page
+              modalEl.addEventListener('hidden.bs.modal', function () {
+                $.get("/Patient/GetFoodIntakeList", { labId: labId, patientId: patientId }, function (html) {
+                  $("#content-area").html(html);
+                });
+              }, { once: true });
+            }
+          });
+      }
+
+      // Run once when page opens (if a date is already filled)
+      const initialDate = $("#fiDate").val();
+      if (initialDate) checkDuplicateForDate(initialDate);
+
+      // Also guard when the user changes the date
+      $("#fiDate").on("change", function () {
+        checkDuplicateForDate($(this).val());
+      });
+    });
+</script>
+
+<script>
+    $(function () {
+      $("#btnFoodSave").off("click").on("click", function () {
+        const labId     = $("#foodLabId").val();
+        const patientId = $("#foodPatientId").val();
+        const dateIso   = $("#fiDate").val();
+        const $msg      = $("#lblFoodMessage").css("color","red").hide();
+
+            // Make Day mandatory
+    const dayText = ($("#fiDay").val() || "").trim();
+    if (!labId || !patientId) { $msg.text("Missing Lab/Patient context.").show(); return; }
+    if (!dayText) {
+      $msg.text("Please select day.").show();
+      $("#fiDay").addClass("is-invalid").focus();
+      return;
+    } else {
+      $("#fiDay").removeClass("is-invalid");
+    }
+    if (!dateIso) { $msg.text("Please select Date.").show(); return; }
+
+        // Nurse 1 required 
+    const sig1 = ($("#fiShift1Sig").val() || "").trim();
+    if (!sig1) {
+      $msg.text("Please enter Nurse Signature (1).").show();
+      $("#fiShift1Sig").addClass("is-invalid").focus();
+      return;
+    } else {
+      $("#fiShift1Sig").removeClass("is-invalid");
+    }
+
+    const des1 = ($("#fiShift1Des").val() || "").trim();
+    if (!des1) {
+      $msg.text("Please enter Nurse Designation (1).").show();
+      $("#fiShift1Des").addClass("is-invalid").focus();
+      return;
+    } else {
+      $("#fiShift1Des").removeClass("is-invalid");
+    }
+
+
+
+        if (!labId || !patientId) { $msg.text("Missing Lab/Patient context.").show(); return; }
+        if (!dateIso) { $msg.text("Please select Date.").show(); return; }
+
+        // 🔎 UI-only guard: check if a record for this date already exists in the list
+        const target = toDmy(dateIso); // dd-MMM-yyyy like in the List page
+        $.get("/Patient/GetFoodIntakeList", { labId: labId, patientId: patientId })
+          .done(function (html) {
+            const $dom = $('<div>').html(html);
+            // In _FoodIntakeList.cshtml, the Date is the 3rd column
+            const exists = $dom.find('#foodTable tbody tr td:nth-child(3)')
+                               .filter(function(){ return $(this).text().trim() === target; })
+                               .length > 0;
+
+            if (exists) {
+              // 🚫 Show friendly modal and stop
+              $("#foodModalHeader").removeClass("bg-success text-white").addClass("bg-danger text-white");
+              $("#foodModalMessage").html(
+                `A Food Intake record already exists for <strong>${target}</strong>.<br>` +
+                `Please open it from the list and use <em>Edit</em>.`
+              );
+
+              new bootstrap.Modal(document.getElementById("foodModal")).show();
+              return;
+            }
+
+            // ✅ Breakfast comment (checkbox bundle → single string)
+            const parts = [];
+            if ($("#cPoor").is(":checked"))        parts.push("poor appetite");
+            if ($("#cNausea").is(":checked"))      parts.push("nausea");
+            if ($("#cRefused").is(":checked"))     parts.push("patient refused meal");
+            if ($("#cInterrupted").is(":checked")) parts.push("interrupted meal time");
+            if ($("#cOtherMeal").is(":checked")) {
+              const t = $("#cOtherMealTxt").val().trim();
+              parts.push("other meal" + (t ? `: ${t}` : ""));
+            }
+            const breakfastComment = parts.length ? parts.join("; ") : null;
+
+            // ✅ Morning-tea comment (single textbox)
+            const morningTeaComment = ($("#mtComment").val() || "").trim() || null;
+
+            // ✅ Lunch comment (checkbox bundle)
+            const lnParts = [];
+            if ($("#lnPoor").is(":checked"))        lnParts.push("poor appetite");
+            if ($("#lnNausea").is(":checked"))      lnParts.push("nausea");
+            if ($("#lnRefused").is(":checked"))     lnParts.push("patient refused meal");
+            if ($("#lnInterrupted").is(":checked")) lnParts.push("interrupted meal time");
+            if ($("#lnOtherMeal").is(":checked")) {
+              const t = $("#lnOtherMealTxt").val().trim();
+              lnParts.push("other meal" + (t ? `: ${t}` : ""));
+            }
+            const lunchComment = lnParts.length ? lnParts.join("; ") : null;
+
+            // ✅ Afternoon-tea comment (single textbox)
+            const afternoonTeaComment = ($("#atComment").val() || "").trim() || null;
+
+            // ✅ Dinner comment (checkbox bundle)
+            const dnParts = [];
+            if ($("#dnPoor").is(":checked"))        dnParts.push("poor appetite");
+            if ($("#dnNausea").is(":checked"))      dnParts.push("nausea");
+            if ($("#dnRefused").is(":checked"))     dnParts.push("patient refused meal");
+            if ($("#dnInterrupted").is(":checked")) dnParts.push("interrupted meal time");
+            if ($("#dnOtherMeal").is(":checked")) {
+              const t = $("#dnOtherMealTxt").val().trim();
+              dnParts.push("other meal" + (t ? `: ${t}` : ""));
+            }
+            const dinnerComment = dnParts.length ? dnParts.join("; ") : null;
+
+            // ✅ Supper comment (single textbox)
+            const supperComment = ($("#spComment").val() || "").trim() || null;
+
+            // Items (ONLY Meal/Label/Notes/Amount)
+            const items = [];
+            function addItem(meal, label, notesId, amtId) {
+              const amt   = $("#"+amtId).val();
+              const notes = ($("#"+notesId).val() || "").trim();
+              if ((amt && amt !== "") || notes !== "") {
+                items.push({ Meal: meal, Label: label, Notes: notes || null, Amount: amt || "0" });
+              }
+            }
+
+            // Breakfast rows
+            addItem("Breakfast", "Cereal with milk", "bfCereal",   "bfCerealAmt");
+            addItem("Breakfast", "Toast",            "bfToast",    "bfToastAmt");
+            addItem("Breakfast", "Hot breakfast",    "bfHot",      "bfHotAmt");
+            addItem("Breakfast", "Yoghurt",          "bfYoghurt",  "bfYoghurtAmt");
+            addItem("Breakfast", "Fruit",            "bfFruit",    "bfFruitAmt");
+            addItem("Breakfast", "Beverage",         "bfBeverage", "bfBeverageAmt");
+            addItem("Breakfast", "Other",            "bfOther",    "bfOtherAmt");
+
+            // Morning tea rows
+            addItem("Morning tea", "Food",     "mtFood",     "mtFoodAmt");
+            addItem("Morning tea", "Beverage", "mtBeverage", "mtBeverageAmt");
+
+            // Lunch rows
+            addItem("Lunch", "Soup",                 "lnSoup",      "lnSoupAmt");
+            addItem("Lunch", "Bread / Bread rolls",  "lnBread",     "lnBreadAmt");
+            addItem("Lunch", "Main meal",            "lnMain",      "lnMainAmt");
+            addItem("Lunch", "Potato/rice/pasta",    "lnCarb",      "lnCarbAmt");
+            addItem("Lunch", "Salad/vegetables",     "lnSalad",     "lnSaladAmt");
+            addItem("Lunch", "Sandwiches",           "lnSandwich",  "lnSandwichAmt");
+            addItem("Lunch", "Dessert",              "lnDessert",   "lnDessertAmt");
+            addItem("Lunch", "Beverage",             "lnBeverage",  "lnBeverageAmt");
+            addItem("Lunch", "Other",                "lnOtherFood", "lnOtherFoodAmt");
+
+            // Afternoon tea rows
+            addItem("Afternoon tea", "Food",     "atFood",     "atFoodAmt");
+            addItem("Afternoon tea", "Beverage", "atBeverage", "atBeverageAmt");
+
+            // Dinner rows
+            addItem("Dinner", "Soup",                 "dnSoup",      "dnSoupAmt");
+            addItem("Dinner", "Bread / Bread rolls",  "dnBread",     "dnBreadAmt");
+            addItem("Dinner", "Main meal",            "dnMain",      "dnMainAmt");
+            addItem("Dinner", "Potato/rice/pasta",    "dnCarb",      "dnCarbAmt");
+            addItem("Dinner", "Salad/vegetables",     "dnSalad",     "dnSaladAmt");
+            addItem("Dinner", "Sandwiches",           "dnSandwich",  "dnSandwichAmt");
+            addItem("Dinner", "Dessert",              "dnDessert",   "dnDessertAmt");
+            addItem("Dinner", "Beverage",             "dnBeverage",  "dnBeverageAmt");
+            addItem("Dinner", "Other",                "dnOtherFood", "dnOtherFoodAmt");
+
+            // Supper rows
+            addItem("Supper", "Food",     "spFood",     "spFoodAmt");
+            addItem("Supper", "Beverage", "spBeverage", "spBeverageAmt");
+
+            if (items.length === 0) { $msg.text("Please add at least one meal line.").show(); return; }
+
+            const dto = {
+              LabId: parseInt(labId, 10),
+              PatientId: parseInt(patientId, 10),
+              DayText: ($("#fiDay").val() || "").trim() || null,
+              IntakeDate: dateIso,
+
+              Shift1Signature: ($("#fiShift1Sig").val() || "").trim() || null,
+              Shift1Designation: ($("#fiShift1Des").val() || "").trim() || null,
+              Shift2Signature: ($("#fiShift2Sig").val() || "").trim() || null,
+              Shift2Designation: ($("#fiShift2Des").val() || "").trim() || null,
+              Shift3Signature: ($("#fiShift3Sig").val() || "").trim() || null,
+              Shift3Designation: ($("#fiShift3Des").val() || "").trim() || null,
+
+              BreakfastComment:       breakfastComment,
+              MorningTeaComment:      morningTeaComment,
+              LunchComment:           lunchComment,
+              AfternoonTeaComment:    afternoonTeaComment,
+              DinnerComment:          dinnerComment,
+              SupperComment:          supperComment,
+
+              Items: items
+            };
+
+            $.ajax({
+              type: "POST",
+              url: "/Patient/AddFoodIntake",
+              contentType: "application/json",
+              data: JSON.stringify(dto),
+              success: function (response) {
+                const code = Number(response);
+                if (code > 0) {
+                  $("#foodModalHeader").removeClass("bg-danger text-white").addClass("bg-success text-white");
+                  $("#foodModalMessage").text("Food Intake saved successfully!");
+                  const modalEl = document.getElementById("foodModal");
+                  const modal = new bootstrap.Modal(modalEl);
+                  modal.show();
+                  modalEl.addEventListener('hidden.bs.modal', function () {
+                    $.get("/Patient/GetFoodIntakeList",
+                      { labId: labId, patientId: patientId },
+                      function (html) { $("#content-area").html(html); });
+                  }, { once:true });
+                } else {
+                  $("#lblFoodMessage").text("Error saving Food Intake.").css("color","red").show();
+                }
+              },
+              error: function () {
+                $("#lblFoodMessage").text("Server error.").css("color","red").show();
+              }
+            });
+          })
+          .fail(function(){
+            // If list can't load, we warn and stop (to avoid duplicates)
+            $("#foodModalHeader").removeClass("bg-success text-white").addClass("bg-danger text-white");
+            $("#foodModalMessage").text("Could not verify existing records due to network error. Please try again.");
+            new bootstrap.Modal(document.getElementById("foodModal")).show();
+          });
+      });
+          $(function () {
+      $("#fiDay, #fiShift1Sig, #fiShift1Des").on("input change", function () {
+        $(this).removeClass("is-invalid");
+        $("#lblFoodMessage").hide();
+      });
+    });
+
+    });
+</script>

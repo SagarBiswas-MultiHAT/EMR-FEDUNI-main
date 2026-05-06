@@ -1,0 +1,116 @@
+﻿/* Print-only rules for Riskman Incident View */
+@media print {
+    /* Hide everything by default */
+    body * {
+        visibility: hidden !important;
+    }
+
+    /* Only show the printable wrapper and its children */
+    #riskman-print, #riskman-print * {
+        visibility: visible !important;
+    }
+
+    /* Put printable content at the top-left for clean capture */
+    #riskman-print {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        padding: 0 12mm !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Page setup (A4-ish margins) */
+    @page {
+        size: A4;
+        margin: 12mm;
+    }
+
+    /* Remove "(VIEW ONLY)" text */
+    .view-only-text {
+        display: none !important;
+    }
+
+    /* Incident Report Title - top center, bigger font */
+    #riskman-print .print-title {
+        display: block !important;
+        text-align: center !important;
+        font-size: 20pt !important;
+        font-weight: bold !important;
+        margin-bottom: 14px !important;
+        margin-top: 0 !important;
+    }
+
+    /* Section titles in print: sit in the label column, not centered */
+    #riskman-print .section-strap {
+        white-space: nowrap !important;
+        display: block !important;
+        text-align: left !important;
+        width: auto !important;
+        margin: 0 !important; /* no left offset */
+        padding: 0 !important;
+        font-size: 13pt !important;
+    }
+    /* Safety: never drift right */
+    #riskman-print .section-strap {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+    }
+
+    /* Label/value column widths */
+    #riskman-print .row > .col-sm-3 {
+        flex: 0 0 35% !important;
+        max-width: 35% !important;
+    }
+
+    #riskman-print .row > .col-sm-6 {
+        flex: 0 0 65% !important;
+        max-width: 65% !important;
+    }
+
+    /* Force same widths everywhere (catches any rows without direct-child layout) */
+    #riskman-print .col-sm-3 {
+        flex: 0 0 35% !important;
+        max-width: 35% !important;
+    }
+
+    #riskman-print .col-sm-6 {
+        flex: 0 0 65% !important;
+        max-width: 65% !important;
+    }
+
+    /* Row behavior: align tops, avoid splitting across pages, tighter spacing */
+    #riskman-print .row {
+        align-items: flex-start !important;
+        break-inside: avoid;
+        page-break-inside: avoid;
+        margin-bottom: 6px !important;
+    }
+
+    /* Inputs / selects / textareas: consistent light grey */
+    #riskman-print input.form-control,
+    #riskman-print textarea.form-control,
+    #riskman-print select.form-control {
+        border: 1px solid #999 !important;
+        background-color: #f0f0f0 !important;
+        box-shadow: inset 0 0 0 1000px #f0f0f0 !important; /* printable fill */
+        background-image: linear-gradient(#f0f0f0, #f
+
+        /* Multiline boxes also expand/wrap in print */
+        #riskman-print .readonly-multiline.form-control {
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+  height: auto !important;
+  min-height: 64px !important;
+  line-height: 1.25 !important;
+  padding: 8px !important;
+}
+        /* Keep only the '?' label on one line (if you added the helper class) */
+        #riskman-print .no-wrap-label label { white-space: nowrap !important; }
+        /* Extra gutter so inputs never sit on top of labels */
+        #riskman-print .row > [class^="col-"], #riskman-print .row > [class*=" col-"] {
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}

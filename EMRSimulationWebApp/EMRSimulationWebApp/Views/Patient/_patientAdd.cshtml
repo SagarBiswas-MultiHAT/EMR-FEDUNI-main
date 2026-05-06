@@ -1,0 +1,185 @@
+﻿<div class="container">
+    <div class="row section">
+        <!-- Left Column -->
+        <!-- Right Column -->
+
+        <div class="col-md-8">
+
+            <div class="form-group row mb-1" style="background-color: black;color: white;">
+                <div class="col-sm-7">
+                    <label class="col-sm-5 col-form-label">ADD PATIENT</label>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label for="txtUriNumber" class="form-label">URI Number</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtUriNumber" autocomplete="off" />
+                </div>
+                <div class="col-sm-3">
+                    <label for="txtAdmitDate" class="form-label">Admit Date</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtAdmitDate" autocomplete="off" />
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label for="txtFirstName" class="form-label">First Name</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtFirstName" autocomplete="off" />
+                </div>
+                <div class="col-sm-3">
+                    <label for="txtLastName" class="form-label">Last Name</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtLastName" autocomplete="off" />
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label for="txtDOB" class="form-label">Date of Birth</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtDOB" autocomplete="off" />
+                </div>
+                <div class="col-sm-3">
+                    <label for="ddlGender" class="form-label">Gender</label>
+                </div>
+                <div class="col-sm-3">
+                    <select id="ddlGender" class="col-form-label" style="width:100%">
+                        <option></option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label for="txtWeight" class="form-label">Weight</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtWeight" autocomplete="off" />
+                </div>
+                <div class="col-sm-3">
+                    <label for="txtHeight" class="form-label">Height</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtHeight" autocomplete="off" />
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label for="txtAge" class="form-label">Age</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtAge" autocomplete="off" />
+                </div>
+                <div class="col-sm-3">
+                    <label for="txtAddress" class="form-label">Address</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtAddress" autocomplete="off" />
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                
+                <div class="col-sm-3">
+                    <label for="txtAllergy" class="form-label">Allergy</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtAllergy" autocomplete="off" />
+                </div>
+                <div class="col-sm-3">
+                    <label for="txtIntolerance" class="form-label">Intolerance</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtIntolerance" autocomplete="off" />
+                </div>
+            </div>
+
+            <div>
+                <label id="lblMessage" style="color:green"></label>
+                <button type="button" id="btnSavePatient" class="btn btn-primary" style="background-color:#FF8A30;float: right;">Save</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#txtDOB").datepicker({
+            dateFormat: "yy-mm-dd" // Set the format here
+        });
+
+        $("#txtAdmitDate").datepicker({
+            dateFormat: "yy-mm-dd" // Set the format here
+        });
+
+        var LabId = $('#txtLabId').val();
+
+        $("#btnSavePatient").on("click", function (e) {
+            e.preventDefault(); // Prevent default link behavior
+
+            var txtFirstName = $('#txtFirstName').val();
+            var txtLastName = $('#txtLastName').val();
+            var txtDOB = $('#txtDOB').val() + "T00:00:00";
+            var txtAdmitDate = $('#txtAdmitDate').val() + "T00:00:00";
+
+            var ddlGender = $('#ddlGender').val();
+            var txtWeight = $('#txtWeight').val();
+            var txtHeight = $('#txtHeight').val();
+
+            var txtAge = $('#txtAge').val();
+            var txtAddress = $('#txtAddress').val();
+            var txtAllergy = $('#txtAllergy').val();
+            var txtIntolerance = $('#txtIntolerance').val();
+            var txtUriNumber = $('#txtUriNumber').val();
+
+            var toPost = {
+                Id: 0,
+                LabId: LabId,
+                FirstName: txtFirstName,
+                LastName: txtLastName,
+                DateOfBirth: txtDOB,
+                Gender: ddlGender,
+                Address: txtAddress,
+                AdmitDate: txtAdmitDate,
+                Weight: txtWeight,
+                Height: txtHeight,
+                Age: txtAge,
+                Allergy: txtAllergy,
+                Intolerance: txtIntolerance,
+                UriNumber: txtUriNumber
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/supervisor/addpatient",
+                contentType: "application/json",
+                data: JSON.stringify(toPost), // Convert JavaScript object to JSON string
+                success: function (response) {
+                    if (response > 0) {
+                        $('#lblMessage').text("Patient record added successfully").css('color', 'green');
+                    } else {
+                        $('#lblMessage').text("Error").css('color', 'red');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $("#error-message").text("Error occurred");
+                }
+            });
+        });
+
+    });
+</script>

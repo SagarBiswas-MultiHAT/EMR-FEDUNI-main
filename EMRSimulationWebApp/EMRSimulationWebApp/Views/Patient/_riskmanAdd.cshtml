@@ -1,0 +1,1003 @@
+﻿<div id="riskman-page" class="container">
+    <div class="row section">
+        <div class="col-12 col-md-10 col-lg-8 mx-auto">
+
+            <!-- Start: Riskman card wrapper -->
+            <div class="riskman-card">
+
+                <!-- Black header strip -->
+                <div class="riskman-card-header">
+                    EMR INCIDENT REPORTING FORM
+                </div>
+
+                <!-- White body -->
+                <div class="riskman-card-body">
+
+                    <!-- helper note -->
+                    <p class="required-note">All fields are mandatory. If you choose “Other”, please provide details in the text box that appears.</p>
+
+                    <!-- ========================= -->
+                    <!-- 1. Incident Information   -->
+                    <!-- ========================= -->
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <label class="form-label" style="font-weight:bold;">1. Incident Information</label>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <label for="incidentDate" class="form-label required">Incident Date</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="date" class="form-control" id="incidentDate" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <label for="incidentTime" class="form-label required">Incident Time</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="time" class="form-control" id="incidentTime" />
+                        </div>
+                    </div>
+
+                    <!-- Campus (dropdown) -->
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <label for="campus" class="form-label required">Campus</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select id="campus" class="form-control">
+                                <option value="">-- Select Campus --</option>
+                                <option value="Gippsland">Gippsland</option>
+                                <option value="Mt Helen">Mt Helen</option>
+                                <option value="Berwick">Berwick</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Ward/Location Type -->
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <label for="wardLocationType" class="form-label required">Ward/Location Type</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="wardLocationType" />
+                        </div>
+                    </div>
+
+                    <!-- ========================= -->
+                    <!-- 2. Person Affected        -->
+                    <!-- ========================= -->
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <label class="form-label" style="font-weight:bold;">2. Person Affected</label>
+                        </div>
+                    </div>
+
+                    <!-- Name -->
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <label for="personName" class="form-label required">Name</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="personName" placeholder="Full name" />
+                        </div>
+                    </div>
+
+                    <!-- Patient Identifier (URI Number) -->
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <label for="uriNumber" class="form-label required">Patient Identifier</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="uriNumber" placeholder="URI Number" />
+                        </div>
+                    </div>
+
+                    <!-- Date of Birth -->
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <label for="dateOfBirth" class="form-label required">Date of Birth</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="date" class="form-control" id="dateOfBirth" />
+                        </div>
+                    </div>
+
+                    <!-- Sex -->
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <label for="sex" class="form-label required">Sex</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select id="sex" class="form-control">
+                                <option value="">-- Select --</option>
+                                <option>Male</option>
+                                <option>Female</option>
+                                <option>Intersex/Indeterminate</option>
+                                <option>Not stated</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Indigenous Status (mark required if your policy demands it) -->
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <label for="indigenousStatus" class="form-label required">Indigenous Status</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select id="indigenousStatus" class="form-control">
+                                <option value="">-- Select --</option>
+                                <option>Aboriginal but not Torres Strait Islander origin</option>
+                                <option>Torres Strait Islander but not Aboriginal origin</option>
+                                <option>Both Aboriginal and Torres Strait Islander origin</option>
+                                <option>Neither Aboriginal nor Torres Strait Islander origin</option>
+                                <option>Question unable to be asked</option>
+                                <option>Patient refused to answer</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 3. Incident Details -->
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <label class="form-label" style="font-weight:bold;">3. Incident Details</label>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <label for="briefSummary" class="form-label required">Brief Summary</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <textarea id="briefSummary" class="form-control autogrow" rows="1" placeholder="One-line summary"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <label for="details" class="form-label required">Details</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <textarea id="details" class="form-control autogrow" rows="2" placeholder="Describe what happened"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <label for="eventType" class="form-label required">Event Type</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select id="eventType" class="form-control">
+                                <option value="">-- Select Event Type --</option>
+                                <option value="Fall">Fall</option>
+                                <option value="Wounds">Wounds</option>
+                                <option value="Medication error">Medication error</option>
+                                <option value="Aggression">Aggression</option>
+                                <option value="Staff Injury">Staff Injury</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <label for="eventSubType" class="form-label required">Event Type Sub-category</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select id="eventSubType" class="form-control" disabled>
+                                <option value="">-- Select Sub-category --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- ========================= -->
+                    <!-- 4. Clinical Incident      -->
+                    <!-- ========================= -->
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <label class="form-label" style="font-weight:bold;">4. Clinical Incident</label>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <label for="isClinicalIncident" class="form-label required">Is this a Clinical Incident?</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select id="isClinicalIncident" class="form-control">
+                                <option value="">-- Select --</option>
+                                <option>Yes</option>
+                                <option>No</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <label for="isApse" class="form-label required">Adverse Patient Safety Event (APSE)?</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select id="isApse" class="form-control">
+                                <option value="">-- Select --</option>
+                                <option>Yes</option>
+                                <option>No</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <label for="clinicalHarmLevel" class="form-label required">Level of Harm (Clinical)</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select id="clinicalHarmLevel" class="form-control">
+                                <option value="">-- Select --</option>
+                                <option>Severe</option>
+                                <option>Moderate</option>
+                                <option>Mild</option>
+                                <option>No harm</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <label for="harmDuration" class="form-label required">Duration of Harm</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select id="harmDuration" class="form-control">
+                                <option value="">-- Select --</option>
+                                <option>Permanent</option>
+                                <option>Temporary</option>
+                                <option>No harm</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <label for="requiredCareLevelClinical" class="form-label required">Level of Care/Treatment Required</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select id="requiredCareLevelClinical" class="form-control">
+                                <option value="">-- Select --</option>
+                                <option>Observation</option>
+                                <option>Minor care</option>
+                                <option>Significant intervention</option>
+                                <option>Intensive care</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- ========================= -->
+                    <!-- 5. Emergency Response     -->
+                    <!-- ========================= -->
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <label class="form-label" style="font-weight:bold;">5. Emergency Response</label>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <label for="emergencyType" class="form-label required">Emergency Response Type</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select id="emergencyType" class="form-control">
+                                <option value="">-- Select --</option>
+                                <option>Code Black</option>
+                                <option>Code Brown</option>
+                                <option>Code Grey (Unplanned)</option>
+                                <option>Code Grey (Planned)</option>
+                                <option>Code Red</option>
+                                <option>Code Yellow</option>
+                                <option>MET/Code Blue</option>
+                                <option>Obstetric Emergency</option>
+                                <option>No Emergency Response Required</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3" id="rowEmergencyOutcome" style="display:none;">
+                        <div class="col-sm-3">
+                            <label for="emergencyOutcome" class="form-label required">Emergency Response Outcome</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select id="emergencyOutcome" class="form-control">
+                                <option value="">-- Select --</option>
+                                <option>No violence or aggression occurred</option>
+                                <option>Situation resolved prior to code grey arrival</option>
+                                <option>Clinically led Code Grey response implemented</option>
+                                <option>Security only response</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- ========================= -->
+                    <!-- 6. Contributing Factors   -->
+                    <!-- ========================= -->
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <label class="form-label" style="font-weight:bold;">6. Contributing Factors</label>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <span class="form-label d-block required">Contributing Factors</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <div id="contribFactorsWrap" class="border rounded p-2">
+                                <div class="form-check">
+                                    <input class="form-check-input cf-item" type="checkbox" id="cfPatient" value="Patient Factors">
+                                    <label class="form-check-label" for="cfPatient">
+                                        Patient Factors (e.g., cognition, mobility, language barrier)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input cf-item" type="checkbox" id="cfStaff" value="Staff Factors">
+                                    <label class="form-check-label" for="cfStaff">
+                                        Staff Factors (e.g., fatigue, inexperience, skill mix)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input cf-item" type="checkbox" id="cfComm" value="Communication Breakdown">
+                                    <label class="form-check-label" for="cfComm">
+                                        Communication Breakdown (e.g., handover issues, unclear documentation)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input cf-item" type="checkbox" id="cfEnv" value="Environmental Factors">
+                                    <label class="form-check-label" for="cfEnv">
+                                        Environmental Factors (e.g., cluttered space, poor lighting)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input cf-item" type="checkbox" id="cfEquip" value="Equipment/Device Issues">
+                                    <label class="form-check-label" for="cfEquip">
+                                        Equipment/Device Issues (e.g., malfunction, incorrect use)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input cf-item" type="checkbox" id="cfPolicy" value="Policy/Procedure Not Followed">
+                                    <label class="form-check-label" for="cfPolicy">
+                                        Policy/Procedure Not Followed (e.g., protocol deviation)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input cf-item" type="checkbox" id="cfSystem" value="System/Workflow Issues">
+                                    <label class="form-check-label" for="cfSystem">
+                                        System/Workflow Issues (e.g., understaffing, delays in care)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <label for="contribDetail" class="form-label required">Additional Detail</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <textarea id="contribDetail" class="form-control" rows="2" placeholder="Add detail about the selected contributing factors"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- =============================================================== -->
+                    <!-- 7. Occupational Health & Safety (OHS) – Staff/Visitor/Patients  -->
+                    <!-- =============================================================== -->
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <label class="form-label" style="font-weight:bold;">7. Occupational Health &amp; Safety (OHS) – For Staff/Visitor/Patients Incidents</label>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <span class="form-label d-block required">Is the Reporter the Affected Staff Member?</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="reporterAffected" id="reporterAffectedYes" value="Yes">
+                                <label class="form-check-label" for="reporterAffectedYes">Yes</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="reporterAffected" id="reporterAffectedNo" value="No">
+                                <label class="form-check-label" for="reporterAffectedNo">No</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <label for="injuryType" class="form-label required">Type of Injury</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select id="injuryType" class="form-control">
+                                <option value="">-- Select --</option>
+                                <option>Musculoskeletal Injury (e.g., strain/sprain from manual handling)</option>
+                                <option>Needlestick/Sharps Injury</option>
+                                <option>Bruising or Contusion</option>
+                                <option>Laceration or Cut</option>
+                                <option>Fracture</option>
+                                <option>Burn or Scald</option>
+                                <option>Psychological Injury (e.g., stress, anxiety post-incident)</option>
+                                <option>Exposure to Infectious Material</option>
+                                <option>Slip, Trip or Fall</option>
+                                <option>Other (please specify)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1" id="rowInjuryOther" style="display:none;">
+                        <div class="col-sm-3">
+                            <label for="injuryOther" class="form-label">If Other, specify</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <textarea id="injuryOther" class="form-control autogrow" rows="1" placeholder="Describe injury type"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <label for="bodyPart" class="form-label required">Body Part Affected</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select id="bodyPart" class="form-control">
+                                <option value="">-- Select --</option>
+                                <option>Head/Face</option>
+                                <option>Neck</option>
+                                <option>Back/Spine</option>
+                                <option>Upper Limb (e.g., shoulder, arm, hand)</option>
+                                <option>Lower Limb (e.g., hip, leg, foot)</option>
+                                <option>Chest/Abdomen</option>
+                                <option>Multiple Areas</option>
+                                <option>Psychological</option>
+                                <option>Other (please specify)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1" id="rowBodyPartOther" style="display:none;">
+                        <div class="col-sm-3">
+                            <label for="bodyPartOther" class="form-label">If Other, specify</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <textarea id="bodyPartOther" class="form-control autogrow" rows="1" placeholder="Describe body part"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <label for="harmSustained" class="form-label required">Level of Harm Sustained</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select id="harmSustained" class="form-control">
+                                <option value="">-- Select --</option>
+                                <option>No Harm</option>
+                                <option>Mild Harm (e.g., minor bruising, discomfort)</option>
+                                <option>Moderate Harm (e.g., requires medical treatment, short-term impact)</option>
+                                <option>Severe Harm (e.g., permanent injury, significant intervention)</option>
+                                <option>Death</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <label for="requiredCareLevel" class="form-label required">Required Level of Care</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <select id="requiredCareLevel" class="form-control">
+                                <option value="">-- Select --</option>
+                                <option>No treatment required</option>
+                                <option>Minor treatment</option>
+                                <option>Medical treatment required</option>
+                                <option>Ongoing healthcare intervention (e.g., physiotherapy, counselling)</option>
+                                <option>Emergency response required (e.g., MET/Code Blue)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <label for="actionsRequired" class="form-label required">Actions Required</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <textarea id="actionsRequired" class="form-control" rows="2" placeholder="Open text"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- =============================================================== -->
+                    <!-- 8. Next of Kin notification  -->
+                    <!-- =============================================================== -->
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <label class="form-label" style="font-weight:bold;">8. Next of Kin Notification</label>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <span class="form-label d-block required">Has the Next of Kin been notified?</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="nextOfKinNotified" id="nextOfKinNotifiedYes" value="Yes">
+                                <label class="form-check-label" for="nextOfKinNotifiedYes">Yes</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="nextOfKinNotified" id="nextOfKinNotifiedNo" value="No">
+                                <label class="form-check-label" for="nextOfKinNotifiedNo">No</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="rowNextOfKinNotification" style="display:none;">
+                        <div class="row mb-1">
+                            <div class="col-sm-3">
+                                <label for="nextOfKinNotifiedDate" class="form-label required">Notified Date</label>
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="date" class="form-control" id="nextOfKinNotifiedDate" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-1">
+                            <div class="col-sm-3">
+                                <label for="nextOfKinNotifiedTime" class="form-label required">Notified Time</label>
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="time" class="form-control" id="nextOfKinNotifiedTime" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ========================= -->
+                    <!-- Sign Off Section -->
+                    <!-- ========================= -->
+                    <div class="row mb-2 mt-4">
+                        <div class="col-sm-12">
+                            <label class="form-label" style="font-weight:bold;">Sign Off</label>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-sm-3">
+                            <label for="signedBy" class="form-label required">Signed By</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="signedBy" placeholder="Full Name" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <label for="signOffDate" class="form-label required">Date</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="date" class="form-control" id="signOffDate" />
+                        </div>
+                    </div>
+
+                    <!-- Save -->
+                    <div class="row mb-1">
+                        <div class="col-sm-3"></div>
+                        <div class="col-sm-6">
+                            <button type="button" id="btnSubmitRiskman" class="btn btn-primary" style="background-color:#FF8A30; float: right;">Save</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label id="lblRiskmanMessage" style="color:green"></label>
+                    </div>
+
+                </div> <!-- /riskman-card-body -->
+            </div>   <!-- /riskman-card -->
+        </div>     <!-- /.col-md-8 -->
+    </div>       <!-- /.row -->
+</div>       <!-- /.container -->
+
+<!-- Riskman Save Modal -->
+<div class="modal fade" id="riskmanModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" id="riskmanModalHeader">
+                <h5 class="modal-title">Notice</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="riskmanModalMessage"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+      $("#btnSubmitRiskman").on("click", function (e) {
+        e.preventDefault();
+
+        // clear previous errors
+        $("#lblRiskmanMessage").text("").hide();
+        $(".is-invalid").removeClass("is-invalid");
+
+        let valid = true;
+        function requireField(selector, msg) {
+          const $el = $(selector);
+          if (!$el.val() || $el.val().trim() === "") {
+            $el.addClass("is-invalid");
+            $("#lblRiskmanMessage").text(msg).css("color", "red").show();
+            valid = false;
+          }
+          return $el.val();
+        }
+
+        // Required fields check
+        const labId = parseInt($("#txtLabId").val(), 10);   // from layout
+        if (!labId) { $("#lblRiskmanMessage").text("Lab ID missing.").css("color","red").show(); return; }
+
+        const incidentDateRaw = requireField("#incidentDate", "Incident Date is required");
+        const incidentTime    = requireField("#incidentTime", "Incident Time is required");
+        const campus          = requireField("#campus", "Campus is required");
+        const wardLocationType= requireField("#wardLocationType", "Ward/Location Type is required");
+        const personName      = requireField("#personName", "Name is required");
+        const uriNumber       = requireField("#uriNumber", "Patient Identifier is required");
+        const dateOfBirthRaw  = requireField("#dateOfBirth", "Date of Birth is required");
+        const sex             = requireField("#sex", "Sex is required");
+        const indigenousStatus= requireField("#indigenousStatus", "Indigenous Status is required");
+        const briefSummary    = requireField("#briefSummary", "Brief Summary is required");
+        const details         = requireField("#details", "Details are required");
+        const eventType       = requireField("#eventType", "Event Type is required");
+        const eventSubType    = requireField("#eventSubType", "Event Sub-category is required");
+        const isClinicalIncident = requireField("#isClinicalIncident", "Clinical Incident selection required");
+        const isApse          = requireField("#isApse", "APSE selection required");
+        const clinicalHarmLevel= requireField("#clinicalHarmLevel", "Clinical Harm Level is required");
+        const harmDuration    = requireField("#harmDuration", "Duration of Harm is required");
+        const requiredCareLevelClinical = requireField("#requiredCareLevelClinical", "Level of Care/Treatment Required is required");
+        const emergencyType   = requireField("#emergencyType", "Emergency Response Type is required");
+        if ($("#rowEmergencyOutcome").is(":visible")) {
+          requireField("#emergencyOutcome", "Emergency Response Outcome is required");
+        }
+        const contribDetail   = requireField("#contribDetail", "Contributing Factors Detail is required");
+        const injuryType      = requireField("#injuryType", "Type of Injury is required");
+        if ($("#rowInjuryOther").is(":visible")) {
+          requireField("#injuryOther", "Please specify Injury Type");
+        }
+        const bodyPart        = requireField("#bodyPart", "Body Part Affected is required");
+        if ($("#rowBodyPartOther").is(":visible")) {
+          requireField("#bodyPartOther", "Please specify Body Part");
+        }
+        const harmSustained   = requireField("#harmSustained", "Level of Harm Sustained is required");
+        const requiredCareLevel = requireField("#requiredCareLevel", "Required Level of Care is required");
+        const actionsRequired = requireField("#actionsRequired", "Actions Required is required");
+
+        let nextOfKinNotifiedDate = null;
+        let nextOfKinNotifiedTime = null;
+        if ($("#rowNextOfKinNotification").is(":visible")) {
+            nextOfKinNotifiedDate = requireField("#nextOfKinNotifiedDate", "Next of Kin Notification Date is required");
+            nextOfKinNotifiedTime = requireField("#nextOfKinNotifiedTime", "Next of Kin Notification Time is required");
+        }
+        const signedBy        = requireField("#signedBy", "Sign Off Name is required");
+        const signOffDate     = requireField("#signOffDate", "Sign Off Date is required");
+
+        // Contributing factors must have at least one checkbox
+        if ($(".cf-item:checked").length === 0) {
+          $("#lblRiskmanMessage").text("At least one Contributing Factor is required").css("color", "red").show();
+          valid = false;
+        }
+
+        // Reporter affected radio
+        const reporterIsAffectedStaffVal = $('input[name="reporterAffected"]:checked').val();
+        if (!reporterIsAffectedStaffVal) {
+          $("#lblRiskmanMessage").text("Reporter affected staff selection is required").css("color", "red").show();
+          valid = false;
+        }
+
+        // Reporter affected radio
+        const nextOfKinNotifiedVal = $('input[name="nextOfKinNotified"]:checked').val();
+        if (!nextOfKinNotifiedVal) {
+            $("#lblRiskmanMessage").text("Next of Kin notification selection is required").css("color", "red").show();
+            valid = false;
+        }
+
+        if (!valid) return; // stop if invalid
+
+        // build payload (unchanged)
+        const data = {
+          Id: 0,
+          LabId: labId,
+          PatientId: 101,
+          IncidentDate: new Date(incidentDateRaw).toISOString(),
+          IncidentTime: incidentTime,
+          URINumber: uriNumber,
+          Campus: campus,
+          WardLocationType: wardLocationType,
+          PersonName: personName,
+          DateOfBirth: new Date(dateOfBirthRaw).toISOString(),
+          Sex: sex,
+          IndigenousStatus: indigenousStatus,
+          BriefSummary: briefSummary,
+          Details: details,
+          EventType: eventType,
+          EventSubType: eventSubType,
+          IsClinicalIncident: (isClinicalIncident.toLowerCase() === "yes"),
+          Apse: (isApse.toLowerCase() === "yes"),
+          ClinicalHarmLevel: clinicalHarmLevel,
+          HarmDuration: harmDuration,
+          RequiredCareLevelClinical: requiredCareLevelClinical,
+          EmergencyResponseType: emergencyType,
+          EmergencyResponseOutcome: $("#emergencyOutcome").val() || null,
+          ContributingFactors: $(".cf-item:checked").map(function(){return this.value;}).get(),
+          ContributingAdditionalDetail: contribDetail,
+          ReporterIsAffectedStaff: (reporterIsAffectedStaffVal === "Yes"),
+          OhsTypeOfInjury: injuryType,
+          OhsTypeOfInjuryOther: $("#injuryOther").val() || null,
+          OhsBodyPartAffected: bodyPart,
+          OhsBodyPartOther: $("#bodyPartOther").val() || null,
+          OhsLevelOfHarmSustained: harmSustained,
+          OhsRequiredLevelOfCare: requiredCareLevel,
+          OhsActionsRequired: actionsRequired,
+          NextOfKinNotifiedDate: nextOfKinNotifiedDate,
+          NextOfKinNotifiedTime: nextOfKinNotifiedTime,
+          SignedBy: signedBy,
+          SignedDate: new Date(signOffDate).toISOString()
+        };
+
+              $.ajax({
+      type: "POST",
+      url: "/Patient/AddRiskmanIncident",
+      contentType: "application/json",
+      data: JSON.stringify(data),
+      success: function (response) {
+        // Hide the inline label; we’re using the modal now
+        $("#lblRiskmanMessage").hide().text("");
+
+        if (Number(response) > 0) {
+          // ✅ Success modal
+          $("#riskmanModalHeader")
+            .removeClass("bg-danger text-white")
+            .addClass("bg-success text-white");
+          $("#riskmanModalMessage").text("Incident added successfully!");
+
+          var modalEl = document.getElementById("riskmanModal");
+          var modal   = new bootstrap.Modal(modalEl);
+          modal.show();
+
+          // 👉 After modal closes, load the incident list into #content-area
+          modalEl.addEventListener('hidden.bs.modal', function () {
+            const labId = parseInt($("#txtLabId").val(), 10);
+            // Use your real patient id here. If you have a hidden #txtPatientId use that; else match your payload (101).
+            const patientId =
+              parseInt($("#txtPatientId").val(), 10) || 101;
+
+            // Adjust the URL below if your list endpoint is named differently.
+            $.get("/Patient/GetRiskmanIncidentList",
+              { labId: labId, patientId: patientId },
+              function (html) { $("#content-area").html(html); }
+            );
+          }, { once: true });
+
+        } else {
+          // ❌ Error modal
+          $("#riskmanModalHeader")
+            .removeClass("bg-success text-white")
+            .addClass("bg-danger text-white");
+          $("#riskmanModalMessage").text("Error saving incident.");
+          new bootstrap.Modal(document.getElementById("riskmanModal")).show();
+        }
+      },
+      error: function () {
+        // ❌ Server/error modal
+        $("#riskmanModalHeader")
+          .removeClass("bg-success text-white")
+          .addClass("bg-danger text-white");
+        $("#riskmanModalMessage").text("Server error.");
+        new bootstrap.Modal(document.getElementById("riskmanModal")).show();
+      }
+    });
+
+
+      });
+    });
+</script>
+<script>
+    // Auto-grow for textareas
+    function bindAutogrow($els) {
+      $els.each(function () {
+        const ta = this;
+        const grow = () => {
+          ta.style.height = 'auto';
+          ta.style.height = ta.scrollHeight + 'px';
+        };
+        ta.style.overflowY = 'hidden';
+        ta.addEventListener('input', grow);
+        grow(); // initial
+      });
+    }
+
+    $(function () {
+      // make these expand while typing (including your existing multi-line ones)
+      bindAutogrow($('#injuryOther, #bodyPartOther, #actionsRequired, #contribDetail, #briefSummary, #details'));
+
+      // tweak show/hide so height recalculates when shown/cleared
+      $('#injuryType').on('change', function () {
+        const isOther = ($(this).val() || '').toLowerCase().indexOf('other') >= 0;
+        $('#rowInjuryOther').toggle(isOther);
+        if (!isOther) { $('#injuryOther').val('').trigger('input'); }
+        else { setTimeout(() => $('#injuryOther').trigger('input'), 0); }
+      });
+
+      $('#bodyPart').on('change', function () {
+        const isOther = ($(this).val() || '').toLowerCase().indexOf('other') >= 0;
+        $('#rowBodyPartOther').toggle(isOther);
+        if (!isOther) { $('#bodyPartOther').val('').trigger('input'); }
+        else { setTimeout(() => $('#bodyPartOther').trigger('input'), 0); }
+      });
+    });
+</script>
+
+<script>
+    // ===== Helpers for Riskman dynamic fields =====
+    $(function () {
+      // 1) Date of Birth: prevent future dates
+      const dob = document.getElementById('dateOfBirth');
+      if (dob) dob.max = new Date().toISOString().split('T')[0];
+
+      // 2) Event Type → Sub-category filtering
+      const subcats = {
+        "Fall": [
+          "Patients fall in bed",
+          "Patients fall when mobilising",
+          "Fall from a chair",
+          "Slip or trip without fall",
+          "Near-miss fall"
+        ],
+        "Wounds": [
+          "Pressure Injury (any stage)",
+          "Surgical wound complication (e.g., dehiscence, infection)",
+          "Skin tear",
+          "Wound on admission",
+          "Medical device-related injury"
+        ],
+        "Medication error": [
+          "Wrong medication administered",
+          "Wrong dose administered",
+          "Missed medication dose",
+          "Wrong patient",
+          "Incorrect route of administration",
+          "Other"
+        ],
+        "Aggression": [
+          "Physical aggression by patient",
+          "Verbal aggression by patient",
+          "Physical aggression by visitor",
+          "Verbal aggression by visitor",
+          "Property damage",
+          "Other"
+        ],
+        "Staff Injury": [
+          "Manual handling injury",
+          "Needle stick or sharps injury",
+          "Slip, trip, or fall (staff)",
+          "Aggression-related injury",
+          "Exposure to infectious material"
+        ],
+        "Other": [
+          "Clinical Deterioration (e.g., unplanned MET/Code Blue)",
+          "Equipment malfunction impacting patient care",
+          "Documentation error (e.g., incorrect patient record entry)",
+          "Near Miss (harm avoided)",
+          "Infection control breach (e.g., PPE not used correctly)"
+        ]
+      };
+
+      const typeEl = document.getElementById('eventType');
+      const subEl  = document.getElementById('eventSubType');
+
+      function populateSubtypes(key) {
+        if (!subEl) return;
+        // use backticks or single-line string
+        subEl.innerHTML = `<option value="">-- Select Sub-category --</option>`;
+        if (!key || !subcats[key]) { subEl.disabled = true; return; }
+        subcats[key].forEach(function (label) {
+          const opt = document.createElement('option');
+          opt.value = label;
+          opt.textContent = label;
+          subEl.appendChild(opt);
+        });
+        subEl.disabled = false;
+      }
+
+      if (typeEl) {
+        typeEl.addEventListener('change', function () {
+          populateSubtypes(this.value);
+        });
+        // populate if already selected (e.g. edit mode)
+        if (typeEl.value) populateSubtypes(typeEl.value);
+      }
+
+      // 3) Emergency Outcome toggle for Code Grey
+        $('#emergencyType').on('change', function () {
+        const val = $(this).val() || '';
+        const show = val.indexOf('Code Grey') >= 0;
+        $('#rowEmergencyOutcome').toggle(show);
+        if (!show) $('#emergencyOutcome').val('');
+      }).trigger('change'); // run once at page load
+
+        // 4) Next of Kin Notified toggle for Yes
+        $('input[name="nextOfKinNotified"]').on('change', function () {
+            const val = $(this).val() || '';
+            const show = val == 'Yes';
+            $('#rowNextOfKinNotification').toggle(show);
+            if (!show) {
+                $('#nextOfKinNotifiedDate').val('');
+                $('#nextOfKinNotifiedTime').val('');
+            }
+        }).trigger('change'); // run once at page load
+
+      // 5) Optional: auto-fill today’s date in Sign Off
+      const signDate = document.getElementById('signOffDate');
+      if (signDate && !signDate.value) {
+        signDate.value = new Date().toISOString().split('T')[0];
+      }
+    });
+</script>
+
+<script>
+    // Clear field-level error as user types/changes
+    function wireLiveClear() {
+      const $msg = $("#lblRiskmanMessage");
+
+      // Any text/textarea/select should clear its own red border on input/change
+      $("#riskman-page").on("input change", "input.form-control, textarea.form-control, select.form-control", function () {
+        const v = ($(this).val() || "").toString().trim();
+        if (v !== "") {
+          $(this).removeClass("is-invalid");
+          // If no invalid fields remain AND special groups are satisfied, hide global message
+          if ($(".is-invalid").length === 0 &&
+              $('input[name="reporterAffected"]:checked').length > 0 &&
+              $(".cf-item:checked").length > 0) {
+            $msg.hide();
+          }
+        }
+      });
+
+      // Contributing factors group (checkboxes)
+      $(".cf-item").on("change", function () {
+        if ($(".cf-item:checked").length > 0 && $(".is-invalid").length === 0) {
+          $msg.hide();
+        }
+      });
+
+      // Reporter affected (radio group)
+      $('input[name="reporterAffected"]').on("change", function () {
+        if ($('input[name="reporterAffected"]:checked').length > 0 && $(".is-invalid").length === 0) {
+          $msg.hide();
+        }
+      });
+
+      // When “Emergency Outcome” section hides, also clear any error on its select
+      $("#emergencyType").on("change", function () {
+        const show = (($(this).val() || "").indexOf("Code Grey") >= 0);
+        if (!show) { $("#emergencyOutcome").removeClass("is-invalid"); }
+      });
+
+      // When the conditional “Other” rows hide, clear their errors too
+      $("#injuryType").on("change", function () {
+        const isOther = (($(this).val() || "").toLowerCase().indexOf("other") >= 0);
+        if (!isOther) { $("#injuryOther").removeClass("is-invalid"); }
+      });
+      $("#bodyPart").on("change", function () {
+        const isOther = (($(this).val() || "").toLowerCase().indexOf("other") >= 0);
+        if (!isOther) { $("#bodyPartOther").removeClass("is-invalid"); }
+      });
+    }
+
+    $(function () { wireLiveClear(); });
+</script>

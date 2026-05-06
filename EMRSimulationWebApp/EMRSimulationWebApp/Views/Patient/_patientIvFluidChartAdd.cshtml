@@ -1,0 +1,164 @@
+﻿<div class="container">
+    <div class="row section">
+        <!-- Left Column -->
+        <!-- Right Column -->
+
+        <div class="col-md-8">
+
+            <div class="form-group row mb-1" style="background-color: black;color: white;">
+                <div class="col-sm-7">
+                    <label class="col-sm-5 col-form-label">MEMBER ORDER</label>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Date</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsMemberOrderDate" autocomplete="off"/>
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Flask Vol.</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsMemberOrderFlask" autocomplete="off"/>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">IV Fluid including strength</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsMemberFluidStrength" autocomplete="off"/>
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Rate</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsMemberOrderRate" autocomplete="off"/>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Additives including dose</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsMemberOrderAdditives" autocomplete="off"/>
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Medical officer signature</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsMemberOrderMedicalOfficerSign" autocomplete="off"/>
+                </div>
+            </div>
+
+
+            <div>
+                <label id="lblMessage" style="color:green"></label>
+                <button type="button" id="btnsSaveIvFluid" class="btn btn-primary" style="background-color:#FF8A30;float: right;">Save</button>
+            </div>
+
+        </div>
+    </div>
+
+     <div class="row section">
+        <div class="col-md-12">
+            <div id="divlstMemberOrder"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    var LabId = null;
+    var PatientId = null;
+
+    $(document).ready(function () {
+        $("#txtsMemberOrderDate").datepicker({
+            dateFormat: "yy-mm-dd" // Set the format here
+        });
+
+        $("#txtNursingOrderEndDate").datepicker({
+            dateFormat: "yy-mm-dd" // Set the format here
+        });
+    
+        LabId = $('#txtLabId').val();
+        PatientId = $('#txtPatientId').val();
+
+        $("#btnsSaveIvFluid").on("click", function (e) {
+            e.preventDefault(); // Prevent default link behavior
+
+            
+
+            var txtsMemberOrderDate = $('#txtsMemberOrderDate').val() + "T00:00:00";
+            var txtsMemberOrderFlask = $('#txtsMemberOrderFlask').val();
+            var txtsMemberFluidStrength = $('#txtsMemberFluidStrength').val();
+
+            var txtsMemberOrderRate = $('#txtsMemberOrderRate').val();
+            var txtsMemberOrderAdditives = $('#txtsMemberOrderAdditives').val();
+            var txtsMemberOrderMedicalOfficerSign = $('#txtsMemberOrderMedicalOfficerSign').val();
+
+            if (txtsMemberOrderDate === "" || txtsMemberOrderDate === "T00:00:00" || 
+                txtsMemberOrderFlask === "" || txtsMemberFluidStrength === "" || txtsMemberOrderRate ==="" 
+                || txtsMemberOrderAdditives === "" || txtsMemberOrderMedicalOfficerSign === "") 
+            {
+                e.preventDefault();
+                $('#lblMessage').text("Please fill in the missing fields.").css('color', 'red');
+                return;
+            }
+
+            var toPost = {
+                Id: 0,
+                LabId: LabId,
+                PatientId: PatientId,
+                Date: txtsMemberOrderDate,
+                FlaskVol: txtsMemberOrderFlask,
+                Strength: txtsMemberFluidStrength,
+                Rate: txtsMemberOrderRate,
+                Dose: txtsMemberOrderAdditives,
+                OfficerSign: txtsMemberOrderMedicalOfficerSign
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/supervisor/addivfluidchart",
+                contentType: "application/json",
+                data: JSON.stringify(toPost), // Convert JavaScript object to JSON string
+                success: function (response) {
+                    if (response > 0) {
+                        $('#lblMessage').text("Patient IV Fluid record added successfully").css('color', 'green');
+                        getMemberOrderList();
+                    } else {
+                        $('#lblMessage').text("Error").css('color', 'red');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $("#error-message").text("Error occurred").css('color', 'red');
+                }
+            });
+        });
+
+        getMemberOrderList();
+    });
+
+    function getMemberOrderList() {
+        $.ajax({
+            url: "/supervisor/getpatientivfluidchartlist",
+            method: "GET",
+            data: { labId: LabId, patientId: PatientId }, // Wrap Id in an object
+            success: function (response) {
+                // Load the response into the right-side content area
+                $('#divlstMemberOrder').html("");
+                $('#divlstMemberOrder').html(response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error loading the page:", error);
+            }
+        });
+    }
+
+</script>

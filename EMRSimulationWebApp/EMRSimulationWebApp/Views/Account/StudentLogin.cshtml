@@ -1,0 +1,93 @@
+﻿@{
+    ViewData["Title"] = "FedUni - Emr Simulation";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+
+<div class="login-container">
+    
+
+    <div class="login-box">
+        <h3>Welcome to Fed Uni EMR Simulator</h3>
+        <br />
+        <form>
+            <div class="row mb-1">
+                <div class="col-sm-5"></div>
+                <div class="col-sm-7">
+                    <br />
+                </div>
+            </div>
+            <div class="input-container">
+                <label for="login-id" id="lblLoginName"></label>
+                <input type="text" id="username" name="username" required autocomplete="off">
+            </div>
+            <div class="input-container">
+                <label for="password" id="lablPassword"></label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div>
+                <button type="button" id="loginButton" class="btn btn-primary" style="background-color:#FF8A30;float: right;">Login</button>
+            </div>
+            <div>
+                <label id="error-message" style="height:30px;color:red">&nbsp;</label>
+            </div>
+        </form>
+    </div>
+
+    <footer>
+        <p>© 2024, Federation University - Version 0.0.0</p>
+    </footer>
+</div>
+
+<input type="hidden" id="txtLogin" value="@ViewData["login"]" />
+
+<script>
+
+    $(document).ready(function () {
+
+        $("#lblLoginName").html($("#txtLogin").val().toUpperCase() + " LOGIN ID *");
+        $("#lablPassword").html("PASSWORD *");
+
+        $('#loginButton').on('click', function (event) {
+
+            if ($("#username").val() == "" || $("#password").val() == "") {
+                $("#error-message").text("Username or password missing.");
+                return;
+            }
+
+            var loginData = {
+                Username: $("#username").val(),
+                Password: $("#password").val()
+            };
+
+            var url = "";
+
+            if ($("#txtLogin").val() == "student")
+            {
+                url = "/api/apiwebapp/authenticatelabasync";
+            }
+            else if ($("#txtLogin").val() == "supervisor")
+            {
+                url = "/api/apiwebapp/authenticatesupervisorasync";
+            }
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                contentType: "application/json",
+                data: JSON.stringify(loginData), // Convert JavaScript object to JSON string
+                success: function (response) {
+                    if (response.labId > 0 && response.resultMessage === "Valid") {
+                        window.location.href = "/home/index?labId=" + response.labId; // Redirect on successful login
+                    } else {
+                        $("#error-message").text(response.resultMessage);
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $("#error-message").text("Error occurred");
+                }
+            });
+        });
+    });
+
+</script>

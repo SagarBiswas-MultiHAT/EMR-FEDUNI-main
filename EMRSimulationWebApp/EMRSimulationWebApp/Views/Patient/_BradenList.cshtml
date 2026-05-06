@@ -1,0 +1,179 @@
+﻿@model IEnumerable<EMRSimulation.Domain.Dtos.BradenDto>
+@using System.Globalization
+
+@{
+    var labId = (ViewBag.LabId ?? 0);
+    var patientId = ViewBag.PatientId; // allow null
+    var hasAnyRow = Model.Any();                 // <-- [1] NEW: server-side boolean
+}
+
+<div class="form-group row mb-1" style="background-color: black;color: white;">
+    <div class="col-sm-7">
+        <label class="col-sm-5 col-form-label" style="font-weight:bold;">BRADEN ASSESSMENTS</label>
+    </div>
+</div>
+<div class="mb-2 text-end">
+    <a href="javascript:void(0);" id="btnBradenAddExtra" class="btn btn-primary" style="background-color:#FF8A30;"
+       @(hasAnyRow ? "" : "disabled title='No initial assessment found. Please use Add Braden Scale first.'")>
+        @* <-- [2] NEW *@
+        Add Assessment
+    </a>
+</div>
+
+
+
+<table id="bradenTable" class="display">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Date of Assessment</th>
+            <th>Shift</th>
+            <th>Nurse Initials</th>
+            <th>Total Score</th>
+            <th>Risk Key</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.DateOfAssessment.ToString("dd-MMM-yyyy")</td>
+                <td>@(string.IsNullOrWhiteSpace(item.Shift) ? "" : item.Shift)</td>
+                <td>@item.NurseInitials</td>
+                <td>@item.TotalScore</td>
+                <td>
+                    @item.RiskKey
+                    @if (item == Model.Last())
+                    {
+                        <span class="badge bg-warning text-dark" style="margin-left:6px;">Initial</span>
+                    }
+                </td>
+
+                <td>
+                    <a href="javascript:void(0);" class="btn btn-light view-braden"
+                       data-id="@item.Id" style="margin-right:6px;">View</a>
+
+                    <a href="javascript:void(0);" class="btn btn-primary delete-braden"
+                       data-id="@item.Id" style="background-color:#FF8A30;">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div><label id="lblDeleteBradenMsg" style="color:green"></label></div>
+<!-- Info Modal for Braden list -->
+<div class="modal fade" id="bradenInfoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div id="bradenInfoHeader" class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">Notice</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="bradenInfoMessage"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var LabId = @labId;
+    var PatientId = @(patientId == null ? "null" : patientId.ToString());
+
+    var table = $('#bradenTable').DataTable({
+        paging: true,
+        info: false,
+        searching: false,
+        ordering: false,
+        autoWidth: false,
+        lengthChange: false,
+        columnDefs: [{ targets: [0], visible: false }] // Hide ID column
+    });
+
+    // DataTables-aware: do we have any real rows?
+    function hasAnyAssessments() { return table.data().any(); }
+
+    // Small helper to show a Bootstrap modal message
+    function showBradenInfo(message, tone) {
+        var $hdr = $("#bradenInfoHeader");
+        $hdr.removeClass("bg-warning bg-danger bg-success text-white text-dark");
+        switch (tone) {
+            case "danger":  $hdr.addClass("bg-danger text-white"); break;
+            case "success": $hdr.addClass("bg-success text-white"); break;
+            default:        $hdr.addClass("bg-warning text-dark"); break;
+        }
+        $("#bradenInfoMessage").text(message);
+        new bootstrap.Modal(document.getElementById("bradenInfoModal")).show();
+    }
+
+    // Set initial state of Add button
+    (function initAddButtonState(){
+        var $btn = $("#btnBradenAddExtra");
+        if (!hasAnyAssessments()) {
+            $btn.prop("disabled", true)
+                .attr("title","No initial assessment found. Please use Add Braden Scale first.");
+        } else {
+            $btn.prop("disabled", false).removeAttr("title");
+        }
+    })();
+
+    // DELETE
+    $('#bradenTable').on('click', '.delete-braden', function () {
+        var id = $(this).data('id');
+        if (!confirm("Are you sure you want to delete this assessment? This action cannot be undone.")) return;
+
+        $.ajax({
+            url: "/Patient/DeleteBradenAssessment",
+            type: "GET",
+            data: { id: id },
+            success: function (res) {
+                if (res > 0) {
+                    alert("Assessment deleted successfully");
+                    var refreshData = (PatientId === null) ? { labId: LabId } : { labId: LabId, patientId: PatientId };
+                    $.get("/Patient/GetBradenAssessmentList", refreshData, function (html) {
+                        $('#content-area').html(html);
+                    }).fail(function(){ alert("Error reloading assessment list"); });
+                } else {
+                    $('#lblDeleteBradenMsg').text("Delete failed").css('color','red');
+                }
+            },
+            error: function () { alert("Error deleting assessment"); }
+        });
+    });
+
+    // VIEW
+    $('#bradenTable').on('click', '.view-braden', function () {
+        var id = $(this).data('id');
+        $.get("/Patient/ViewBradenAssessment", { id: id, labId: LabId }, function (html) {
+            $('#content-area').html(html);
+        }).fail(function(){ alert("Error loading assessment view"); });
+    });
+
+    // ADD ASSESSMENT (Follow-Up)
+    $("#btnBradenAddExtra").on("click", function () {
+        // block if no initial (no rows)
+        if (!hasAnyAssessments()) {
+            showBradenInfo("No initial assessment found. Please use Add Braden Scale first.", "warning");
+            return;
+        }
+        // require a concrete patient
+        const data = (PatientId === null) ? { labId: LabId, patientId: 0 } : { labId: LabId, patientId: PatientId };
+        if (data.patientId === 0) {
+            showBradenInfo("Select a patient first to add a follow-up.", "warning");
+            return;
+        }
+        // open follow-up form
+        $.get("/Patient/GetBradenFollowUpAdd", data, function (html) {
+            $("#content-area").html(html);
+        }).fail(function(){
+            showBradenInfo("Error opening follow-up form.", "danger");
+        });
+    });
+</script>
+
+<
+     

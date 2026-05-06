@@ -1,0 +1,55 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+<div id="lab-header">
+</div>
+
+<div id="patient-header">
+</div>
+
+<div id="content-area">
+</div>
+
+<input type="hidden" id="txtLabId" value="@ViewData["labId"]" />
+<input type="hidden" id="txtPatientId" />
+
+<script>
+    $(document).ready(function () {
+
+        var LabId = $('#txtLabId').val();
+        
+        // Use AJAX to load the content from the URL
+        $.ajax({
+            url: "/patient/getpatientlist",
+            method: "GET",
+            data: { labId: LabId},
+            success: function (response) {
+                // Load the response into the right-side content area
+                $('#content-area').html("");
+                $('#content-area').html(response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error loading the page:", error);
+            }
+        });
+
+        $.ajax({
+                url: "/lab/getlabrecord",
+            method: "GET",
+            data: { Id: LabId},
+            success: function (response) {
+                // Load the response into the right-side content area
+                $('#lab-header').html("");
+                $('#lab-header').html(response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error loading the page:", error);
+            }
+        });
+
+        
+
+    });
+</script>

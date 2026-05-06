@@ -1,0 +1,131 @@
+@{
+    ViewData["Title"] = "Patient List";
+}
+@using EMRSimulation.Domain.Dtos;
+@model IEnumerable<NeurologicalAdministrationDto>
+
+<div class="form-group row mb-1" style="background-color: black;color: white;">
+    <div class="col-sm-7">
+        <label class="col-sm-5 col-form-label">NEUROLOGICAL ADMINISTRATION LIST</label>
+    </div>
+</div>
+<div class="text-left">
+    <table id="patientsNeurologicalAdminTable" class="display">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Start Date</th>
+                <th>Start Time</th>
+                <th>End Date</th>
+                <th>End Time</th>
+                <th>Pharmacist Review</th>
+                <th>Nurse Sign</th>
+                <th>Co-Sign</th>
+                @if (User.HasClaim(c => c.Value == "student"))
+                {
+                    <th>Action</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var patient in Model)
+            {
+                <tr>
+                    <td>@patient.Id</td>
+                    <td>@(patient.StartDate?.ToShortDateString() ?? "")</td>
+                    <td>@patient.StartTime</td>
+                    <td>@(patient.EndDate?.ToShortDateString() ?? "")</td>
+                    <td>@patient.EndTime</td>
+                    <td>@patient.PharmacistReview</td>
+                    <td>@patient.NurseSign</td>
+                    <td>@patient.CoSign</td>
+
+                    @if (User.HasClaim(c => c.Value == "student"))
+                    {
+                        <td>
+                            <a href="javascript:void(0);" class="btn btn-primary deleteNeurologicalAdmin" data-custom="@patient.Id" style="background-color:#FF8A30;">Delete</a>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <label id="lblMessage" style="color:green"></label>
+</div>
+
+<script>
+    var LabId = null;
+    var PatientId = null;
+
+    $(document).ready(function () {
+        var table = $('#patientsNeurologicalAdminTable').DataTable({
+            "paging": true,
+            "info": false,
+            "searching": false,
+            "ordering": true,
+            "autoWidth": false,
+            "lengthChange": false,
+            "columnDefs": [
+                {
+                    "targets": [0],
+                    "visible": false
+                }
+        @if (User.HasClaim(c => c.Value == "student"))
+        {
+            <text>, {
+                        "targets": [8],
+                        "orderable": false
+                                }</text>
+        }
+                ]
+        });
+
+        LabId = $('#txtLabId').val();
+        PatientId = $('#txtPatientId').val();
+
+        $('#patientsNeurologicalAdminTable').on('click', '.deleteNeurologicalAdmin', function () {
+
+            var adminId = $(this).attr("data-custom");
+
+            if (confirm("Are you sure you want to delete this neurological administration record?")) {
+                $.ajax({
+                    type: "GET",
+                    url: "/patient/deleteneurologicaladministration",
+                    contentType: "application/json",
+                    data: { Id: adminId },
+                    success: function (response) {
+                        if (response > 0) {
+                            alert("Neurological administration record deleted successfully")
+
+                            $.ajax({
+                                url: "/patient/getneurologicaladministration",
+                                method: "GET",
+                                data: { labId: LabId, patientId: PatientId, neurologicalChartId: $('#hdnNeurologicalChartId').val() },
+                                success: function (response) {
+                                    // Load the response into the neurological admin content area
+                                    $('#divlstneurologicaladmin').html("");
+                                    $('#divlstneurologicaladmin').html(response);
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error("Error loading the page:", error);
+                                }
+                            });
+
+                        } else {
+                            $('#lblMessage').text("Error deleting record").css('color', 'red');
+                        }
+
+                        console.log("Success:", response);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log("Error:", textStatus);
+                        alert("Error deleting neurological administration record: " + textStatus);
+                    }
+                });
+            }
+        });
+    });
+
+</script>

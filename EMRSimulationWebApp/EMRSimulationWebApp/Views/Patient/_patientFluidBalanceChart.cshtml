@@ -1,0 +1,272 @@
+@using EMRSimulation.Domain.Dtos;
+@model PatientFluidBalanceChartViewModel
+
+<div class="container">
+    <div class="row section">
+        <!-- Left Column -->
+        <!-- Right Column -->
+
+        <div class="col-md-8">
+
+            <div class="form-group row mb-1" style="background-color: black;color: white;">
+                <div class="col-sm-7">
+                    <label class="col-sm-5 col-form-label">FLUID RECORD</label>
+                </div>
+            </div>
+
+            <div class="row mb-2 align-items-center">
+                <div class="row mb-1">
+                    <div class="col-sm-3">
+                        <label class="form-label">Date</label>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="txtFluidRecordDate" value="@Convert.ToDateTime(Model.FluidBalanceChartDto.Date).ToShortDateString()" disabled>
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="form-label">Iv Fluid (ml)</label>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="txtFluidRecordIV_Fluids" value="@Model.FluidBalanceChartDto.IV_Fluids" disabled>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Oral Intake (ml)</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtFluidRecordOral_Intake" value="@Model.FluidBalanceChartDto.Oral_Intake" disabled>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <label class="form-label">Enteric Intake (ml)</label>
+            </div>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="txtFluidRecordEnteric_Intake" value="@Model.FluidBalanceChartDto.Enteric_Intake" disabled>
+            </div>
+        </div>
+
+
+        <div class="form-group row mb-2 mt-3 bg-dark text-white py-1">
+            <div class="col-sm-12">
+                <label class="col-form-label">OUTPUT MEASUREMENTS</label>
+            </div>
+        </div>
+        <div class="row mb-1">
+            <div class="col-sm-3">
+                <label class="form-label">Urine Output (ml)</label>
+            </div>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="txtFluidRecordUrine_Output" value="@Model.FluidBalanceChartDto.Urine_Output" disabled>
+            </div>
+            <div class="col-sm-3">
+                <label class="form-label">Drainage (ml)</label>
+            </div>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="txtFluidRecordDrainage" value="@Model.FluidBalanceChartDto.Drainage" disabled>
+            </div>
+        </div>
+
+        <div class="row mb-1">
+            <div class="col-sm-3">
+                <label class="form-label">Bladder Scan (ml)</label>
+            </div>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="txtFluidRecordBladder_Scan" value="@Model.FluidBalanceChartDto.Bladder_Scan" disabled>
+            </div>
+            <div class="col-sm-3">
+                <label class="form-label">Faecal Output (ml)</label>
+            </div>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="txtFluidRecordFaecal_Output" value="@Model.FluidBalanceChartDto.Faecal_Output" disabled>
+            </div>
+            <div class="col-sm-3">
+                <label class="form-label">Vomit (ml)</label>
+            </div>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="txtFluidRecordVomitus" value="@Model.FluidBalanceChartDto.Vomitus" disabled>
+            </div>
+        </div>
+
+        @if (User.HasClaim(c => c.Value == "student"))
+        {
+            <div class="form-group row mb-1" style="background-color: black;color: white;">
+                <div class="col-sm-7">
+                    <label class="col-sm-5 col-form-label">ADD NURSING ORDER</label>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label for="txtNursingOrderStartDate" class="form-label">Start Date</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNursingOrderStartDate" autocomplete="off">
+                </div>
+                <div class="col-sm-3">
+                    <label for="txtNursingOrderStartTime" class="form-label">Start Time</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNursingOrderStartTime" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label for="txtNursingOrderEndDate" class="form-label">End Date</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNursingOrderEndDate" autocomplete="off">
+                </div>
+                <div class="col-sm-3">
+                    <label for="txtNursingOrderEndTime" class="form-label">End Time</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNursingOrderEndTime" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label for="txtNursingOrderVolGiven" class="form-label">Vol. given : ml</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNursingOrderVolGiven" autocomplete="off">
+                </div>
+                <div class="col-sm-3">
+                    <label for="txtNursingNurseSign" class="form-label">Nurse Signature</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNursingNurseSign" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label for="txtNursingPharmacistReview" class="form-label">Pharmacist Review</label>
+                </div>
+                <!--
+                                    <div class="col-sm-6">
+                -->
+                <div class="col-sm-3">
+                    <textarea style="width:100%" id="txtNursingPharmacistReview"></textarea>
+                </div>
+                <div class="col-sm-3">
+                    <label for="txtNursingCoSign" class="form-label">Co-Signature</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtNursingCoSign" autocomplete="off">
+                </div>
+            </div>
+
+            <div>
+                <label id="lblMessage" style="color:green"></label>
+                <button type="button" id="btnSaveFluidBalanceAdmin" class="btn btn-primary" style="background-color:#FF8A30;float: right;">Save</button>
+            </div>
+        }
+
+    </div>
+</div>
+
+<div class="row section">
+    <div class="col-md-12">
+        <div id="divlstfluidbalanceadmin"></div>
+    </div>
+    <input type="hidden" id="hdnIvFluidChartId" value="@Model.FluidBalanceChartDto.Id" />
+</div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#txtNursingOrderStartDate").datepicker({
+            dateFormat: "yy-mm-dd" // Set the format here
+        });
+
+        $("#txtNursingOrderEndDate").datepicker({
+            dateFormat: "yy-mm-dd" // Set the format here
+        });
+
+        var LabId = $('#txtLabId').val();
+        var PatientId = $('#txtPatientId').val();
+
+        $("#btnSaveFluidBalanceAdmin").on("click", function (e) {
+            e.preventDefault(); // Prevent default link behavior
+
+            var txtNursingOrderStartDate = $('#txtNursingOrderStartDate').val() + "T00:00:00";
+            var txtNursingOrderStartTime = $('#txtNursingOrderStartTime').val();
+            //            var txtNursingOrderEndDate = $('#txtNursingOrderEndDate').val() + "T00:00:00";
+            var txtNursingOrderEndDate = $('#txtNursingOrderEndDate').val();
+            var txtNursingOrderEndTime = $('#txtNursingOrderEndTime').val();
+
+            var txtNursingOrderVolGiven = $('#txtNursingOrderVolGiven').val();
+            var txtNursingNurseSign = $('#txtNursingNurseSign').val();
+            var txtNursingCoSign = $('#txtNursingCoSign').val();
+
+            var txtNursingPharmacistReview = $('#txtNursingPharmacistReview').val();
+            /*
+                        if (txtNursingOrderStartDate === "" || txtNursingOrderStartDate === "T00:00:00" || txtNursingOrderStartTime === ""
+                            || txtNursingOrderEndDate === "" || txtNursingOrderEndDate === "T00:00:00" || txtNursingOrderEndTime === ""
+                            || txtNursingOrderVolGiven === "" || txtNursingNurseSign === "" || txtNursingPharmacistReview === "") {
+            */
+
+            if (txtNursingOrderStartDate === "" || txtNursingOrderStartDate === "T00:00:00" || txtNursingOrderStartTime === ""
+                || txtNursingOrderVolGiven === "" || txtNursingNurseSign === "" || txtNursingPharmacistReview === "" || txtNursingCoSign === "") {
+
+                e.preventDefault();
+                $('#lblMessage').text("Please fill in the missing fields.").css('color', 'red');
+                return;
+            }
+
+            var toPost = {
+                Id: 0,
+                FluidBalanceChartId: $('#hdnFluidBalanceChartId').val(),
+                LabId: LabId,
+                PatientId: PatientId,
+                StartDate: txtNursingOrderStartDate,
+                StartTime: txtNursingOrderStartTime,
+                EndDate: txtNursingOrderEndDate === "" ? null : txtNursingOrderEndDate + "T00:00:00",
+                EndTime: txtNursingOrderEndTime === "" ? null : txtNursingOrderEndTime,
+                VolGiven: txtNursingOrderVolGiven,
+                PharmacistReview: txtNursingPharmacistReview,
+                NurseSign: txtNursingNurseSign,
+                CoSign: txtNursingCoSign
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/patient/addpatientfluidbalanceadministration",
+                contentType: "application/json",
+                data: JSON.stringify(toPost), // Convert JavaScript object to JSON string
+                success: function (response) {
+                    if (response > 0) {
+                        $('#lblMessage').text("Patient Fluid Balance record added successfully").css('color', 'green');
+                        getfluidbalanceadministration();
+                    } else {
+                        $('#lblMessage').text("Error").css('color', 'red');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $("#error-message").text("Error occurred").css('color', 'red');
+                }
+            });
+        });
+
+        getfluidbalanceadministration();
+
+        function getfluidbalanceadministration() {
+            $.ajax({
+                url: "/patient/getfluidbalanceadministration",
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId, fluidBalanceChartId: $('#hdnFluidBalanceChartId').val() }, // Wrap Id in an object
+                success: function (response) {
+                    // Load the response into the right-side content area
+                    $('#divlstfluidbalanceadmin').html("");
+                    $('#divlstfluidbalanceadmin').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        }
+
+    });
+</script>

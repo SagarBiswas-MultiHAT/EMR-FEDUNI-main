@@ -1,0 +1,205 @@
+﻿<div class="container">
+    <div class="row section">
+        <!-- Left Column -->
+        <!-- Right Column -->
+
+        <div class="col-md-8">
+
+            <div class="form-group row mb-1" style="background-color: black;color: white;">
+                <div class="col-sm-7">
+                    <label class="col-sm-8 col-form-label">MEDICATION CHART - REGULAR</label>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label for="txtsMedicationRegularDate" class="form-label">Dose Date</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsMedicationRegularDate" autocomplete="off" />
+                </div>
+                <div class="col-sm-3">
+                    <label for="txtsMedicationRegularTime" class="form-label">Dose Time</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsMedicationRegularTime" autocomplete="off" />
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label for="ddlMedicationRegularName" class="form-label">Medication</label>
+                </div>
+                <div class="col-sm-3">
+                    <select id="ddlMedicationRegularName" class="col-form-label" style="width:100%">
+                        <option value="">--Select Medication--</option> <!-- Empty first option -->
+                        @foreach (var medication in Model)
+                        {
+                            <option value="@medication.Id">@medication.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-sm-3">
+                    <label for="txtsMedicationRegularRoute" class="form-label">Route</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsMedicationRegularRoute" autocomplete="off" />
+                </div>
+                
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label for="txtsMedicationRegularDose" class="form-label">Dosage</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsMedicationRegularDose" autocomplete="off" />
+                </div>
+                <div class="col-sm-3">
+                    <label for="txtsMedicationRegularFrequency" class="form-label">Frequency</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsMedicationRegularFrequency" autocomplete="off" />
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label for="txtsMedicationRegularIndication" class="form-label">Indication</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsMedicationRegularIndication" autocomplete="off" />
+                </div>
+                <div class="col-sm-3">
+                    <label for="txtsMedicationRegularPharmacy" class="form-label">Pharmacy</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsMedicationRegularPharmacy" autocomplete="off" />
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                
+                <div class="col-sm-3">
+                    <label for="txtsMedicationRegularPrescriber" class="form-label">Prescriber</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsMedicationRegularPrescriber" autocomplete="off" />
+                </div>
+                <div class="col-sm-3">
+                    <label for="txtsMedicationRegularPrescriberSign" class="form-label">Prescriber Sign</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsMedicationRegularPrescriberSign" autocomplete="off" />
+                </div>
+            </div>
+
+            
+            <div>
+                <label id="lblMessage" style="color:green"></label>
+                <button type="button" id="btnsSaveMedicationRegularAdmin" class="btn btn-primary" style="background-color:#FF8A30;float: right;">Save</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row section">
+        <div class="col-md-12">
+            <div id="divlstMedicationRegular"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#txtsMedicationRegularDate").datepicker({
+            dateFormat: "yy-mm-dd" // Set the format here
+        });
+
+        var LabId = $('#txtLabId').val();
+        var PatientId = $('#txtPatientId').val();
+
+        $("#btnsSaveMedicationRegularAdmin").on("click", function (e) {
+            e.preventDefault(); // Prevent default link behavior
+
+            var ddlMedicationRegularName = $('#ddlMedicationRegularName').val();
+
+            var txtsMedicationRegularDate = $('#txtsMedicationRegularDate').val() + "T00:00:00";
+            var txtsMedicationRegularTime = $('#txtsMedicationRegularTime').val();
+            var txtsMedicationRegularRoute = $('#txtsMedicationRegularRoute').val();
+
+            var txtsMedicationRegularDose = $('#txtsMedicationRegularDose').val();
+            var txtsMedicationRegularFrequency = $('#txtsMedicationRegularFrequency').val();
+            var txtsMedicationRegularIndication = $('#txtsMedicationRegularIndication').val();
+
+            var txtsMedicationRegularPharmacy = $('#txtsMedicationRegularPharmacy').val();
+            var txtsMedicationRegularPrescriber = $('#txtsMedicationRegularPrescriber').val();
+            var txtsMedicationRegularPrescriberSign = $('#txtsMedicationRegularPrescriberSign').val();
+
+            if (txtsMedicationRegularDate === "" || txtsMedicationRegularDate === "T00:00:00" || ddlMedicationRegularName === "" || ddlMedicationRegularName === "--Select Medication--" ||
+                txtsMedicationRegularTime === "" || txtsMedicationRegularRoute === "" 
+                || txtsMedicationRegularDose === "" || txtsMedicationRegularFrequency === "" || txtsMedicationRegularIndication === "" || txtsMedicationRegularPharmacy === "" 
+                || txtsMedicationRegularPrescriber ==="" || txtsMedicationRegularPrescriberSign === "" ) 
+            {
+                e.preventDefault();
+                $('#lblMessage').text("Please fill in the missing fields.").css('color', 'red');
+                return;
+            }
+
+            var toPost = {
+                Id: 0,
+                LabId: LabId,
+                PatientId: PatientId,
+                MedicationId: ddlMedicationRegularName,
+                MedicationName: "",
+                Dose: txtsMedicationRegularDose,
+                DoseFrequency: txtsMedicationRegularFrequency,
+                DoseDate: txtsMedicationRegularDate,
+                DoseTime: txtsMedicationRegularTime,
+                Indication: txtsMedicationRegularIndication,
+                Route: txtsMedicationRegularRoute,
+                Pharmacy: txtsMedicationRegularPharmacy,
+                Prescriber: txtsMedicationRegularPrescriber,
+                PrescriberSign: txtsMedicationRegularPrescriberSign
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/supervisor/addmedicationregularchart",
+                contentType: "application/json",
+                data: JSON.stringify(toPost), // Convert JavaScript object to JSON string
+                success: function (response) {
+                    if (response > 0) {
+                        $('#lblMessage').text("Patient Medication - REGULAR record added successfully").css('color', 'green');
+                        getMedicationRegularList();
+                    } else {
+                        $('#lblMessage').text("Error").css('color', 'red');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $("#error-message").text("Error occurred").css('color', 'red');
+                }
+            });
+        });
+
+        getMedicationRegularList();
+
+        function getMedicationRegularList() {
+            $.ajax({
+                url: "/supervisor/getpatientmedicationregularlist",
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId }, // Wrap Id in an object
+                success: function (response) {
+                    // Load the response into the right-side content area
+                    $('#divlstMedicationRegular').html("");
+                    $('#divlstMedicationRegular').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        }
+
+    });
+</script>

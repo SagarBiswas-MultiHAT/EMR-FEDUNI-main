@@ -1,0 +1,176 @@
+@{
+    ViewData["Title"] = "Patient List";
+}
+@using EMRSimulation.Domain.Dtos;
+@model IEnumerable<NeurologicalChartDto>
+
+<div class="form-group row mb-1" style="background-color: black;color: white;">
+    <div class="col-sm-7">
+        <label class="col-sm-5 col-form-label">NEUROLOGICAL RECORD LIST</label>
+    </div>
+</div>
+<div class="text-left">
+    <table id="patientsNeurologicalRecordTable" class="display">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Eyes Open</th>
+                <th>Verbal Response</th>
+                <th>Motor Response</th>
+                <th>Total GCS</th>
+                <th>Endotracheal Tube</th>
+                <th>Right Pupil Size</th>
+                <th>Right Pupil Reaction</th>
+                <th>Left Pupil Size</th>
+                <th>Left Pupil Reaction</th>
+                <th>Right Arm Response</th>
+                <th>Right Leg Response</th>
+                <th>Left Arm Response</th>
+                <th>Left Leg Response</th>
+                <th>Nurse Sign</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@(item.Date != null ? Convert.ToDateTime(item.Date).ToShortDateString() : "N/A")</td>
+                    <td>@item.EyesOpenScore</td>
+                    <td>@item.VerbalResponseScore</td>
+                    <td>@item.MotorResponseScore</td>
+                    <td>@item.TotalComaScale</td>
+                    <td>@(item.EndotrachealTube.HasValue && item.EndotrachealTube.Value ? "Yes" : "No")</td>
+                    <td>@item.RightPupilSize</td>
+                    <td>@item.RightPupilReaction</td>
+                    <td>@item.LeftPupilSize</td>
+                    <td>@item.LeftPupilReaction</td>
+                    <td>@item.RightArmResponse</td>
+                    <td>@item.RightLegResponse</td>
+                    <td>@item.LeftArmResponse</td>
+                    <td>@item.LeftLegResponse</td>
+                    <td>@item.OfficerSign</td>
+                    <td>
+                        <a href="javascript:void(0);" class="btn btn-primary deleteNeurologicalRecord" data-custom="@item.Id" style="background-color:#FF8A30;">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <label id="lblMessage" style="color:green"></label>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var table = $('#patientsNeurologicalRecordTable').DataTable({
+            "paging": true,
+            "info": false,
+            "searching": false,
+            "ordering": true,
+            "autoWidth": false,
+            "lengthChange": false,
+            "columnDefs": [
+                {
+                    "targets": [0],
+                    "visible": false
+                }
+            ]
+        });
+
+        // Get LabId and PatientId safely
+        var LabId = $('#txtLabId').val() || '';
+        var PatientId = $('#txtPatientId').val();
+
+        // Validate required PatientId
+        if (!PatientId) {
+            console.error('PatientId is required but not found');
+            $('#lblMessage').text('Patient ID is missing').css('color', 'red');
+            return;
+        }
+
+        $('#patientsNeurologicalRecordTable').on('click', '.deleteNeurologicalRecord', function () {
+            var recordId = $(this).attr("data-custom");
+
+            if (!recordId) {
+                alert('Invalid record ID');
+                return;
+            }
+
+            if (!confirm("Are you sure you want to delete this record?")) {
+                return;
+            }
+
+            // Show loading state
+            var $button = $(this);
+            var originalText = $button.text();
+            $button.text('Deleting...').prop('disabled', true);
+
+            $.ajax({
+                type: "POST",
+                url: "/supervisor/DeleteNeurologicaleChart",
+                data: { 
+                    Id: recordId 
+                },
+                success: function (response) {
+                    if (response && response.id > 0) {
+                        alert("Neurological Record deleted successfully");
+
+                        // Reload the list
+                        reloadNeurologicalRecordList();
+                    } else {
+                        var errorMsg = response && response.resultMessage ? response.resultMessage : 'Unknown error occurred';
+                        $('#lblMessage').text(errorMsg).css('color', 'red');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error("Delete Error:", {
+                        status: jqXHR.status,
+                        statusText: jqXHR.statusText,
+                        responseText: jqXHR.responseText,
+                        error: errorThrown
+                    });
+                    
+                    var errorMsg = 'Failed to delete record. ';
+                    if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                        errorMsg += jqXHR.responseJSON.message;
+                    } else {
+                        errorMsg += 'Please try again.';
+                    }
+                    
+                    $('#lblMessage').text(errorMsg).css('color', 'red');
+                },
+                complete: function () {
+                    $button.text(originalText).prop('disabled', false);
+                }
+            });
+        });
+
+        // Function to reload the list
+        function reloadNeurologicalRecordList() {
+            $.ajax({
+                url: "/supervisor/GetPatientNeurologicalChartList",
+                method: "GET",
+                data: { 
+                    labId: LabId, 
+                    patientId: PatientId 
+                },
+                success: function (response) {
+                    $('#divlstNeurologicalRecord').html(response);
+                    $('#lblMessage').text('List refreshed successfully').css('color', 'green');
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", {
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        error: error
+                    });
+                    $('#lblMessage').text('Error refreshing list').css('color', 'red');
+                }
+            });
+        }
+    });
+</script>

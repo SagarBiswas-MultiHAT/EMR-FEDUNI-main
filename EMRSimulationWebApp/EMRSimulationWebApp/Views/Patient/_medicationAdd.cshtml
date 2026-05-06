@@ -1,0 +1,95 @@
+﻿<div class="container">
+    <div class="row section">
+        <!-- Left Column -->
+        <!-- Right Column -->
+
+        <div class="col-md-8">
+
+            <div class="form-group row mb-1" style="background-color: black;color: white;">
+                <div class="col-sm-7">
+                    <label class="col-sm-5 col-form-label">ADD MEDICATION</label>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label for="txtMedicationName" class="form-label">Medication Name</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationName" autocomplete="off" />
+                </div>
+            </div>
+
+            <div>
+                <label id="lblMessage" style="color:green"></label>
+                <button type="button" id="btnSaveMedication" class="btn btn-primary" style="background-color:#FF8A30;float: right;">Save</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row section">
+        <div class="col-md-12">
+            <div id="divlstMedication"></div>
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+
+    $(document).ready(function () {
+
+        var LabId = $('#txtLabId').val();
+
+        $("#btnSaveMedication").on("click", function (e) {
+            e.preventDefault(); // Prevent default link behavior
+
+            var txtMedicationName = $('#txtMedicationName').val();
+            
+            var toPost = {
+                Id: 0,
+                LabId: LabId,
+                Name: txtMedicationName
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/supervisor/addmedication",
+                contentType: "application/json",
+                data: JSON.stringify(toPost), // Convert JavaScript object to JSON string
+                success: function (response) {
+                    if (response > 0) {
+                        $('#lblMessage').text("Medication record added successfully").css('color', 'green');
+                        getMedicationList();
+                    } else {
+                        $('#lblMessage').text("Error").css('color', 'red');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $("#error-message").text("Error occurred");
+                }
+            });
+        });
+
+        getMedicationList();
+
+        function getMedicationList() {
+            $.ajax({
+                url: "/supervisor/getmedicationlist",
+                method: "GET",
+                data: { labId: LabId }, // Wrap Id in an object
+                success: function (response) {
+                    // Load the response into the right-side content area
+                    $('#divlstMedication').html("");
+                    $('#divlstMedication').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        }
+
+    });
+</script>

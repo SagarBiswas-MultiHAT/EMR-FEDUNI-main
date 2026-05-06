@@ -1,0 +1,236 @@
+﻿@using EMRSimulation.Domain.Dtos;
+@model PatientMedicationPrnListViewModel
+
+<div class="container">
+    <div class="row section">
+        <!-- Left Column -->
+        <!-- Right Column -->
+
+        <div class="col-md-8">
+
+            <div class="form-group row mb-1" style="background-color: black;color: white;">
+                <div class="col-sm-7">
+                    <label class="col-sm-7 col-form-label">MEDICATION CHART - PRN</label>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Dose Date</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationPrnDate" value="@Convert.ToDateTime(Model.MedicationPrnChartDto.DoseDate).ToShortDateString()" disabled>
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Dose Time</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationPrnTime" value="@Model.MedicationPrnChartDto.DoseTime" disabled>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Medication</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationPrnName" value="@Model.MedicationPrnChartDto.MedicationName" disabled />
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Dosage</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationPrnDose" value="@Model.MedicationPrnChartDto.Dose" disabled />
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Additives including dose</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationPrnFrequency" value="@Model.MedicationPrnChartDto.DoseFrequency" disabled />
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Route</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationPrnRoute" value="@Model.MedicationPrnChartDto.Route" disabled />
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Pharmacy</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationPharmacy" value="@Model.MedicationPrnChartDto.Pharmacy" disabled />
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Prescriber</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationPrnPrescriber" value="@Model.MedicationPrnChartDto.Prescriber" disabled />
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Prescriber Sign</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtMedicationPrnPrescriberSign" value="@Model.MedicationPrnChartDto.PrescriberSign" disabled />
+                </div>
+            </div>
+
+            @if (User.HasClaim(c => c.Value == "student"))
+            {
+                <div class="form-group row mb-1" style="background-color: black;color: white;">
+                    <div class="col-sm-7">
+                        <label class="col-sm-7 col-form-label">ADD NURSE MEDICATION</label>
+                    </div>
+                </div>
+
+                <div class="row mb-1">
+                    <div class="col-sm-3">
+                        <label for="txtNursingMedicationStartDate" class="form-label">Start Date</label>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="txtNursingMedicationStartDate" autocomplete="off">
+                    </div>
+                    <div class="col-sm-3">
+                        <label for="txtNursingMedicationStartTime" class="form-label">Start Time</label>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="txtNursingMedicationStartTime" autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="row mb-1">
+                    <div class="col-sm-3">
+                        <label for="txtNursingMedicationDose" class="form-label">Dose</label>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="txtNursingMedicationDose" autocomplete="off">
+                    </div>
+                    <div class="col-sm-3">
+                        <label for="txtNursingMedicationRoute" class="form-label">Route</label>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="txtNursingMedicationRoute" autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="row mb-1">
+                    <div class="col-sm-3">
+                        <label for="txtNursingMedicationNurseSign" class="form-label">Nurse Signature</label>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="txtNursingMedicationNurseSign" autocomplete="off">
+                    </div>
+                    <div class="col-sm-3">
+                        <label for="txtNursingMedicationCoNurseSign" class="form-label">Co Sign</label>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="txtNursingMedicationCoNurseSign" autocomplete="off">
+                    </div>
+                </div>
+
+                <div>
+                    <label id="lblMessage" style="color:green"></label>
+                    <button type="button" id="btnSaveMedicationPrnAdmin" class="btn btn-primary" style="background-color:#FF8A30;float: right;">Save</button>
+                </div>
+            }
+
+        </div>
+    </div>
+
+    <div class="row section">
+        <div class="col-md-12">
+            <div id="divlstMedicationprnadmin"></div>
+        </div>
+        <input type="hidden" id="hdnPatientsMedicationPrnId" value="@Model.MedicationPrnChartDto.Id" />
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#txtNursingMedicationStartDate").datepicker({
+            dateFormat: "yy-mm-dd" // Set the format here
+        });
+
+        var LabId = $('#txtLabId').val();
+        var PatientId = $('#txtPatientId').val();
+
+        $("#btnSaveMedicationPrnAdmin").on("click", function (e) {
+            e.preventDefault(); // Prevent default link behavior
+
+            var txtNursingMedicationStartDate = $('#txtNursingMedicationStartDate').val() + "T00:00:00";
+            var txtNursingMedicationStartTime = $('#txtNursingMedicationStartTime').val();
+            var txtNursingMedicationRoute = $('#txtNursingMedicationRoute').val();
+            var txtNursingMedicationNurseSign = $('#txtNursingMedicationNurseSign').val();
+            var txtNursingMedicationCoNurseSign = $('#txtNursingMedicationCoNurseSign').val();
+
+            var txtNursingMedicationDose = $('#txtNursingMedicationDose').val();
+            
+            if (txtNursingMedicationStartDate === "" || txtNursingMedicationStartDate === "T00:00:00" || txtNursingMedicationStartTime === "" 
+                || txtNursingMedicationDose === "" || txtNursingMedicationRoute === "" || txtNursingMedicationNurseSign === "" || txtNursingMedicationCoNurseSign === "") {
+                e.preventDefault();
+                $('#lblMessage').text("Please fill in the missing fields.").css('color', 'red');
+                return;
+            }
+
+            var toPost = {
+                Id: 0,
+                PatientMedicationChartId: $('#hdnPatientsMedicationPrnId').val(),
+                LabId: LabId,
+                PatientId: PatientId,
+                DoseDate: txtNursingMedicationStartDate,
+                DoseTime: txtNursingMedicationStartTime,
+                Dose: txtNursingMedicationDose,
+                Route: txtNursingMedicationRoute,
+                Reason: "",
+                StudentSign: txtNursingMedicationNurseSign,
+                CoSign: txtNursingMedicationCoNurseSign
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/patient/addpatientmedicationprnadministration",
+                contentType: "application/json",
+                data: JSON.stringify(toPost), // Convert JavaScript object to JSON string
+                success: function (response) {
+                    if (response > 0) {
+                        $('#lblMessage').text("Patient Medication - PRN record added successfully").css('color', 'green');
+                        getpatientmedicationprnadministration();
+                    } else {
+                        $('#lblMessage').text("Error").css('color', 'red');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $("#error-message").text("Error occurred").css('color', 'red');
+                }
+            });
+        });
+
+        getpatientmedicationprnadministration();
+
+        function getpatientmedicationprnadministration() {
+            $.ajax({
+                url: "/patient/getpatientmedicationprnadministration",
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId, patientMedicationChartId: $('#hdnPatientsMedicationPrnId').val() }, // Wrap Id in an object
+                success: function (response) {
+                    // Load the response into the right-side content area
+                    $('#divlstMedicationprnadmin').html("");
+                    $('#divlstMedicationprnadmin').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        }
+
+    });
+</script>

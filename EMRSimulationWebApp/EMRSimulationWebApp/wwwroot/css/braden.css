@@ -1,0 +1,94 @@
+﻿.br-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .br-table th, .br-table td {
+        border: 1px solid #cfcfcf;
+        padding: .5rem;
+        vertical-align: top;
+    }
+
+    .br-table thead th {
+        background: #efefef;
+        font-weight: 600;
+    }
+
+.br-factor {
+    width: 210px;
+}
+
+.br-desc {
+    width: 520px;
+}
+
+.br-assess {
+    width: 140px;
+    text-align: center;
+}
+
+.br-assess-box {
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.br-option {
+    display: flex;
+    gap: .5rem;
+    align-items: flex-start;
+}
+
+    .br-option label {
+        margin: 0;
+        cursor: pointer;
+    }
+
+.br-muted {
+    color: #666;
+    font-size: .9rem;
+}
+
+.br-total-row td {
+    background: #fafafa;
+}
+
+.br-key-pill {
+    display: inline-block;
+    padding: .25rem .5rem;
+    border-radius: 999px;
+    border: 1px solid #ddd;
+    font-weight: 600;
+}
+
+.tooltip-pointer {
+    text-decoration: dotted underline;
+    cursor: help;
+}
+
+.info-icon {
+    font-weight: 700;
+}
+
+.popover {
+    max-width: 420px;
+}
+
+.popover-body {
+    text-align: left;
+}
+
+/* Quick-intervention line shown under each assess cell */
+.br-table .br-qiline {
+    margin-top: .25rem;
+    font-size: .85rem;
+    line-height: 1.25;
+}
+
+.br-table .br-qi-text {
+    font-weight: 500;
+}

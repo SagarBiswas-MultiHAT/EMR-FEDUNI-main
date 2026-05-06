@@ -1,0 +1,244 @@
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+    background-color: #F2F2F3
+}
+
+.sidebar {
+    height: 200vh; /*position: fixed;*/
+    top: 0;
+    left: 0;
+    padding-top: 20px;
+    background-color: #343a40; /* Dark background */
+}
+
+    .sidebar .nav-link {
+        color: #ffffff; /* White text */
+        padding: 10px 15px;
+        display: block;
+        transition: background-color 0.3s;
+    }
+
+        .sidebar .nav-link:hover {
+            background-color: #FF8A30; /* Highlight on hover */
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #FF8A30; /* Active link color */
+            font-weight: bold;
+        }
+
+    .sidebar ul li {
+        margin: 10px 0;
+    }
+        /* Links */
+
+        .sidebar ul li a {
+            color: #ffffff; /* White text */
+            text-decoration: none;
+            padding: 10px;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+            .sidebar ul li a:hover {
+                background-color: #FF8A30; /* Orange color on hover */
+                color: #000000; /* Black text on hover */
+            }
+/* Menu buttons */
+
+.menu-btn {
+    background: none;
+    border: none;
+    color: white;
+    text-align: left;
+    padding: 10px;
+    width: 100%;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+    .menu-btn:hover {
+        background-color: #FF8A30;
+        color: #000;
+    }
+/* Submenu styles (hidden by default) */
+
+.submenu {
+    display: none;
+    list-style-type: none;
+    padding-left: 15px; /* Indent the sub-menu items */
+}
+    /* When the submenu is visible */
+
+    .submenu.show {
+        display: block;
+    }
+/* Main content styles */
+
+.content {
+    margin-left: 220px; /* Offset the content from the sidebar */
+    padding: 20px;
+}
+
+.patient-card { /*width: 80%;*/ /*margin: 20px auto;*/
+    background-color: #f2f2f2; /* Gray background */ /*position: relative;*/ /*padding-top: 20px;*/ /* To position the tab header */
+}
+
+.patient-header {
+    background-color: #FABC3F; /* Orange tab */
+    padding: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: black;
+    text-align: left;
+    width: fit-content; /*position: absolute;*/
+    top: -20px; /* Creates a tab effect */
+    left: 10px;
+    border: 1px solid black;
+}
+
+.patient-info {
+    padding: 20px;
+    background-color: white;
+    border: 1px solid black;
+}
+/* Left-align the table headers */
+
+table.dataTable thead th {
+    text-align: left !important; /* Force left alignment for all headers */
+}
+/* Left-align the table data cells */
+
+table.dataTable tbody td {
+    text-align: left !important; /* Force left alignment for all table data */
+}
+
+.section {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.table {
+    margin-top: 20px;
+}
+
+.inner-border {
+    border: 1px solid #ccc; /* Light gray border around inner divs */
+    padding: 5px; /* Padding inside each inner div */
+    margin: 2px 0; /* Margin between rows for spacing */
+}
+
+.readonly-multiline.form-control {
+    white-space: pre-wrap; /* keep user line breaks + wrap long runs */
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    height: auto; /* grow with content */
+    min-height: 38px; /* same as normal input height */
+    line-height: 1.25;
+    padding: 6px 8px; /* match input padding */
+}
+
+/* ===== Fixed layout: header + sidebar sticky, content scrolls ===== */
+:root {
+    /* Adjust these two numbers if needed */
+    --header-h: 64px; /* actual navbar height; tweak to match your header */
+    --sidebar-w: 240px; /* visual width you want for the sidebar */
+}
+
+/* Keep page from double-scrolling; the main area will scroll instead */
+html, body {
+    height: 100%;
+}
+
+body {
+    overflow: hidden; /* prevent whole-page scroll */
+    padding-top: var(--header-h); /* push content below fixed header */
+    background-color: #F2F2F3; /* keep your existing bg */
+}
+
+/* Header stays fixed on top */
+#appHeader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1040; /* above everything */
+    background: #fff; /* ensure solid background */
+}
+
+/* Sidebar: fixed on the left, scrolls internally if long */
+#appSidebar {
+    position: fixed;
+    top: var(--header-h);
+    left: 0;
+    width: var(--sidebar-w);
+    bottom: 0;
+    overflow-y: auto;
+    height: auto; /* override previous 200vh */
+    z-index: 1030; /* under header, over main */
+    /* keeps your existing dark styling from .sidebar */
+}
+
+/* Main content: only this scrolls */
+#appMain {
+    margin-left: var(--sidebar-w); /* make room for sidebar */
+    height: calc(100vh - var(--header-h)); /* full height minus header */
+    overflow-y: auto; /* scroll here */
+    padding-bottom: 24px; /* breathing room at bottom */
+}
+
+/* (Optional) If any dropdown/datepicker hides under header, give it a higher z-index */
+.ui-datepicker {
+    z-index: 2000 !important;
+}
+
+/* Mobile/tablet: fall back to normal flow to avoid cramped UI */
+@media (max-width: 991.98px) {
+    body {
+        overflow: auto;
+    }
+    /* allow page scroll again */
+    #appSidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        bottom: auto;
+        overflow: visible;
+    }
+
+    #appMain {
+        margin-left: 0;
+        height: auto;
+        overflow: visible;
+    }
+}
+
+.allergy {
+    color: #ff0000;
+}
+
+#content-area {
+    padding-bottom: 125px;
+}

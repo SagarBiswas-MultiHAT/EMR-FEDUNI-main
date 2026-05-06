@@ -1,0 +1,256 @@
+<div class="container">
+    <div class="row section">
+        <div class="col-md-8">
+
+            <div class="form-group row mb-1" style="background-color: black;color: white;">
+                <div class="col-sm-7">
+                    <label class="col-sm-5 col-form-label">FLUID RECORD</label>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Date</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsFluidRecordDate" autocomplete="off" />
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">IV Fluid (ml)</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsFluidRecordIV_Fluid" autocomplete="off" />
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Oral Intake (ml)</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsFluidRecordOral_Intake" autocomplete="off" />
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Enteric Intake (ml)</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsFluidRecordEntericIntake" autocomplete="off" />
+                </div>
+            </div>
+
+
+            <div class="form-group row mb-2 mt-3 bg-dark text-white py-1">
+                <div class="col-sm-12">
+                    <label class="col-form-label">OUTPUT MEASUREMENTS</label>
+                </div>
+            </div>
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Urine Output (ml)</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsFluidRecordUrine_Output" autocomplete="off" />
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Drainage (ml)</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsFluidRecordDrainage" autocomplete="off" />
+                </div>
+            </div>
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Bladder Scan (ml)</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsFluidRecordBladder_Scan" autocomplete="off" />
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Faecal Output (ml)</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsFluidRecordFaecal_Output" autocomplete="off" />
+                </div>
+            </div>
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Vomit (ml)</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsFluidRecordVomitus" autocomplete="off" />
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Total Intake (ml)</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsCumulativeIntake" autocomplete="off" readonly />
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label class="form-label">Total Output (ml)</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsCumulativeOutput" autocomplete="off" readonly />
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Difference (Intake - Output) (ml)</label>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="txtsDifference" autocomplete="off" readonly />
+                </div>
+            </div>
+
+
+            <div>
+                <label id="lblMessage" style="color:green"></label>
+                <button type="button" id="btnsSaveFluidBalance" class="btn btn-primary" style="background-color:#FF8A30;float: right;">Save</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row section">
+        <div class="col-md-12">
+            <div id="divlstFluidRecord"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    var LabId = null;
+    var PatientId = null;
+
+    $(document).ready(function () {
+        $("#txtsFluidRecordDate").datepicker({
+            dateFormat: "yy-mm-dd" // Set the format here
+        });
+
+        $("#txtNursingOrderEndDate").datepicker({
+            dateFormat: "yy-mm-dd" // Set the format here
+        });
+
+        getFluidRecordList();
+
+        LabId = $('#txtLabId').val();
+        PatientId = $('#txtPatientId').val();
+
+        // Call calculateCumulativeValues whenever an input field changes
+        $('#txtsFluidRecordIV_Fluid, #txtsFluidRecordOral_Intake, #txtsFluidRecordEntericIntake, #txtsFluidRecordUrine_Output, #txtsFluidRecordDrainage, #txtsFluidRecordBladder_Scan, #txtsFluidRecordFaecal_Output, #txtsFluidRecordVomitus').on('input', calculateCumulativeValues);
+
+
+        $("#btnsSaveFluidBalance").on("click", function (e) {
+            e.preventDefault(); // Prevent default link behavior
+
+            var txtsFluidRecordDate = $('#txtsFluidRecordDate').val() + "T00:00:00";
+            var txtsFluidRecordIV_Fluid = $('#txtsFluidRecordIV_Fluid').val();
+            var txtsFluidRecordOral_Intake = $('#txtsFluidRecordOral_Intake').val();
+            var txtsFluidRecordEntericIntake = $('#txtsFluidRecordEntericIntake').val();
+            var txtsFluidRecordUrine_Output = $('#txtsFluidRecordUrine_Output').val();
+            var txtsFluidRecordDrainage = $('#txtsFluidRecordDrainage').val();
+            var txtsFluidRecordBladder_Scan = $('#txtsFluidRecordBladder_Scan').val();
+            var txtsFluidRecordFaecal_Output = $('#txtsFluidRecordFaecal_Output').val();
+            var txtsFluidRecordVomitus = $('#txtsFluidRecordVomitus').val();
+            var txtsCumulativeIntake = $('#txtsCumulativeIntake').val();
+            var txtsCumulativeOutput = $('#txtsCumulativeOutput').val();
+            var txtsDifference = $('#txtsDifference').val();
+
+
+            if (txtsFluidRecordDate === "" || txtsFluidRecordDate === "T00:00:00" ||
+                txtsFluidRecordIV_Fluid === "" || txtsFluidRecordOral_Intake === "" || txtsFluidRecordUrine_Output === ""
+                || txtsFluidRecordDrainage === "") {
+                e.preventDefault();
+                $('#lblMessage').text("Please fill in the missing fields.").css('color', 'red');
+                return;
+            }
+
+            var toPost = {
+                Id: 0,
+                LabId: LabId,
+                PatientId: PatientId,
+                Date: txtsFluidRecordDate,
+                IV_Fluid: txtsFluidRecordIV_Fluid,
+                Oral_Intake: txtsFluidRecordOral_Intake,
+                Enteric_Intake: txtsFluidRecordEntericIntake,
+                Urine_Output: txtsFluidRecordUrine_Output,
+                Drainage: txtsFluidRecordDrainage,
+                Bladder_Scan: txtsFluidRecordBladder_Scan,
+                Faecal_Output: txtsFluidRecordFaecal_Output,
+                Vomitus: txtsFluidRecordVomitus,
+                Cumulative_Intake: txtsCumulativeIntake,
+                Cumulative_Output: txtsCumulativeOutput,
+                Difference: txtsDifference
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/supervisor/addfluidbalancechart",
+                contentType: "application/json",
+                data: JSON.stringify(toPost), // Convert JavaScript object to JSON string
+                success: function (response) {
+                    if (response > 0) {
+                        $('#lblMessage').text("Patient Fluid Balance record added successfully").css('color', 'green');
+                        getFluidRecordList();
+                        // Optionally clear the form after successful save
+                        $('#txtsFluidRecordDate').val('');
+                        $('#txtsFluidRecordIV_Fluid').val('');
+                        $('#txtsFluidRecordOral_Intake').val('');
+                        $('#txtsFluidRecordEntericIntake').val('');
+                        $('#txtsFluidRecordUrine_Output').val('');
+                        $('#txtsFluidRecordDrainage').val('');
+                        $('#txtsFluidRecordBladder_Scan').val('');
+                        $('#txtsFluidRecordFaecal_Output').val('');
+                        $('#txtsFluidRecordVomitus').val('');
+                        calculateCumulativeValues(); // Recalculate to clear cumulative fields
+                    } else {
+                        $('#lblMessage').text("Error").css('color', 'red');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $("#error-message").text("Error occurred").css('color', 'red');
+                }
+            });
+        });
+
+    });
+
+    function calculateCumulativeValues() {
+        var ivFluid = parseFloat($('#txtsFluidRecordIV_Fluid').val() || 0);
+        var oralIntake = parseFloat($('#txtsFluidRecordOral_Intake').val() || 0);
+        var entericIntake = parseFloat($('#txtsFluidRecordEntericIntake').val() || 0);
+
+        var totalIntake = ivFluid + oralIntake + entericIntake;
+
+        var urineOutput = parseFloat($('#txtsFluidRecordUrine_Output').val() || 0);
+        var drainage = parseFloat($('#txtsFluidRecordDrainage').val() || 0);
+        var bladderScan = parseFloat($('#txtsFluidRecordBladder_Scan').val() || 0);
+        var faecalOutput = parseFloat($('#txtsFluidRecordFaecal_Output').val() || 0);
+        var vomitus = parseFloat($('#txtsFluidRecordVomitus').val() || 0);
+
+        var totalOutput = urineOutput + drainage + bladderScan + faecalOutput + vomitus;
+        var difference = totalIntake - totalOutput;
+
+        $('#txtsCumulativeIntake').val(totalIntake);
+        $('#txtsCumulativeOutput').val(totalOutput);
+        $('#txtsDifference').val(difference);
+    }
+
+    function getFluidRecordList() {
+        $.ajax({
+            url: "/supervisor/getpatientfluidbalancechartlist",
+            method: "GET",
+            data: { labId: LabId, patientId: PatientId }, // Wrap Id in an object
+            success: function (response) {
+                // Load the response into the right-side content area
+                $('#divlstFluidRecord').html("");
+                $('#divlstFluidRecord').html(response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error loading the page:", error);
+            }
+        });
+    }
+
+</script>

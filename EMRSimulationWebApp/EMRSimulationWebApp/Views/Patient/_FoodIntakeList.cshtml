@@ -1,0 +1,87 @@
+﻿@model IEnumerable<EMRSimulation.Domain.Dtos.FoodIntakeListDto>
+@{
+    var labId = (int)ViewBag.LabId;
+    var patientId = ViewBag.PatientId; // may be null
+}
+
+<div class="form-group row mb-1" style="background-color:#000;color:#fff;">
+    <div class="col-sm-7">
+        <label class="col-form-label" style="font-weight:bold;">FOOD INTAKE RECORDS</label>
+    </div>
+</div>
+
+<table id="foodTable" class="display">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Day</th>
+            <th>Date</th>
+            <th>Meals Recorded</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in Model)
+        {
+            <tr>
+                <td>@row.Id</td>
+                <td>@(string.IsNullOrWhiteSpace(row.DayText) ? "" : row.DayText)</td>
+                <td>@row.IntakeDate.ToString("dd-MMM-yyyy")</td>
+                <td>
+                    <span class="badge bg-secondary" title="@row.MealsRecordedSummary">Recorded</span>
+                </td>
+
+                <td>
+                    <a href="javascript:void(0);" class="btn btn-light view-food" data-id="@row.Id" style="margin-right:6px;">View</a>
+                    <a href="javascript:void(0);" class="btn btn-warning edit-food" data-id="@row.Id" style="margin-right:6px; color:#fff; background-color:#f0ad4e; border-color:#eea236;">Edit</a>
+                    <a href="javascript:void(0);" class="btn btn-primary delete-food" data-id="@row.Id" style="background-color:#FF8A30;">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div><label id="lblDeleteFoodMsg" style="color:green"></label></div>
+
+<script>
+    var LabId = @labId;
+    var PatientId = @(patientId == null ? "null" : patientId.ToString());
+
+    var table = $('#foodTable').DataTable({
+        paging: true, info: false, searching: false, ordering: false, autoWidth: false, lengthChange: false,
+        columnDefs: [{ targets: [0], visible: false }]
+    });
+
+    // VIEW
+    $('#foodTable').on('click', '.view-food', function () {
+        var id = $(this).data('id');
+        $.get("/Patient/ViewFoodIntake", { labId: LabId, id: id }, function (html) {
+            $('#content-area').html(html);
+        }).fail(function(){ alert("Error loading Food Intake view."); });
+    });
+
+    // DELETE
+    $('#foodTable').on('click', '.delete-food', function () {
+        var id = $(this).data('id');
+        if (!confirm("Delete this Food Intake record? This cannot be undone.")) return;
+        $.get("/Patient/DeleteFoodIntake", { id: id }, function (res) {
+            if (Number(res) > 0) {
+                var data = (PatientId === null) ? { labId: LabId } : { labId: LabId, patientId: PatientId };
+                $.get("/Patient/GetFoodIntakeList", data, function (html) {
+                    $('#content-area').html(html);
+                });
+            } else {
+                $('#lblDeleteFoodMsg').text("Delete failed").css('color','red');
+            }
+        }).fail(function(){ alert("Error deleting Food Intake record."); });
+    });
+
+        // EDIT
+    $('#foodTable').on('click', '.edit-food', function () {
+        var id = $(this).data('id');
+        $.get("/Patient/GetFoodIntakeEdit", { labId: LabId, id: id }, function (html) {
+            $('#content-area').html(html);
+        }).fail(function(){ alert("Error loading Food Intake edit view."); });
+    });
+
+</script>

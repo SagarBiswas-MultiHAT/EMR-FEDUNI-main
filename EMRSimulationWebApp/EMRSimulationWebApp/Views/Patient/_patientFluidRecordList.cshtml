@@ -1,0 +1,136 @@
+@{
+    ViewData["Title"] = "Patient List";
+}
+@using EMRSimulation.Domain.Dtos;
+@model IEnumerable<FluidBalanceChartDto>
+
+<div class="form-group row mb-1" style="background-color: black;color: white;">
+    <div class="col-sm-7">
+        <label class="col-sm-5 col-form-label">FLUID RECORD LIST</label>
+    </div>
+</div>
+<div class="text-left">
+    <table id="patientsFluidRecordTable" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>IV Fluids</th>
+                <th>Oral Intake</th>
+                <th>Enteric Intake</th>
+                <th>Urine Output</th>
+                <th>Faecal Output</th>
+                <th>Vomitus</th>
+                <th>Drainage</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@Convert.ToDateTime(item.Date).ToShortDateString()</td>
+                    <td>@item.IV_Fluids</td>
+                    <td>@item.Oral_Intake</td>
+                    <td>@item.Enteric_Intake</td>
+                    <td>@item.Urine_Output</td>
+                    <td>@item.Faecal_Output</td>
+                    <td>@item.Vomitus</td>
+                    <td>@item.Drainage</td>
+                    <td>
+                        <a href="javascript:void(0);"
+                           class="btn btn-danger deleteFluidRecord"
+                           data-custom="@item.Id"
+                           style="padding: 5px 10px;">
+                            <i class="fas fa-trash"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <label id="lblMessage" style="color:green"></label>
+</div>
+
+<script>
+    var LabId = null;
+    var PatientId = null;
+
+    $(document).ready(function () {
+        // Initialize DataTable with proper configuration
+        var table = $('#patientsFluidRecordTable').DataTable({
+            "paging": true,
+            "info": false,
+            "searching": true,
+            "ordering": true,
+            "autoWidth": true,
+            "lengthChange": false,
+            "columns": [
+                { "visible": false }, // ID column
+                null, // Date
+                null, // IV Fluids
+                null, // Oral Intake
+                null, // Enteric Intake
+                null, // Urine Output
+                null, // Faecal Output
+                null, // Vomitus
+                null, // Drainage
+                { "orderable": false } // Action column
+            ],
+            "language": {
+                "emptyTable": "No fluid records found"
+            }
+        });
+
+        LabId = $('#txtLabId').val();
+        PatientId = $('#txtPatientId').val();
+
+        // Delete handler with improved error handling
+        $('#patientsFluidRecordTable').on('click', '.deleteFluidRecord', function () {
+            if (!confirm('Are you sure you want to delete this record?')) return;
+
+            var recordId = $(this).data('custom');
+
+            $.ajax({
+                type: "DELETE",
+                url: "/supervisor/deletefluidbalancechart",
+                data: { Id: recordId },
+                success: function (response) {
+                    if (response > 0) {
+                        refreshFluidRecords();
+                        $('#lblMessage').text("Record deleted successfully").css('color', 'green');
+                    } else {
+                        $('#lblMessage').text("Failed to delete record").css('color', 'red');
+                    }
+                },
+                error: function (xhr) {
+                    console.error("Delete error:", xhr.responseText);
+                    $('#lblMessage').text("Error deleting record").css('color', 'red');
+                }
+            });
+        });
+    });
+
+    // Function to refresh records
+    function refreshFluidRecords() {
+        $.ajax({
+            url: "/supervisor/getpatientfluidbalancechartlist",
+            data: { labId: LabId, patientId: PatientId },
+            success: function (response) {
+                $('#divlstFluidRecord').html(response);
+                // Reinitialize DataTable
+                $('#patientsFluidRecordTable').DataTable().destroy();
+                $('#patientsFluidRecordTable').DataTable({
+                    // Same configuration as above
+                });
+            },
+            error: function (xhr) {
+                console.error("Refresh error:", xhr.responseText);
+                $('#lblMessage').text("Error loading records").css('color', 'red');
+            }
+        });
+    }
+</script>

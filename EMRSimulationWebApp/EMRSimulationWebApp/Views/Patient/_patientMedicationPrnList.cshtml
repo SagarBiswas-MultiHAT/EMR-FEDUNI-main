@@ -1,0 +1,117 @@
+﻿@{
+    ViewData["Title"] = "Patient List";
+}
+@using EMRSimulation.Domain.Dtos;
+@model PatientMedicationPrnListViewModel
+
+<div class="form-group row mb-1" style="background-color: black;color: white;">
+    <div class="col-sm-7">
+        <label class="col-sm-5 col-form-label">MEDICATION - PRN</label>
+    </div>
+</div>
+
+<div class="text-left">
+    <table id="patientsMedicationPrnTable" class="display">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>MedicationName</th>
+                <th>Dose</th>
+                <th>Frequency</th>
+                <th>DoseDate</th>
+                <th>DoseTime</th>
+                <th>Indication</th>
+                <th>Route</th>
+                <th>MAXDose</th>
+                <th>Prescriber</th>
+                <th>PrescriberSign</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var patient in Model.MedicationPrnChartDtoList)
+            {
+                <tr>
+                    <td>@patient.Id</td>
+                    <td>@patient.MedicationName</td>
+                    <td>@patient.Dose</td>
+                    <td>@patient.DoseFrequency</td>
+                    <td>@Convert.ToDateTime(patient.DoseDate).ToShortDateString()</td>
+                    <td>@patient.DoseTime</td>
+                    <td>@patient.Indication</td>
+                    <td>@patient.Route</td>
+                    <td>@patient.Pharmacy</td>
+                    <td>@patient.Prescriber</td>
+                    <td>@patient.PrescriberSign</td>
+
+                    @{
+                        var actionType = "";
+
+                        if (User.HasClaim(c => c.Value == "student"))
+                        {
+                            actionType = "Add Record";
+                        }
+                        else if (User.HasClaim(c => c.Value == "supervisor"))
+                        {
+                            actionType = "View Record";
+                        }
+                    }
+                    <td>
+                        <a href="javascript:void(0);" class="btn btn-primary addpatientsMedicationPrnAdmin" data-custom="@patient.Id" style="background-color:#FF8A30;">@actionType</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <label id="lblMessage" style="color:green"></label>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+    var table = $('#patientsMedicationPrnTable').DataTable({
+        "paging": true, // Remove paging control
+        "info": false, // Remove "Showing 1 to X" information
+        "searching": false, // Remove search box
+        "ordering": true, // Enable column ordering (if needed)
+        "autoWidth": false, // Prevent auto width
+        "lengthChange": false,  // Hide the entries per page dropdown
+        // "pageLength": 3,  // Set the default number of entries per page (optional)
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false
+            } // Disable sorting for the action column
+        ]
+    });
+
+    $('#patientsMedicationPrnTable').on('click', '.addpatientsMedicationPrnAdmin', function() {
+
+        var ivFluidId = $(this).attr("data-custom");
+
+        var LabId = $('#txtLabId').val();
+        var PatientId = $('#txtPatientId').val();
+
+        // Get the URL from the data-url attribute
+        var pageUrl = "/patient/getpatientmedicationprn";
+
+        // Use AJAX to load the content from the URL
+        $.ajax({
+            url: pageUrl,
+            method: "GET",
+            data: { Id: ivFluidId, labId: LabId, patientId: PatientId }, // Wrap Id in an object
+            success: function (response) {
+                // Load the response into the right-side content area
+                $('#content-area').html("");
+                $('#content-area').html(response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error loading the page:", error);
+            }
+        });
+    });
+    });
+
+</script>

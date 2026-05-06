@@ -1,0 +1,67 @@
+﻿/* Food Intake custom styles */
+.fi-table th,
+.fi-table td {
+    vertical-align: middle !important;
+}
+
+.fi-th {
+    height: 64px; /* gives header cells consistent height */
+}
+
+.fi-table td[rowspan] {
+    vertical-align: middle !important; /* keeps "Breakfast" / "Morning tea" centered */
+}
+
+.fi-table thead small {
+    line-height: 1.1;
+    margin-top: 2px;
+}
+
+/* Top-align content in the comments column */
+.fi-table td.fi-comments {
+    vertical-align: top !important;
+}
+
+    /* Slightly tighter spacing for checkbox stacks, if present */
+    .fi-table td.fi-comments .form-check {
+        margin-bottom: .25rem;
+    }
+
+/* Strong divider before a new meal section (e.g., Morning tea) */
+.fi-table tr.fi-section-sep > td {
+    border-top-width: 3px !important;
+}
+
+/* Fill and balance the tall Breakfast comments cell */
+.fi-comments-fill {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* spreads items top→bottom */
+    gap: .35rem;
+    height: 100%;
+}
+    /* Avoid extra spacing fights inside the balanced stack */
+    .fi-comments-fill .form-check {
+        margin-bottom: 0;
+    }
+
+/* Keep each checkbox + its text input together as a mini block */
+.fi-pair {
+    display: flex;
+    flex-direction: column; /* checkbox row, then its input underneath */
+    gap: .25rem;
+}
+
+/* Center the shared Morning-tea comment vertically between Food & Beverage */
+.fi-centerbox {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fi-table td.fi-comments.fi-comments--center {
+    vertical-align: middle !important;
+}
+
+

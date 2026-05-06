@@ -1,0 +1,92 @@
+﻿@{
+    ViewData["Title"] = "Lab List";
+}
+@using EMRSimulation.Domain.Dtos;
+@model LabDto
+
+<div class="text-left">
+    <table id="LabTable" class="display">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Lab Name</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Model.Id</td>
+                <td>@Model.LabName</td>
+                <td>
+                    <a href="javascript:void(0);" class="btn btn-primary clearLabData" data-custom="@Model.Id" style="background-color:#FF8A30;">Clear Records</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="clearLabModal" tabindex="-1" aria-labelledby="clearLabModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="clearLabModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" style="background-color:black" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var table = $('#LabTable').DataTable({
+            "paging": true, // Remove paging control
+            "info": false, // Remove "Showing 1 to X" information
+            "searching": false, // Remove search box
+            "ordering": true, // Enable column ordering (if needed)
+            "autoWidth": false, // Prevent auto width
+            "lengthChange": false,  // Hide the entries per page dropdown
+            "pageLength": 5,  // Set the default number of entries per page (optional)
+            "columnDefs": [
+                {   "targets": [0],
+                    "visible": false
+                } // Disable sorting for the action column
+            ]
+        });
+
+        $(document).on('click', '.clearLabData', function (e) {
+            e.preventDefault(); 
+
+            var LabId = $('#txtLabId').val();
+            var patientId = $(this).attr("data-custom");
+
+            $.ajax({
+                type: "GET",
+                url: "/supervisor/clearlabdata",
+                contentType: "application/json",
+                data: { labId: LabId, patientId: patientId },
+                success: function (response) {
+                    let tableHtml = '<table class="table table-striped"><thead><tr><th>&nbsp;</th><th style="text-align:left">Record</th><th>Rows Deleted</th></tr></thead><tbody>';
+                    response.forEach(item => {
+                        tableHtml += `<tr><td>&nbsp</td><td style='text-align:left'>${item.moduleName}</td><td>${item.rowsDeleted}</td></tr>`;
+                    });
+                    tableHtml += '</tbody></table>';
+
+                    $('#clearLabModal .modal-body').html(tableHtml);
+                    $('#clearLabModalLabel').text('Cleared Lab Records');
+                    $('#clearLabModal').modal('show');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log("Error:", textStatus);
+                }
+            });
+        });
+
+    });
+
+</script>

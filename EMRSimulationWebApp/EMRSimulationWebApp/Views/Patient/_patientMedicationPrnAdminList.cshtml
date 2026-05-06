@@ -1,0 +1,123 @@
+﻿@{
+    ViewData["Title"] = "Patient List";
+}
+@using EMRSimulation.Domain.Dtos;
+@model IEnumerable<MedicationAdministrationPrnDto>
+
+<div class="form-group row mb-1" style="background-color: black;color: white;">
+    <div class="col-sm-7">
+        <label class="col-sm-5 col-form-label">NURSING RECORD LIST</label>
+    </div>
+</div>
+<div class="text-left">
+    <table id="patientsPrnAdminTable" class="display">
+        <thead>
+            <tr>
+                <th>Patient ID</th>
+                <th>Start Date</th>
+                <th>Start Time</th>
+                <th>Dose</th>
+                <th>Route</th>
+                <th>Nurse Sign</th>
+                <th>Co Sign</th>
+                @if (User.HasClaim(c => c.Value == "student"))
+                {
+                    <th>Action</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var patient in Model)
+            {
+                <tr>
+                    <td>@patient.Id</td>
+                    <td>@Convert.ToDateTime(patient.DoseDate).ToShortDateString()</td>
+                    <td>@patient.DoseTime</td>
+                    <td>@patient.Dose</td>
+                    <td>@patient.Route</td>
+                    <td>@patient.StudentSign</td>
+                    <td>@patient.CoSign</td>
+
+                    @if (User.HasClaim(c => c.Value == "student"))
+                    {
+                        <td>
+                            <a href="javascript:void(0);" class="btn btn-primary deleteMedicationPrnAdmin" data-custom="@patient.Id" style="background-color:#FF8A30;">Delete</a>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <label id="lblMessage" style="color:green"></label>
+</div>
+
+<script>
+    var LabId = null;
+    var PatientId = null;
+
+    $(document).ready(function () {
+        var table = $('#patientsPrnAdminTable').DataTable({
+            "paging": true, // Remove paging control
+            "info": false, // Remove "Showing 1 to X" information
+            "searching": false, // Remove search box
+            "ordering": true, // Enable column ordering (if needed)
+            "autoWidth": false, // Prevent auto width
+            "lengthChange": false,  // Hide the entries per page dropdown
+            // "pageLength": 3,  // Set the default number of entries per page (optional)
+            "columnDefs": [
+                {
+                    "targets": [0],
+                    "visible": false
+                } // Disable sorting for the action column
+            ]
+        });
+
+        LabId = $('#txtLabId').val();
+        PatientId = $('#txtPatientId').val();
+
+        $('#patientsPrnAdminTable').on('click', '.deleteMedicationPrnAdmin', function() {
+
+            var addsId = $(this).attr("data-custom");
+
+            $.ajax({
+                type: "GET",
+                url: "/patient/deletepatientmedicationprnadministration",
+                contentType: "application/json",
+                data: { Id: addsId }, // Wrap Id in an object
+                success: function (response) {
+                    if (response > 0) {
+
+                        alert("Patient Medication - PRN record deleted successfully")
+
+                        $.ajax({
+                            url: "/patient/getpatientmedicationprnadministration",
+                            method: "GET",
+                            data: { labId: LabId, patientId: PatientId, patientMedicationChartId: $('#hdnPatientsMedicationPrnId').val() }, // Wrap Id in an object
+                            success: function (response) {
+                                // Load the response into the right-side content area
+                                $('#divlstMedicationprnadmin').html("");
+                                $('#divlstMedicationprnadmin').html(response);
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error loading the page:", error);
+                            }
+                        });
+
+                    } else {
+                        $('#lblMessage').text("Error").css('color', 'red');
+                    }
+                
+
+                    console.log("Success:", response);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log("Error:", textStatus);
+                }
+            });
+        });
+    });
+    
+
+</script>

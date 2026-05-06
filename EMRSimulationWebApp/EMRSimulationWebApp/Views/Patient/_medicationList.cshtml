@@ -1,0 +1,101 @@
+﻿@{
+    ViewData["Title"] = "Patient List";
+}
+@using EMRSimulation.Domain.Dtos;
+@model IEnumerable<MedicationDto>
+
+<div class="form-group row mb-1" style="background-color: black;color: white;">
+    <div class="col-sm-7">
+        <label class="col-sm-5 col-form-label">MEDICATION LIST</label>
+    </div>
+</div>
+<div class="text-left">
+    <table id="medicationAddsTable" class="display">
+        <thead>
+            <tr>
+                <th>Medication ID</th>
+                <th>Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Name</td>
+                    <td>
+                        <a href="javascript:void(0);" class="btn btn-primary deleteMedication" data-custom="@item.Id" style="background-color:#FF8A30;">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <label id="lblMessage" style="color:green"></label>
+</div>
+
+<script>
+
+    var table = $('#medicationAddsTable').DataTable({
+        "paging": true, // Remove paging control
+        "info": false, // Remove "Showing 1 to X" information
+        "searching": false, // Remove search box
+        "ordering": true, // Enable column ordering (if needed)
+        "autoWidth": false, // Prevent auto width
+        "lengthChange": false,  // Hide the entries per page dropdown
+        // "pageLength": 3,  // Set the default number of entries per page (optional)
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false
+            } // Disable sorting for the action column
+        ]
+    });
+
+    var LabId = $('#txtLabId').val();
+    
+    $('#medicationAddsTable').on('click', '.deleteMedication', function() {
+        
+        var addsId = $(this).attr("data-custom");
+
+        $.ajax({
+            type: "GET",
+            url: "/supervisor/deletemedication",
+            contentType: "application/json",
+            data: { Id: addsId }, // Wrap Id in an object
+            success: function (response) {
+                if (response.id > 0) {
+
+                    alert("Medication record deleted successfully")
+
+                    $.ajax({
+                        url: "/supervisor/getmedicationlist",
+                        method: "GET",
+                        data: { labId: LabId }, // Wrap Id in an object
+                        success: function (response) {
+                            // Load the response into the right-side content area
+                            $('#divlstMedication').html("");
+                            $('#divlstMedication').html(response);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error loading the page:", error);
+                        }
+                    });
+
+                } else {
+                    $('#lblMessage').text(response.resultMessage).css('color', 'red');
+                }
+                
+
+                console.log("Success:", response);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log("Error:", textStatus);
+            }
+        });
+    });
+    
+
+</script>

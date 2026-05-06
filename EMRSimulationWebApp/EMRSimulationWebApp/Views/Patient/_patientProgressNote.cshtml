@@ -1,0 +1,111 @@
+﻿<div class="container">
+    <div class="row section">
+        <!-- Left Column -->
+        <!-- Right Column -->
+
+        <div class="col-md-8">
+
+            <div class="form-group row mb-1" style="background-color: black;color: white;">
+                <div class="col-sm-7">
+                    <label class="col-sm-5 col-form-label">PROGRESS NOTE</label>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label for="txtProgressNote" class="form-label">Progress Note</label>
+                </div>
+                <div class="col-sm-6">
+                    <textarea style="width:100%" id="txtProgressNote" rows="7"></textarea>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    <label for="txtPorgressNoteNurseSign" class="form-label">Nurse Signature</label>
+                </div>
+                <div class="col-sm-6">
+                    <input type="text" class="form-control" id="txtPorgressNoteNurseSign" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3">
+                    
+                </div>
+                <div class="col-sm-6">
+                    <button type="button" id="btnSaveProgressNote" class="btn btn-primary" style="background-color:#FF8A30;float: right;">Save</button>
+                </div>
+            </div>
+
+            <div>
+                <label id="lblMessage" style="color:green"></label>
+                
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+        $(document).ready(function () {
+
+            var LabId = $('#txtLabId').val();
+            var PatientId = $('#txtPatientId').val();
+
+            var currentDateTime = formatDate(new Date());
+
+            $("#btnSaveProgressNote").on("click", function (e) {
+                e.preventDefault(); // Prevent default link behavior
+
+                var txtProgressNote = $('#txtProgressNote').val();
+                var txtPorgressNoteNurseSign = $('#txtPorgressNoteNurseSign').val();
+
+                if (txtProgressNote === "" || txtPorgressNoteNurseSign === "") 
+                {
+                    e.preventDefault();
+                    $('#lblMessage').text("Please fill in the missing fields.").css('color', 'red');
+                    return;
+                }
+
+                var toPost = {
+                    Id: 0,
+                    LabId: LabId,
+                    PatientId: PatientId,
+                    Notes: txtProgressNote,
+                    Sign: txtPorgressNoteNurseSign,
+                    NotesDate: currentDateTime
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: "/patient/addprogressnote",
+                    contentType: "application/json",
+                    data: JSON.stringify(toPost), // Convert JavaScript object to JSON string
+                    success: function (response) {
+                        if (response > 0) {
+                            $('#lblMessage').text("Progress Note record added successfully").css('color', 'green');
+                        } else {
+                        $('#lblMessage').text("Error").css('color', 'red');
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $("#error-message").text("Error occurred").css('color', 'red');
+                    }
+                });
+            });
+
+            function formatDate(date) {
+                var year = date.getFullYear();
+                var month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+                var day = String(date.getDate()).padStart(2, '0');
+                var hours = String(date.getHours()).padStart(2, '0');
+                var minutes = String(date.getMinutes()).padStart(2, '0');
+                var seconds = String(date.getSeconds()).padStart(2, '0');
+
+                return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`; // Example format
+            }
+
+        });
+</script>

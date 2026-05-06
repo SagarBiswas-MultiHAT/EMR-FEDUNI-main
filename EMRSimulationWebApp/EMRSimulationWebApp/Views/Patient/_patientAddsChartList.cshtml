@@ -1,0 +1,216 @@
+﻿@{
+    ViewData["Title"] = "Patient List";
+}
+@using EMRSimulation.Domain.Dtos;
+@using System.Globalization
+@model PatientAddsListViewModel
+
+<div class="text-left">
+    <table id="patientsAddsTable" class="display">
+        <thead>
+            <tr>
+                <th>Patient ID</th>
+                <th>Entered Date</th>
+                <th>Entered Time</th>
+                <th>Respiratory Rate</th>
+                <th>OxygenSaturation</th>
+                <th>OxygenFlow</th>
+                <th>Blood Pressure Systolic</th>
+                <th>Blood Pressure Diastolic</th>
+                <th>Heart Rate</th>
+                <th>Temperature</th>
+                <th>Consciousness</th>
+                <th>Total ADDS</th>
+
+                @if (User.HasClaim(c => c.Value == "student"))
+                {
+                    <th>Action</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var patient in Model.AddsDtoList)
+            {
+                string enteredTime = patient.EnteredTime;
+                if (DateTime.TryParseExact(
+                    patient.EnteredTime,
+                    new[] { "HH:mm", "H:mm", "hh:mm tt", "h:mm tt" },
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var t))
+                {
+                    enteredTime = t.ToString("hh:mm tt");
+                }
+                <tr>
+                    <td>@patient.Id</td>
+                    <td>@(patient.EnteredDate?.ToString("dd-MMM-yyyy"))</td>
+                    <td>@patient.EnteredTime</td>
+                    @if (patient.RespiratoryRate.Contains("Write"))
+                    {
+                        <td>@patient.RespiratoryRate: (@patient.RespiratoryRateValue)</td>
+                    }
+                    else
+                    {
+                        <td>@patient.RespiratoryRate</td>
+                    }
+
+                    @if (patient.OxygenSaturation.Contains("Write"))
+                    {
+                        <td>@patient.OxygenSaturation: (@patient.OxygenSaturationValue)</td>
+                    }
+                    else
+                    {
+                        <td>@patient.OxygenSaturation</td>
+                    }
+
+                    <td>@patient.OxygenFlow</td>
+
+                    @if (patient.BloodPressure.Contains("Write"))
+                    {
+                        <td>@patient.BloodPressure: (@patient.BloodPressureValue)</td>
+                    }
+                    else
+                    {
+                        <td>@patient.BloodPressure</td>
+                    }
+
+                    @if (patient.BloodPressureDiastolic.Contains("Write"))
+                    {
+                        <td>@patient.BloodPressureDiastolic: (@patient.BloodPressureDiastolicValue)</td>
+                    }
+                    else
+                    {
+                        <td>@patient.BloodPressureDiastolic</td>
+                    }
+
+                    @if (patient.HeartRate.Contains("Write"))
+                    {
+                        <td>@patient.HeartRate: (@patient.HeartRateValue)</td>
+                    }
+                    else
+                    {
+                        <td>@patient.HeartRate</td>
+                    }
+
+                    @if (patient.Temperature.Contains("Write"))
+                    {
+                        <td>@patient.Temperature: (@patient.TemperatureValue)</td>
+                    }
+                    else
+                    {
+                        <td>@patient.Temperature</td>
+                    }
+
+                    <td>@patient.Consciousness</td>
+                    <td>@patient.TotalScore</td>
+
+                    @if (User.HasClaim(c => c.Value == "student"))
+                    {
+                        <td>
+                            <a href="javascript:void(0);" class="btn btn-primary deleteAdds" data-custom="@patient.Id" style="background-color:#FF8A30;">Delete</a>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <label id="lblMessage" style="color:green"></label>
+
+    @*
+    @if (User.HasClaim(c => c.Value == "student"))
+    {
+    *@
+        <button type="button" id="btnAddAddsChart" class="btn btn-primary" style="background-color:#FF8A30;float: left;">Add ADDS</button>
+    @*
+    }
+    *@
+</div>
+
+<script>
+    $(document).ready(function () {
+        var table = $('#patientsAddsTable').DataTable({
+            "paging": true, // Remove paging control
+            "info": false, // Remove "Showing 1 to X" information
+            "searching": false, // Remove search box
+            "ordering": true, // Enable column ordering (if needed)
+            "autoWidth": false, // Prevent auto width
+            "lengthChange": false,  // Hide the entries per page dropdown
+            // "pageLength": 3,  // Set the default number of entries per page (optional)
+            "columnDefs": [
+                {
+                    "targets": [0],
+                    "visible": false
+                } // Disable sorting for the action column
+            ]
+        });
+
+        var LabId = $('#txtLabId').val();
+        var PatientId = $('#txtPatientId').val();
+
+        $('#btnAddAddsChart').on('click', function (e) {
+            e.preventDefault(); // Prevent default link behavior
+
+            // Get the URL from the data-url attribute
+            var pageUrl = "/patient/getpatientadds";
+
+            // Use AJAX to load the content from the URL
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId },
+                success: function (response) {
+                    // Load the response into the right-side content area
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('#patientsAddsTable').on('click', '.deleteAdds', function() {
+
+            var addsId = $(this).attr("data-custom");
+
+            $.ajax({
+                type: "GET",
+                url: "/patient/deletepatientadds",
+                contentType: "application/json",
+                data: { Id: addsId },
+                success: function (response) {
+                    if (response > 0) {
+                        alert("Patient ADDS record deleted successfully")
+
+                        $.ajax({
+                            url: "/patient/getpatientaddslist",
+                            method: "GET",
+                            data: { labId: LabId, patientId: PatientId },
+                            success: function (response) {
+                                // Load the response into the right-side content area
+                                $('#content-area').html("");
+                                $('#content-area').html(response);
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error loading the page:", error);
+                            }
+                        });
+
+                    } else {
+                        $('#lblMessage').text("Error").css('color', 'red');
+                    }
+
+
+                    console.log("Success:", response);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log("Error:", textStatus);
+                }
+            });
+        });
+    });
+
+
+</script>

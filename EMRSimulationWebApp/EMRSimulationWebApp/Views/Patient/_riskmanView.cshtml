@@ -1,0 +1,461 @@
+﻿@model EMRSimulation.Domain.Dtos.RiskmanDto
+@using System.Globalization
+
+@{
+    string dateDisplay = Model.IncidentDate.HasValue
+        ? Model.IncidentDate.Value.ToString("dd-MMM-yyyy", CultureInfo.InvariantCulture)
+        : "";
+
+    string timeDisplay = "";
+    if (!string.IsNullOrWhiteSpace(Model.IncidentTime))
+    {
+        if (DateTime.TryParseExact(
+                Model.IncidentTime,
+                new[] { "HH:mm", "H:mm", "hh:mm tt", "h:mm tt" },
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var t))
+        {
+            timeDisplay = t.ToString("hh:mm tt", CultureInfo.InvariantCulture);
+        }
+        else
+        {
+            timeDisplay = Model.IncidentTime;
+        }
+    }
+
+    string uriDisplay = Model.URINumber ?? "";
+    string campusDisplay = Model.Campus ?? "";
+    string wardDisplay = Model.WardLocationType ?? "";
+    string nameDisplay = Model.PersonName ?? "";
+    string dobDisplay = Model.DateOfBirth.HasValue
+        ? Model.DateOfBirth.Value.ToString("dd-MMM-yyyy", CultureInfo.InvariantCulture)
+        : "";
+    string sexDisplay = Model.Sex ?? "";
+    string indigenousDisplay = Model.IndigenousStatus ?? "";
+    string briefSummaryDisplay = (Model.BriefSummary ?? "").Trim();
+    string detailsDisplay = (Model.Details ?? "").Trim();
+    string eventTypeDisplay = Model.EventType ?? "";
+    string eventSubTypeDisplay = Model.EventSubType ?? "";
+
+    // helpers
+    string yesNo(bool? b) => b == true ? "Yes" : b == false ? "No" : "—";
+    string dash(string? s) => string.IsNullOrWhiteSpace(s) ? "—" : s;
+
+    string clinicalIncidentDisplay = yesNo(Model.IsClinicalIncident);
+    string apseDisplay = yesNo(Model.Apse);
+    string clinicalHarmLevelDisplay = dash(Model.ClinicalHarmLevel);
+    string harmDurationDisplay = dash(Model.HarmDuration);
+    string requiredCareClinicalDisplay = dash(Model.RequiredCareLevelClinical);
+
+    string emergencyTypeDisplay = dash(Model.EmergencyResponseType);
+    string emergencyOutcomeDisplay = dash(Model.EmergencyResponseOutcome);
+
+    string contributingDetailDisplay = dash(Model.ContributingAdditionalDetail);
+
+    string reporterAffectedStaffDisplay = yesNo(Model.ReporterIsAffectedStaff);
+    string ohsInjuryTypeDisplay = dash(Model.OhsTypeOfInjury);
+    string ohsInjuryTypeOtherDisplay = (Model.OhsTypeOfInjuryOther ?? "").Trim();
+
+    string ohsBodyPartDisplay = dash(Model.OhsBodyPartAffected);
+    string ohsBodyPartOtherDisplay = (Model.OhsBodyPartOther ?? "").Trim();
+
+    string ohsHarmLevelDisplay = dash(Model.OhsLevelOfHarmSustained);
+    string ohsRequiredCareDisplay = dash(Model.OhsRequiredLevelOfCare);
+    string ohsActionsRequiredDisplay = dash(Model.OhsActionsRequired);
+
+    string nextOfKinNotifiedDate = Model.NextOfKinNotifiedDate.HasValue
+           ? Model.NextOfKinNotifiedDate.Value.ToString("dd-MMM-yyyy", CultureInfo.InvariantCulture)
+           : "";
+
+    string nextOfKinNotifiedTime = "";
+    if (!string.IsNullOrWhiteSpace(Model.NextOfKinNotifiedTime))
+    {
+        if (DateTime.TryParseExact(
+                Model.NextOfKinNotifiedTime,
+                new[] { "HH:mm", "H:mm", "hh:mm tt", "h:mm tt" },
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var t))
+        {
+            nextOfKinNotifiedTime = t.ToString("hh:mm tt", CultureInfo.InvariantCulture);
+        }
+        else
+        {
+            nextOfKinNotifiedTime = Model.NextOfKinNotifiedTime;
+        }
+    }
+
+    string signedByDisplay = dash(Model.SignedBy);
+    string signedDateDisplay = Model.SignedDate.HasValue
+        ? Model.SignedDate.Value.ToString("dd-MMM-yyyy", CultureInfo.InvariantCulture)
+        : "—";
+
+    // print-only conditional row
+    bool showEmergencyOutcome =
+        (!string.IsNullOrWhiteSpace(Model.EmergencyResponseType)
+            && Model.EmergencyResponseType.IndexOf("Code Grey", System.StringComparison.OrdinalIgnoreCase) >= 0)
+        || !string.IsNullOrWhiteSpace(Model.EmergencyResponseOutcome);
+
+    bool showNextOfKinNotified = Model.NextOfKinNotifiedDate.HasValue && !string.IsNullOrWhiteSpace(Model.NextOfKinNotifiedTime);
+    string nextOfKinNotified = yesNo(showNextOfKinNotified);
+}
+
+<link rel="stylesheet" href="~/css/riskman-print.css" media="print" asp-append-version="true" />
+
+<style>
+    .print-title {
+        display: none;
+    }
+
+    /* screen-view multiline block (matches your Details/Additional Detail) */
+    .form-control.readonly-multiline {
+        white-space: pre-wrap;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        height: auto !important; /* beat Bootstrap’s fixed height */
+        min-height: 64px; /* start tall enough */
+        line-height: 1.35;
+        padding: 8px;
+        overflow-y: visible;
+    }
+</style>
+
+
+
+
+<div id="riskman-page" class="container">
+  <div class="row section">
+    <div class="col-12 col-md-10 col-lg-8 mx-auto">
+
+      <div class="riskman-card">
+        <div class="riskman-card-header">
+          EMR INCIDENT REPORTING FORM <span class="view-only-text" style="font-weight:normal;color:#ccc;">(VIEW ONLY)</span>
+        </div>
+
+        <div class="riskman-card-body">
+
+          <!-- WRAP ONLY THE PRINTABLE CONTENT -->
+          <div id="riskman-print">
+
+            <!-- print-only heading (centered A4 title) -->
+            <div class="form-group row mb-1">
+              <div class="col-sm-12">
+                <label class="col-form-label print-title">
+                  INCIDENT REPORT <span class="view-only-text">(VIEW ONLY)</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- 1. Incident Information -->
+            <div class="row mb-2">
+              <div class="col-sm-12">
+                <label class="form-label" style="font-weight:bold;">1. Incident Information</label>
+              </div>
+            </div>
+
+            <div class="row mb-1">
+              <div class="col-sm-3"><label class="form-label">Incident Date</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@dateDisplay" readonly /></div>
+            </div>
+
+            <div class="row mb-1">
+              <div class="col-sm-3"><label class="form-label">Incident Time</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@timeDisplay" readonly /></div>
+            </div>
+
+            <div class="row mb-1">
+              <div class="col-sm-3"><label class="form-label">Campus</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@campusDisplay" readonly /></div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-sm-3"><label class="form-label">Ward/Location Type</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@wardDisplay" readonly /></div>
+            </div>
+
+            <!-- 2. Person Affected -->
+            <div class="row mb-2">
+              <div class="col-sm-12">
+                <label class="form-label" style="font-weight:bold;">2. Person Affected</label>
+              </div>
+            </div>
+
+            <div class="row mb-1">
+              <div class="col-sm-3"><label class="form-label">Name</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@nameDisplay" readonly /></div>
+            </div>
+
+            <div class="row mb-1">
+              <div class="col-sm-3"><label class="form-label">Patient Identifier</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@uriDisplay" readonly /></div>
+            </div>
+
+            <div class="row mb-1">
+              <div class="col-sm-3"><label class="form-label">Date of Birth</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@dobDisplay" readonly /></div>
+            </div>
+
+            <div class="row mb-1">
+              <div class="col-sm-3"><label class="form-label">Sex</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@sexDisplay" readonly /></div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-sm-3"><label class="form-label">Indigenous Status</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@indigenousDisplay" readonly /></div>
+            </div>
+
+            <!-- 3. Incident Details -->
+            <div class="row mb-2">
+              <div class="col-sm-12">
+                <label class="form-label" style="font-weight:bold;">3. Incident Details</label>
+              </div>
+            </div>
+
+            <div class="row mb-1">
+             <div class="col-sm-3"><label class="form-label">Brief Summary</label></div>
+             <div class="col-sm-6">
+             <div class="form-control readonly-multiline" readonly>@briefSummaryDisplay</div>
+             </div>
+             </div>
+
+            
+
+            <div class="row mb-1">
+              <div class="col-sm-3"><label class="form-label">Details</label></div>
+              <div class="col-sm-6"><div class="form-control readonly-multiline" style="min-height:70px;" readonly>@detailsDisplay</div></div>
+            </div>
+
+            <div class="row mb-1">
+              <div class="col-sm-3"><label class="form-label">Event Type</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@eventTypeDisplay" readonly /></div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-sm-3"><label class="form-label">Event Type Sub-category</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@eventSubTypeDisplay" readonly /></div>
+            </div>
+
+            <!-- 4. Clinical Incident -->
+            <div class="row mb-2">
+              <div class="col-sm-12">
+                <label class="form-label" style="font-weight:bold;">4. Clinical Incident</label>
+              </div>
+            </div>
+
+            <div class="row mb-1">
+              <div class="col-sm-3"><label class="form-label">Is this a Clinical Incident?</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@clinicalIncidentDisplay" readonly /></div>
+            </div>
+
+            <div class="row mb-1">
+              <div class="col-sm-3"><label class="form-label">Adverse Patient Safety Event (APSE)?</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@apseDisplay" readonly /></div>
+            </div>
+
+            <div class="row mb-1">
+              <div class="col-sm-3"><label class="form-label">Level of Harm (Clinical)</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@clinicalHarmLevelDisplay" readonly /></div>
+            </div>
+
+            <div class="row mb-1">
+              <div class="col-sm-3"><label class="form-label">Duration of Harm</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@harmDurationDisplay" readonly /></div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-sm-3"><label class="form-label">Level of Care/Treatment Required</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@requiredCareClinicalDisplay" readonly /></div>
+            </div>
+
+            <!-- 5. Emergency Response -->
+            <div class="row mb-2">
+              <div class="col-sm-12">
+                <label class="form-label" style="font-weight:bold;">5. Emergency Response</label>
+              </div>
+            </div>
+
+            <div class="row mb-1">
+              <div class="col-sm-3"><label class="form-label">Emergency Response Type</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@emergencyTypeDisplay" readonly /></div>
+            </div>
+
+            @if (showEmergencyOutcome)
+            {
+              <div class="row mb-3">
+                <div class="col-sm-3"><label class="form-label">Emergency Response Outcome</label></div>
+                <div class="col-sm-6"><input type="text" class="form-control" value="@emergencyOutcomeDisplay" readonly /></div>
+              </div>
+            }
+
+            <!-- 6. Contributing Factors -->
+            <div class="row mb-2">
+              <div class="col-sm-12">
+                <label class="form-label" style="font-weight:bold;">6. Contributing Factors</label>
+              </div>
+            </div>
+
+            <div class="row mb-1">
+              <div class="col-sm-3"><span class="form-label d-block">Contributing Factors</span></div>
+              <div class="col-sm-6">
+                @if (Model.ContributingFactors != null && Model.ContributingFactors.Any())
+                {
+                    <div class="form-control border rounded p-2" style="height:auto; min-height:38px;" readonly>
+                      <ul class="mb-0 ps-3">
+                        @foreach (var f in Model.ContributingFactors)
+                        {
+                          <li>@f</li>
+                        }
+                      </ul>
+                    </div>
+                }
+                else
+                {
+                    <input type="text" class="form-control" value="—" readonly />
+                }
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-sm-3"><label class="form-label">Additional Detail</label></div>
+              <div class="col-sm-6"><div class="form-control readonly-multiline" style="min-height:38px;" readonly>@contributingDetailDisplay</div></div>
+            </div>
+
+            <!-- 7. OHS -->
+            <div class="row mb-2">
+              <div class="col-sm-12">
+                <label class="form-label" style="font-weight:bold;">7. Occupational Health &amp; Safety (OHS) – For Staff/Visitor/Patients Incidents</label>
+              </div>
+            </div>
+
+            <div class="row mb-1">
+              <div class="col-sm-3"><span class="form-label d-block">Is the Reporter the Affected Staff Member?</span></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@reporterAffectedStaffDisplay" readonly /></div>
+            </div>
+
+            <div class="row mb-1">
+              <div class="col-sm-3"><label class="form-label">Type of Injury</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@ohsInjuryTypeDisplay" readonly /></div>
+            </div>
+
+              @if (!string.IsNullOrWhiteSpace(Model.OhsTypeOfInjuryOther))
+                        {
+                            <div class="row mb-1">
+                                <div class="col-sm-3"><label class="form-label">If Other, specify</label></div>
+                                <div class="col-sm-6">
+                                    <div class="form-control readonly-multiline" readonly>@ohsInjuryTypeOtherDisplay</div>
+                                </div>
+                            </div>
+                        }
+
+
+                        <div class="row mb-1">
+                            <div class="col-sm-3"><label class="form-label">Body Part Affected</label></div>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" value="@ohsBodyPartDisplay" readonly />
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(Model.OhsBodyPartOther))
+                        {
+                            <div class="row mb-1">
+                                <div class="col-sm-3"><label class="form-label">If Other, specify</label></div>
+                                <div class="col-sm-6">
+                                    <div class="form-control readonly-multiline" readonly>@ohsBodyPartOtherDisplay</div>
+                                </div>
+                            </div>
+                        }
+
+
+                        <div class="row mb-1">
+              <div class="col-sm-3"><label class="form-label">Level of Harm Sustained</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@ohsHarmLevelDisplay" readonly /></div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-sm-3"><label class="form-label">Required Level of Care</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@ohsRequiredCareDisplay" readonly /></div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-sm-3"><label class="form-label">Actions Required</label></div>
+              <div class="col-sm-6"><div class="form-control" style="min-height:38px; padding:6px;" readonly>@ohsActionsRequiredDisplay</div></div>
+            </div>
+
+            <!-- 8. Next of Kin Notified -->
+            <div class="row mb-2">
+                <div class="col-sm-12">
+                    <label class="form-label" style="font-weight:bold;">8. Next of Kin Notification</label>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-sm-3"><span class="form-label d-block">Has the Next of Kin been notified?</span></div>
+                <div class="col-sm-6"><input type="text" class="form-control" value="@nextOfKinNotified" readonly /></div>
+            </div>
+
+            @if (showNextOfKinNotified)
+            {
+                <div class="row mb-1">
+                    <div class="col-sm-3"><label class="form-label">Notified Date</label></div>
+                    <div class="col-sm-6"><input type="text" class="form-control" value="@nextOfKinNotifiedDate" readonly /></div>
+                </div>
+
+                <div class="row mb-1">
+                    <div class="col-sm-3"><label class="form-label">Notified Time</label></div>
+                    <div class="col-sm-6"><input type="text" class="form-control" value="@nextOfKinNotifiedTime" readonly /></div>
+                </div>
+            }
+
+            <!-- 9. Sign Off -->
+            <div class="row mb-2">
+              <div class="col-sm-12">
+                <label class="form-label" style="font-weight:bold;">Sign Off</label>
+              </div>
+            </div>
+
+            <div class="row mb-1">
+              <div class="col-sm-3"><label class="form-label">Signed By</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@signedByDisplay" readonly /></div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-sm-3"><label class="form-label">Date</label></div>
+              <div class="col-sm-6"><input type="text" class="form-control" value="@signedDateDisplay" readonly /></div>
+            </div>
+
+          </div> <!-- /#riskman-print -->
+
+          <!-- Buttons OUTSIDE print wrapper so they don't print -->
+          <div class="row mb-1">
+            <div class="col-sm-6 offset-sm-3 text-end">
+              <a href="javascript:void(0);" id="btnBackToRiskmanList" class="btn btn-secondary">Back to List</a>
+              <a href="javascript:void(0);" id="btnPrintRiskman" class="btn btn-warning ms-2">Print</a>
+            </div>
+          </div>
+
+        </div> <!-- /riskman-card-body -->
+      </div>   <!-- /riskman-card -->
+
+    </div>
+  </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+      $('#btnBackToRiskmanList').on('click', function () {
+        $.ajax({
+          url: "/Patient/GetRiskmanIncidentList",
+          type: "GET",
+          data: { labId: @ViewBag.LabId },
+          success: function (html) { $('#content-area').html(html); },
+          error: function () { alert("Error loading incident list"); }
+        });
+      });
+
+      $('#btnPrintRiskman').on('click', function () {
+        window.print();
+      });
+    });
+</script>
