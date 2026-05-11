@@ -114,6 +114,7 @@ namespace EMRSimulation.Infrastructure.Repositories
                         }
                     }
                 }
+
             }
 
             return patients;
@@ -175,6 +176,7 @@ namespace EMRSimulation.Infrastructure.Repositories
                         }
                     }
                 }
+
             }
 
             return patients;
@@ -505,6 +507,7 @@ namespace EMRSimulation.Infrastructure.Repositories
                         }
                     }
                 }
+
             }
 
             return patients;
@@ -1951,6 +1954,176 @@ var patient = new FluidBalanceChartDto
             return (ok == null || ok == DBNull.Value) ? 0 : Convert.ToInt32(ok);
         }
 
+        public async Task<VictorianMaternityRecordDto> GetVictorianMaternityRecordAsync(int labId, int patientId)
+        {
+            using var connection = (SqlConnection)await _dbConnectionFactory.CreateAsync();
+            await EnsureVictorianMaternityRecordTableAsync(connection);
+
+            using var command = connection.CreateCommand();
+            command.CommandType = CommandType.Text;
+            command.CommandText = @"
+SELECT TOP (1)
+    Id,
+    LabId,
+    PatientId,
+    FormDataJson,
+    LastUpdatedBy,
+    LastUpdatedRole,
+    LastUpdatedAt,
+    SupervisorReviewNotes,
+    SupervisorReviewedBy,
+    SupervisorReviewedAt
+FROM dbo.VictorianMaternityRecord
+WHERE LabId = @LabId AND PatientId = @PatientId;";
+            command.Parameters.Add(new SqlParameter("@LabId", labId));
+            command.Parameters.Add(new SqlParameter("@PatientId", patientId));
+
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return new VictorianMaternityRecordDto
+                {
+                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                    LabId = reader.GetInt32(reader.GetOrdinal("LabId")),
+                    PatientId = reader.GetInt32(reader.GetOrdinal("PatientId")),
+                    FormDataJson = reader.IsDBNull(reader.GetOrdinal("FormDataJson")) ? "{}" : reader.GetString(reader.GetOrdinal("FormDataJson")),
+                    LastUpdatedBy = reader.IsDBNull(reader.GetOrdinal("LastUpdatedBy")) ? null : reader.GetString(reader.GetOrdinal("LastUpdatedBy")),
+                    LastUpdatedRole = reader.IsDBNull(reader.GetOrdinal("LastUpdatedRole")) ? null : reader.GetString(reader.GetOrdinal("LastUpdatedRole")),
+                    LastUpdatedAt = reader.IsDBNull(reader.GetOrdinal("LastUpdatedAt")) ? null : reader.GetDateTime(reader.GetOrdinal("LastUpdatedAt")),
+                    SupervisorReviewNotes = reader.IsDBNull(reader.GetOrdinal("SupervisorReviewNotes")) ? null : reader.GetString(reader.GetOrdinal("SupervisorReviewNotes")),
+                    SupervisorReviewedBy = reader.IsDBNull(reader.GetOrdinal("SupervisorReviewedBy")) ? null : reader.GetString(reader.GetOrdinal("SupervisorReviewedBy")),
+                    SupervisorReviewedAt = reader.IsDBNull(reader.GetOrdinal("SupervisorReviewedAt")) ? null : reader.GetDateTime(reader.GetOrdinal("SupervisorReviewedAt"))
+                };
+            }
+
+            return new VictorianMaternityRecordDto
+            {
+                LabId = labId,
+                PatientId = patientId,
+                FormDataJson = "{}"
+            };
+        }
+
+        public async Task<int> SaveVictorianMaternityRecordAsync(VictorianMaternityRecordDto dto, string updatedBy, string updatedRole)
+        {
+            using var connection = (SqlConnection)await _dbConnectionFactory.CreateAsync();
+            await EnsureVictorianMaternityRecordTableAsync(connection);
+
+            using var command = connection.CreateCommand();
+            command.CommandType = CommandType.Text;
+            command.CommandText = @"
+UPDATE dbo.VictorianMaternityRecord
+SET
+    FormDataJson = @FormDataJson,
+    LastUpdatedBy = @UpdatedBy,
+    LastUpdatedRole = @UpdatedRole,
+    LastUpdatedAt = SYSUTCDATETIME(),
+    SupervisorReviewNotes = CASE WHEN @UpdatedRole = N'supervisor' THEN @SupervisorReviewNotes ELSE SupervisorReviewNotes END,
+    SupervisorReviewedBy = CASE WHEN @UpdatedRole = N'supervisor' THEN @UpdatedBy ELSE SupervisorReviewedBy END,
+    SupervisorReviewedAt = CASE WHEN @UpdatedRole = N'supervisor' THEN SYSUTCDATETIME() ELSE SupervisorReviewedAt END
+WHERE LabId = @LabId AND PatientId = @PatientId;
+
+IF @@ROWCOUNT = 0
+BEGIN
+    INSERT INTO dbo.VictorianMaternityRecord
+    (
+        LabId,
+        PatientId,
+        FormDataJson,
+        LastUpdatedBy,
+        LastUpdatedRole,
+        LastUpdatedAt,
+        SupervisorReviewNotes,
+        SupervisorReviewedBy,
+        SupervisorReviewedAt
+    )
+    VALUES
+    (
+        @LabId,
+        @PatientId,
+        @FormDataJson,
+        @UpdatedBy,
+        @UpdatedRole,
+        SYSUTCDATETIME(),
+        CASE WHEN @UpdatedRole = N'supervisor' THEN @SupervisorReviewNotes ELSE NULL END,
+        CASE WHEN @UpdatedRole = N'supervisor' THEN @UpdatedBy ELSE NULL END,
+        CASE WHEN @UpdatedRole = N'supervisor' THEN SYSUTCDATETIME() ELSE NULL END
+    );
+
+    SELECT CAST(SCOPE_IDENTITY() AS INT);
+END
+ELSE
+BEGIN
+    SELECT Id
+    FROM dbo.VictorianMaternityRecord
+    WHERE LabId = @LabId AND PatientId = @PatientId;
+END";
+
+            command.Parameters.Add(new SqlParameter("@LabId", dto.LabId));
+            command.Parameters.Add(new SqlParameter("@PatientId", dto.PatientId));
+            command.Parameters.Add(new SqlParameter("@FormDataJson", SqlDbType.NVarChar, -1)
+            {
+                Value = string.IsNullOrWhiteSpace(dto.FormDataJson) ? "{}" : dto.FormDataJson
+            });
+            command.Parameters.Add(new SqlParameter("@UpdatedBy", string.IsNullOrWhiteSpace(updatedBy) ? "Unknown" : updatedBy));
+            command.Parameters.Add(new SqlParameter("@UpdatedRole", string.IsNullOrWhiteSpace(updatedRole) ? "unknown" : updatedRole));
+            command.Parameters.Add(new SqlParameter("@SupervisorReviewNotes", SqlDbType.NVarChar, -1)
+            {
+                Value = (object?)dto.SupervisorReviewNotes ?? DBNull.Value
+            });
+
+            var savedId = await command.ExecuteScalarAsync();
+            return (savedId == null || savedId == DBNull.Value) ? 0 : Convert.ToInt32(savedId);
+        }
+
+        private static async Task EnsureVictorianMaternityRecordTableAsync(SqlConnection connection)
+        {
+            using var command = connection.CreateCommand();
+            command.CommandType = CommandType.Text;
+            command.CommandText = @"
+IF OBJECT_ID(N'dbo.VictorianMaternityRecord', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.VictorianMaternityRecord
+    (
+        Id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_VictorianMaternityRecord PRIMARY KEY,
+        LabId INT NOT NULL,
+        PatientId INT NOT NULL,
+        FormDataJson NVARCHAR(MAX) NOT NULL CONSTRAINT DF_VMR_FormDataJson DEFAULT (N'{}'),
+        LastUpdatedBy NVARCHAR(120) NULL,
+        LastUpdatedRole NVARCHAR(40) NULL,
+        LastUpdatedAt DATETIME2(0) NOT NULL CONSTRAINT DF_VMR_LastUpdatedAt DEFAULT (SYSUTCDATETIME()),
+        SupervisorReviewNotes NVARCHAR(MAX) NULL,
+        SupervisorReviewedBy NVARCHAR(120) NULL,
+        SupervisorReviewedAt DATETIME2(0) NULL,
+        CONSTRAINT UQ_VMR_LabPatient UNIQUE (LabId, PatientId),
+        CONSTRAINT FK_VMR_Patient FOREIGN KEY (PatientId) REFERENCES dbo.Patient(Id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IX_VMR_LabPatient ON dbo.VictorianMaternityRecord (LabId, PatientId);
+END";
+
+            await command.ExecuteNonQueryAsync();
+        }
+
+        private static async Task<int> DeleteVictorianMaternityRecordsAsync(SqlConnection connection, int labId, int? patientId)
+        {
+            await EnsureVictorianMaternityRecordTableAsync(connection);
+
+            using var command = connection.CreateCommand();
+            command.CommandType = CommandType.Text;
+            command.CommandText = patientId.HasValue
+                ? "DELETE FROM dbo.VictorianMaternityRecord WHERE LabId = @LabId AND PatientId = @PatientId;"
+                : "DELETE FROM dbo.VictorianMaternityRecord WHERE LabId = @LabId;";
+
+            command.Parameters.Add(new SqlParameter("@LabId", labId));
+            if (patientId.HasValue)
+            {
+                command.Parameters.Add(new SqlParameter("@PatientId", patientId.Value));
+            }
+
+            return await command.ExecuteNonQueryAsync();
+        }
+
 
 
         public async Task<int> AddProgressNotesAsync(ProgressNotesDto addsDto)
@@ -2402,6 +2575,13 @@ var patient = new FluidBalanceChartDto
                         }
                     }
                 }
+
+                var vmrRowsDeleted = await DeleteVictorianMaternityRecordsAsync((SqlConnection)connection, labId, patientId);
+                patients.Add(new ClearDataDto
+                {
+                    ModuleName = "Victorian Maternity Record",
+                    RowsDeleted = vmrRowsDeleted
+                });
             }
 
             return patients;
@@ -2438,6 +2618,13 @@ var patient = new FluidBalanceChartDto
                         }
                     }
                 }
+
+                var vmrRowsDeleted = await DeleteVictorianMaternityRecordsAsync((SqlConnection)connection, labId, null);
+                patients.Add(new ClearDataDto
+                {
+                    ModuleName = "Victorian Maternity Record",
+                    RowsDeleted = vmrRowsDeleted
+                });
             }
 
             return patients;

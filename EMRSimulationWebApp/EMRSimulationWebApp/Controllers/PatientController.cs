@@ -33,6 +33,63 @@ namespace EMRSimulation.WebApp.Controllers
             return PartialView("~/views/patient/_patientRecord.cshtml", patient);
         }
 
+        public async Task<IActionResult> GetVictorianMaternityRecord(int labId, int patientId)
+        {
+            if (labId <= 0 || patientId <= 0)
+            {
+                return Content("<div class='p-3 text-danger'>Missing lab or patient context.</div>", "text/html");
+            }
+
+            var patient = await _patientService.GetPatientById(patientId, labId);
+            if (patient == null || patient.Id <= 0)
+            {
+                return Content("<div class='p-3 text-danger'>Patient not found.</div>", "text/html");
+            }
+
+            var record = await _patientService.GetVictorianMaternityRecordAsync(labId, patientId);
+            var vm = new VictorianMaternityRecordViewModel
+            {
+                Patient = patient,
+                Record = record,
+                IsSupervisor = User.HasClaim(c => c.Value == "supervisor")
+            };
+
+            return PartialView("~/views/patient/_VictorianMaternityRecord.cshtml", vm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveVictorianMaternityRecord([FromBody] VictorianMaternityRecordDto dto)
+        {
+            if (dto == null) return BadRequest("No VMR payload.");
+            if (dto.LabId <= 0 || dto.PatientId <= 0) return BadRequest("Missing LabId or PatientId.");
+
+            var role = User.HasClaim(c => c.Value == "supervisor")
+                ? "supervisor"
+                : User.HasClaim(c => c.Value == "student")
+                    ? "student"
+                    : User.FindFirst("Role")?.Value ?? "unknown";
+
+            var updatedBy = User.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(updatedBy))
+            {
+                updatedBy = role == "unknown" ? "EMR user" : role;
+            }
+
+            var newId = await _patientService.SaveVictorianMaternityRecordAsync(dto, updatedBy, role);
+            var saved = await _patientService.GetVictorianMaternityRecordAsync(dto.LabId, dto.PatientId);
+
+            return Ok(new
+            {
+                success = newId > 0,
+                id = newId,
+                lastUpdatedBy = saved.LastUpdatedBy,
+                lastUpdatedRole = saved.LastUpdatedRole,
+                lastUpdatedAt = saved.LastUpdatedAt?.ToString("yyyy-MM-dd HH:mm"),
+                supervisorReviewedBy = saved.SupervisorReviewedBy,
+                supervisorReviewedAt = saved.SupervisorReviewedAt?.ToString("yyyy-MM-dd HH:mm")
+            });
+        }
+
         public async Task<IActionResult> GetPatientADDS(int labId, int patientId)
         {
             PatientDto patient;

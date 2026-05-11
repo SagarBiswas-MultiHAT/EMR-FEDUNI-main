@@ -72,6 +72,10 @@ namespace EMRSimulation.Application.Services
         Task<int> DeleteFoodIntakeAsync(int id);
         Task<int> UpdateFoodIntakeAsync(FoodIntakeDto dto);
 
+        // Victorian Maternity Record
+        Task<VictorianMaternityRecordDto> GetVictorianMaternityRecordAsync(int labId, int patientId);
+        Task<int> SaveVictorianMaternityRecordAsync(VictorianMaternityRecordDto dto, string updatedBy, string updatedRole);
+
         //Fluid balance chart
         Task<FluidBalanceChartDto> GetFluidBalanceChartByIdAsync(int Id, int labId);
         Task<IEnumerable<FluidBalanceChartDto>> GetFluidBalanceChartAsync(int labId, int patientId);

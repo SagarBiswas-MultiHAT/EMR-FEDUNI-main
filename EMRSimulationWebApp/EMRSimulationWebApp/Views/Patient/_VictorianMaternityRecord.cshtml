@@ -1,0 +1,780 @@
+@model EMRSimulationWebApp.Models.VictorianMaternityRecordViewModel
+@{
+    var patientName = $"{Model.Patient.FirstName} {Model.Patient.LastName}".Trim();
+    var patientDob = Model.Patient.DateOfBirth?.ToString("yyyy-MM-dd") ?? "";
+    var recordJson = Model.Record.FormDataJson ?? "{}";
+}
+
+<div class="vmr-shell">
+    <input type="hidden" id="vmrLabId" value="@Model.Record.LabId" />
+    <input type="hidden" id="vmrPatientId" value="@Model.Record.PatientId" />
+
+    <div class="vmr-hero">
+        <div>
+            <div class="vmr-kicker">Victorian</div>
+            <h2>Maternity Record</h2>
+            <div class="vmr-subtitle">Confidential pregnancy, birth and postnatal record</div>
+        </div>
+        <div class="vmr-patient-label">
+            <label>Woman's name</label>
+            <div>@patientName</div>
+            <label>UR number</label>
+            <div>@Model.Patient.UriNumber</div>
+        </div>
+    </div>
+
+    <div class="vmr-status-bar">
+        <div><strong>Patient:</strong> @patientName</div>
+        <div><strong>DOB:</strong> @patientDob</div>
+        <div><strong>URI:</strong> @Model.Patient.UriNumber</div>
+        <div id="vmrSavedMeta">
+            <strong>Last saved:</strong>
+            @(Model.Record.LastUpdatedAt?.ToString("yyyy-MM-dd HH:mm") ?? "Not saved yet")
+            @if (!string.IsNullOrWhiteSpace(Model.Record.LastUpdatedBy))
+            {
+                <span> by @Model.Record.LastUpdatedBy (@Model.Record.LastUpdatedRole)</span>
+            }
+        </div>
+    </div>
+
+    <div class="vmr-actions">
+        <button type="button" class="btn btn-primary" id="btnSaveVmr">Save VMR</button>
+        <button type="button" class="btn btn-outline-dark" id="btnPrintVmr">Print</button>
+        <span id="vmrMessage" class="vmr-message" aria-live="polite"></span>
+    </div>
+
+    <div id="vmrTabs" class="vmr-tabs"></div>
+    <form id="vmrForm" class="vmr-form">
+        <div id="vmrSections"></div>
+    </form>
+
+    <section class="vmr-section vmr-review-section">
+        <div class="vmr-section-title">
+            <span>Supervisor Review</span>
+        </div>
+        <div class="vmr-field full">
+            <label for="vmrSupervisorReviewNotes">Review notes</label>
+            <textarea id="vmrSupervisorReviewNotes" rows="4" @(Model.IsSupervisor ? "" : "readonly")>@Model.Record.SupervisorReviewNotes</textarea>
+        </div>
+        <div class="vmr-review-meta">
+            Reviewed by: <strong id="vmrReviewedBy">@(Model.Record.SupervisorReviewedBy ?? "Not reviewed")</strong>
+            <span id="vmrReviewedAt">@Model.Record.SupervisorReviewedAt?.ToString("yyyy-MM-dd HH:mm")</span>
+        </div>
+    </section>
+</div>
+
+<script>
+    (function () {
+        const vmrInitialJson = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(recordJson));
+        const isSupervisor = @(Model.IsSupervisor.ToString().ToLowerInvariant());
+        const patientDefaults = {
+            "details.preferredName": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(patientName)),
+            "details.age": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Patient.Age ?? "")),
+            "details.dob": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(patientDob)),
+            "history.age": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Patient.Age ?? "")),
+            "history.dob": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(patientDob)),
+            "header.womanName": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(patientName)),
+            "header.urNumber": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Patient.UriNumber ?? ""))
+        };
+
+        let vmrData = {};
+        try {
+            vmrData = JSON.parse(vmrInitialJson || "{}") || {};
+        } catch {
+            vmrData = {};
+        }
+
+        const yesNo = ["", "Yes", "No"];
+        const regularity = ["", "Regular", "Irregular", "Unsure"];
+        const birthModes = ["", "Spontaneous", "Forceps", "Ventouse", "Breech", "Emergency Caesarean", "Elective Caesarean"];
+
+        const visitColumns = [
+            { key: "date", label: "Date", type: "date" },
+            { key: "gestation", label: "Gestation" },
+            { key: "bloodPressure", label: "Blood pressure" },
+            { key: "fundalHeight", label: "Fundal height" },
+            { key: "fhr", label: "FHR" },
+            { key: "fm", label: "FM" },
+            { key: "presentationStation", label: "Presentation and station" },
+            { key: "nextVisit", label: "Next visit", type: "date" },
+            { key: "urinalysis", label: "Urinalysis" },
+            { key: "other", label: "Other" },
+            { key: "comments", label: "Comments", wide: true },
+            { key: "printName", label: "Print name" },
+            { key: "signature", label: "Signature" },
+            { key: "designation", label: "Designation" },
+            { key: "interpreterUsed", label: "Interpreter used", type: "select", options: yesNo }
+        ];
+
+        const testRows = [
+            ["fbe", "FBE (note MCV)", "Booking"],
+            ["bloodGroup", "Blood group", "Booking"],
+            ["antibodies", "Antibodies", "Booking"],
+            ["urinalysis", "Urinalysis/MSU", "Booking"],
+            ["hepatitisB", "Hepatitis B", "Booking"],
+            ["syphilis", "Syphilis", "Booking"],
+            ["rubella", "Rubella", "Booking"],
+            ["hivAids", "HIV/AIDS", "Booking"],
+            ["firstTrimester", "1st trimester combined screening", "11-12 wks"],
+            ["msst", "MSST", "14-20 wks"],
+            ["ultrasound18", "Ultrasound", "18-20 wks"],
+            ["secondTrimesterFbe", "2nd trimester FBE", "25-30 wks"],
+            ["gctGtt", "GCT/GTT", "25-30 wks"],
+            ["rhNegative", "If Rh D-ve: antibodies / Anti D", "28/40 wks"],
+            ["gbs", "GBS", "36-38 wks"],
+            ["papTest", "Pap test", "Booking"],
+            ["hepatitisC", "Hepatitis C", "Booking"],
+            ["vitaminD", "Vitamin D", "Booking"],
+            ["ferritin", "Ferritin", "Booking"],
+            ["thalassaemia", "Thalassaemia", "Booking"],
+            ["ultrasound10", "Ultrasound", "10-13 wks"],
+            ["thirdTrimesterFbe", "3rd trimester FBE", "36-38 wks"],
+            ["cvs", "CVS", ""],
+            ["amniocentesis", "Amniocentesis", ""]
+        ];
+
+        const sections = [
+            {
+                id: "details",
+                title: "Your Details",
+                theme: "peach",
+                fields: [
+                    { key: "details.todayDate", label: "Today's date", type: "date", col: "third" },
+                    { key: "details.returnUrgentlyTo", label: "If found, return urgently to", col: "wide" },
+                    { type: "subhead", title: "Your details" },
+                    { key: "details.preferredName", label: "Preferred name", col: "full" },
+                    { key: "details.age", label: "Age", col: "third" },
+                    { key: "details.dob", label: "DOB", type: "date", col: "third" },
+                    { key: "details.culturalBackground", label: "Cultural background", col: "third" },
+                    { key: "details.language", label: "Language", col: "half" },
+                    { key: "details.interpreterRequired", label: "Interpreter required", type: "select", options: yesNo, col: "quarter" },
+                    { key: "details.aboriginalTorresStraitIslander", label: "Aboriginal/Torres Strait Islander", type: "select", options: yesNo, col: "quarter" },
+                    { key: "details.occupation", label: "Occupation", col: "half" },
+                    { type: "subhead", title: "Partner/contact person" },
+                    { key: "details.partnerName", label: "Partner's name", col: "third" },
+                    { key: "details.contactPerson", label: "Contact person (if different)", col: "third" },
+                    { key: "details.relationship", label: "Relationship", col: "third" },
+                    { type: "subhead", title: "Pregnancy care option" },
+                    { key: "details.pregnancyCareOption", label: "Your option/type of pregnancy care is called", col: "full" },
+                    { type: "subhead", title: "Recommended care option" },
+                    { key: "details.suitableLowRiskCare", label: "Suitable for low risk/shared maternity care", type: "select", options: yesNo, col: "third" },
+                    { key: "details.carerNameTeamClinic", label: "Carer's name/team/clinic", col: "third" },
+                    { key: "details.plannedPlaceBirth", label: "Planned place for birth", col: "third" },
+                    { key: "details.birthPlaceBooked", label: "Booked", type: "select", options: yesNo, col: "third" },
+                    { key: "details.recommendationNotCarryRecord", label: "Carer recommendation not to carry record", type: "checkbox", col: "third" },
+                    { key: "details.signatureDate", label: "Signature date", type: "date", col: "third" },
+                    { type: "subhead", title: "Shared care provider details" },
+                    { key: "details.sharedCareProvider", label: "Shared care doctor/midwife", col: "wide" },
+                    { key: "details.sharedCarePhone", label: "T", col: "quarter" },
+                    { key: "details.sharedCareFax", label: "F", col: "quarter" },
+                    { key: "details.doctorFamilyGp", label: "Doctor or family GP", col: "wide" },
+                    { key: "details.doctorFamilyGpPhone", label: "T", col: "quarter" },
+                    { key: "details.doctorFamilyGpFax", label: "F", col: "quarter" },
+                    { key: "details.sharedCareStoppedOn", label: "Shared care stopped on", type: "date", col: "third" },
+                    { key: "details.sharedCareStoppedReason", label: "Reason", col: "wide" },
+                    { key: "details.alerts", label: "Alerts", type: "textarea", rows: 5, col: "half" },
+                    { key: "details.managementPlan", label: "Management plan", type: "textarea", rows: 6, col: "half" }
+                ]
+            },
+            {
+                id: "history",
+                title: "History and Exam",
+                theme: "peach",
+                fields: [
+                    { key: "history.age", label: "Age", col: "quarter" },
+                    { key: "history.dob", label: "DOB", type: "date", col: "quarter" },
+                    { key: "history.contraceptionMethod", label: "Contraception method before pregnancy", col: "half" },
+                    { key: "history.contraceptionStoppedOn", label: "Stopped on", type: "date", col: "quarter" },
+                    { key: "history.assistedConception", label: "Assisted conception", type: "select", options: yesNo, col: "quarter" },
+                    { key: "history.conceptionMethod", label: "Conception method", col: "half" },
+                    { type: "subhead", title: "Menstrual cycle" },
+                    { key: "history.lastPeriod", label: "Last period", type: "date", col: "quarter" },
+                    { key: "history.cycleRegularity", label: "Cycle", type: "select", options: regularity, col: "quarter" },
+                    { key: "history.daysInCycle", label: "Days in cycle", col: "quarter" },
+                    { key: "history.edbMenstrual", label: "EDB menstrual", type: "date", col: "quarter" },
+                    { key: "history.edbUltrasound", label: "EDB ultrasound", type: "date", col: "quarter" },
+                    { key: "history.edbUltrasoundWeeks", label: "At weeks", col: "quarter" },
+                    { key: "history.agreedDueDate", label: "Agreed due date", type: "date", col: "quarter" },
+                    { key: "history.gravida", label: "G", col: "quarter" },
+                    { key: "history.para", label: "P", col: "quarter" },
+                    {
+                        type: "table",
+                        title: "Past pregnancies/Obstetric history",
+                        base: "history.obstetric",
+                        rows: 6,
+                        columns: [
+                            { key: "year", label: "Year" },
+                            { key: "gestation", label: "Gestation" },
+                            { key: "place", label: "Place" },
+                            { key: "labourType", label: "Type of labour" },
+                            { key: "birthType", label: "Type of birth" },
+                            { key: "outcome", label: "Outcome" },
+                            { key: "sex", label: "M/F" },
+                            { key: "birthWeight", label: "Birth weight" },
+                            { key: "breastfeedingLength", label: "Length of B/F" },
+                            { key: "commentsName", label: "Comments/Name", wide: true }
+                        ]
+                    },
+                    { key: "history.gynaecologicalComments", label: "Gynaecological history comments", type: "textarea", rows: 3, col: "full" },
+                    { key: "history.medicalSurgicalComments", label: "Medical and surgical history comments", type: "textarea", rows: 3, col: "full" },
+                    { key: "history.nutritionSupplementsComments", label: "Nutrition/supplements comments", type: "textarea", rows: 3, col: "full" },
+                    { key: "history.allergies", label: "Allergies", type: "textarea", rows: 2, col: "half" },
+                    { key: "history.medications", label: "Medications", type: "textarea", rows: 2, col: "half" },
+                    { key: "history.familyHealth", label: "Family health", type: "textarea", rows: 3, col: "full" },
+                    { key: "history.mentalHealth", label: "Mental health history", type: "textarea", rows: 3, col: "half" },
+                    { key: "history.socialOther", label: "Social/Other", type: "textarea", rows: 3, col: "half" },
+                    { type: "subhead", title: "Alcohol/Substance use" },
+                    { key: "history.drinkAlcohol", label: "Do you drink alcohol?", type: "select", options: yesNo, col: "quarter" },
+                    { key: "history.drinksBeforePregnancy", label: "Standard drinks per week before pregnancy", col: "quarter" },
+                    { key: "history.drinksCurrently", label: "Standard drinks per week currently", col: "quarter" },
+                    { key: "history.drugUseComments", label: "Drug use comments", type: "textarea", rows: 2, col: "full" },
+                    { key: "history.receivingTreatment", label: "Receiving treatment?", type: "select", options: yesNo, col: "quarter" },
+                    { key: "history.treatmentWhereWhat", label: "Where/what?", col: "wide" },
+                    { type: "subhead", title: "Smoking and physical examination" },
+                    { key: "history.smokedLast12Months", label: "Smoked within last 12 months?", type: "select", options: yesNo, col: "quarter" },
+                    { key: "history.weight", label: "Weight (kg)", col: "quarter" },
+                    { key: "history.height", label: "Height (cm)", col: "quarter" },
+                    { key: "history.bmi", label: "BMI", col: "quarter" },
+                    { key: "history.bp", label: "BP", col: "quarter" },
+                    { key: "history.physicalComments", label: "Physical examination comments", type: "textarea", rows: 3, col: "full" },
+                    {
+                        type: "table",
+                        title: "Referrals",
+                        base: "history.referrals",
+                        rows: 3,
+                        columns: [
+                            { key: "date", label: "Date", type: "date" },
+                            { key: "name", label: "Name" },
+                            { key: "specialist", label: "Specialist" },
+                            { key: "place", label: "Place" },
+                            { key: "reason", label: "Reason", wide: true }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: "tests",
+                title: "Tests",
+                theme: "peach",
+                custom: "tests"
+            },
+            {
+                id: "progress",
+                title: "Pregnancy Progress",
+                theme: "progress",
+                fields: [
+                    {
+                        type: "visitTable",
+                        title: "Visits 1-6",
+                        base: "progress.visits",
+                        start: 1,
+                        end: 6
+                    },
+                    { type: "subhead", title: "Smoking assessment" },
+                    { key: "progress.smoking.gestation", label: "Gestation", col: "quarter" },
+                    { key: "progress.smoking.smokedLast12Months", label: "Smoked within last 12 months?", type: "select", options: yesNo, col: "quarter" },
+                    { key: "progress.smoking.currentStatus", label: "Current smoking", type: "select", options: ["", "Not smoking in this pregnancy", "Quit since finding out pregnant", "Started smoking again", "Smoking the same/more", "Smoking less"], col: "half" },
+                    { key: "progress.smoking.dateQuit", label: "Date quit", type: "date", col: "quarter" },
+                    { key: "progress.smoking.cigarettesPerDay", label: "No. of cigarettes per day", col: "quarter" },
+                    { key: "progress.smoking.partnerSmokes", label: "Does partner smoke?", type: "select", options: yesNo, col: "quarter" },
+                    { key: "progress.smoking.partnerInfo", label: "Partner would like quitting information?", type: "select", options: yesNo, col: "quarter" },
+                    { key: "progress.smoking.behaviourStage", label: "Behaviour stage", type: "select", options: ["", "Not interested in quitting", "Thinking about quitting", "Preparing to quit", "Recently quit", "Relapse/Slip up"], col: "half" },
+                    { key: "progress.smoking.resourcesGiven", label: "Written resources given", type: "select", options: ["", "Declined", "Consented"], col: "quarter" },
+                    { key: "progress.smoking.resourcesDate", label: "Date given", type: "date", col: "quarter" },
+                    { key: "progress.smoking.quitlineReferral", label: "Quitline referral faxed", type: "select", options: ["", "Declined", "Consented"], col: "quarter" },
+                    { key: "progress.smoking.quitlineDate", label: "Date faxed", type: "date", col: "quarter" }
+                ]
+            },
+            {
+                id: "notes",
+                title: "Additional Notes",
+                theme: "plain",
+                fields: [
+                    { key: "notes.g", label: "G", col: "quarter" },
+                    { key: "notes.p", label: "P", col: "quarter" },
+                    { key: "notes.edb", label: "EDB", type: "date", col: "quarter" },
+                    { key: "notes.bloodGroup", label: "Blood group", col: "quarter" },
+                    {
+                        type: "table",
+                        title: "Additional care/management notes",
+                        base: "notes.entries",
+                        rows: 12,
+                        columns: [
+                            { key: "dateGest", label: "Date/Gest" },
+                            { key: "notes", label: "Notes", wide: true },
+                            { key: "nameSignatureDesignation", label: "Name/Signature/Designation" }
+                        ]
+                    },
+                    {
+                        type: "table",
+                        title: "Referrals",
+                        base: "notes.referrals",
+                        rows: 4,
+                        columns: [
+                            { key: "date", label: "Date", type: "date" },
+                            { key: "name", label: "Name" },
+                            { key: "specialist", label: "Specialist" },
+                            { key: "place", label: "Place" },
+                            { key: "reason", label: "Reason", wide: true }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: "birthPlan",
+                title: "Birth Plan",
+                theme: "blue",
+                fields: [
+                    { key: "birthPlan.generalPreferences", label: "General preferences - food, drink, support people, music", type: "textarea", rows: 4, col: "full" },
+                    { key: "birthPlan.painReliefPreferences", label: "Preferences regarding pain relief", type: "textarea", rows: 4, col: "full" },
+                    { key: "birthPlan.labourPreferences", label: "Preferences during labour", type: "textarea", rows: 4, col: "full" },
+                    { key: "birthPlan.afterBirthPreferences", label: "Preferences after birth", type: "textarea", rows: 4, col: "full" },
+                    { key: "birthPlan.flexibilityAcknowledged", label: "Flexible if unforeseen circumstances occur", type: "checkbox", col: "half" },
+                    { key: "birthPlan.motherSignature", label: "Mother signature", col: "quarter" },
+                    { key: "birthPlan.midwifeDoctorSignature", label: "Midwife/Doctor signature", col: "quarter" },
+                    { key: "birthPlan.myNotes", label: "My notes", type: "textarea", rows: 6, col: "full" }
+                ]
+            },
+            {
+                id: "labourBirth",
+                title: "Labour and Birth",
+                theme: "blue",
+                fields: [
+                    { key: "labour.admissionDate", label: "Admission", type: "date", col: "quarter" },
+                    { key: "labour.admissionTime", label: "Time", type: "time", col: "quarter" },
+                    { key: "labour.attendedBy", label: "Attended by (Accoucher)", col: "half" },
+                    { key: "labour.alsoPresent", label: "Also present", col: "half" },
+                    { type: "subhead", title: "Labour" },
+                    { key: "labour.spontaneous", label: "Spontaneous", type: "checkbox", col: "quarter" },
+                    { key: "labour.arm", label: "ARM", type: "checkbox", col: "quarter" },
+                    { key: "labour.indication", label: "Indication", col: "half" },
+                    { key: "labour.augmentedOxytocin", label: "Augmented/Oxytocin", type: "checkbox", col: "quarter" },
+                    { key: "labour.noLabour", label: "No labour", type: "checkbox", col: "quarter" },
+                    { key: "labour.establishedDate", label: "Labour established", type: "date", col: "quarter" },
+                    { key: "labour.establishedTime", label: "Time", type: "time", col: "quarter" },
+                    { key: "labour.membranesRupturedDate", label: "Membranes ruptured", type: "date", col: "quarter" },
+                    { key: "labour.membranesRupturedTime", label: "Time", type: "time", col: "quarter" },
+                    { key: "labour.secondStageBeganDate", label: "2nd stage began", type: "date", col: "quarter" },
+                    { key: "labour.secondStageBeganTime", label: "Time", type: "time", col: "quarter" },
+                    { key: "labour.gaveBirthDate", label: "Gave birth", type: "date", col: "quarter" },
+                    { key: "labour.gaveBirthTime", label: "Time", type: "time", col: "quarter" },
+                    { key: "labour.thirdStageEndDate", label: "3rd stage end", type: "date", col: "quarter" },
+                    { key: "labour.thirdStageEndTime", label: "Time", type: "time", col: "quarter" },
+                    { key: "labour.firstStageDuration", label: "1st stage duration", col: "quarter" },
+                    { key: "labour.secondStageDuration", label: "2nd stage duration", col: "quarter" },
+                    { key: "labour.thirdStageDuration", label: "3rd stage duration", col: "quarter" },
+                    { key: "labour.totalHours", label: "Total hours", col: "quarter" },
+                    { key: "labour.comments", label: "Comments", type: "textarea", rows: 3, col: "full" },
+                    { type: "subhead", title: "Induction, liquor and pain relief" },
+                    { key: "labour.inductionReason", label: "Indication/Reason", col: "half" },
+                    { key: "labour.inductionProstin", label: "Prostin", type: "checkbox", col: "quarter" },
+                    { key: "labour.inductionArm", label: "ARM", type: "checkbox", col: "quarter" },
+                    { key: "labour.inductionOxytocin", label: "Oxytocin", type: "checkbox", col: "quarter" },
+                    { key: "labour.liquor", label: "Liquor", type: "select", options: ["", "Clear", "Blood stained", "No liquor", "Meconium stained"], col: "quarter" },
+                    { key: "labour.painReliefUsed", label: "Pain relief used", type: "multicheck", options: ["None", "N2O+O2", "Epidural", "Pudendal", "TENS", "Sterile water injections", "Pethidine", "Spinal", "General", "Spinal epidural", "Perineal infiltration"], col: "full" },
+                    { key: "labour.medicationsAntibiotics", label: "Antibiotics given", type: "select", options: yesNo, col: "quarter" },
+                    { key: "labour.medicationsAntibioticsSpecify", label: "Specify", col: "quarter" },
+                    { key: "labour.medicationsOther", label: "Other medications", type: "select", options: yesNo, col: "quarter" },
+                    { key: "labour.medicationsOtherSpecify", label: "Specify", col: "quarter" },
+                    { key: "labour.fetalMonitoring", label: "Fetal monitoring", type: "select", options: ["", "Auscultation", "Sonicaid", "CTG"], col: "quarter" },
+                    { key: "labour.fetalMonitoringComments", label: "Fetal monitoring comments", type: "textarea", rows: 3, col: "wide" },
+                    { type: "subhead", title: "Birth, placenta, cord, blood loss and perineum" },
+                    { key: "labour.birthPresentation", label: "Presentation", type: "select", options: ["", "Vx/Cephalic", "Breech", "Transverse"], col: "quarter" },
+                    { key: "labour.birthMode", label: "Mode of birth", type: "select", options: birthModes, col: "quarter" },
+                    { key: "labour.birthIndicationReason", label: "Indication/Reason", col: "half" },
+                    { key: "labour.placentaMode", label: "Placenta mode of delivery", type: "select", options: ["", "Spontaneous", "Fundal pressure", "Manual removal", "Controlled cord traction"], col: "half" },
+                    { key: "labour.placentaComplete", label: "Placenta", type: "select", options: ["", "Complete", "Incomplete", "Abnormalities"], col: "quarter" },
+                    { key: "labour.membranes", label: "Membranes", type: "select", options: ["", "Complete", "Incomplete"], col: "quarter" },
+                    { key: "labour.cordVessels", label: "Cord number of vessels", col: "quarter" },
+                    { key: "labour.cordInsertions", label: "Insertions", col: "quarter" },
+                    { key: "labour.cordComplications", label: "Cord complications", col: "half" },
+                    { key: "labour.cordAroundNeck", label: "Cord around neck", type: "select", options: yesNo, col: "quarter" },
+                    { key: "labour.cordBloodTaken", label: "Cord blood taken", type: "select", options: yesNo, col: "quarter" },
+                    { key: "labour.stemBloodTaken", label: "Stem blood taken", type: "select", options: yesNo, col: "quarter" },
+                    { key: "labour.bloodLossAmount", label: "Blood loss (mls)", col: "quarter" },
+                    { key: "labour.bloodLossMethod", label: "Blood loss method", type: "select", options: ["", "Estimated", "Measured", "Before placenta", "After placenta"], col: "quarter" },
+                    { key: "labour.bloodTransfusionUnits", label: "Blood transfusion units", col: "quarter" },
+                    { key: "labour.perineum", label: "Perineum", type: "select", options: ["", "Intact", "Tear 1", "Tear 2", "Tear 3", "Tear 4"], col: "quarter" },
+                    { key: "labour.episiotomy", label: "Episiotomy", type: "select", options: yesNo, col: "quarter" },
+                    { key: "labour.suturedWith", label: "Sutured with", col: "quarter" },
+                    { key: "labour.suturedBy", label: "Sutured by", col: "quarter" },
+                    { key: "labour.perineumOther", label: "Other", col: "quarter" },
+                    { key: "labour.complicationsAfterBirth", label: "Complications after birth", type: "textarea", rows: 4, col: "full" },
+                    { key: "labour.signName", label: "Name", col: "quarter" },
+                    { key: "labour.signSignature", label: "Signature", col: "quarter" },
+                    { key: "labour.signDesignation", label: "Designation", col: "quarter" },
+                    { key: "labour.signDate", label: "Date", type: "date", col: "quarter" }
+                ]
+            },
+            {
+                id: "baby",
+                title: "Baby Summary",
+                theme: "blue",
+                fields: [
+                    { key: "baby.name", label: "Name of baby", col: "half" },
+                    { key: "baby.bornAtDate", label: "Born at", type: "date", col: "quarter" },
+                    { key: "baby.bornAtTime", label: "Time", type: "time", col: "quarter" },
+                    { key: "baby.status", label: "Status", type: "select", options: ["", "Alive", "Stillborn"], col: "quarter" },
+                    { key: "baby.gestation", label: "Gestation (wks)", col: "quarter" },
+                    { key: "baby.gender", label: "Gender", type: "select", options: ["", "M", "F"], col: "quarter" },
+                    { key: "baby.bloodGroup", label: "Blood group", col: "quarter" },
+                    { key: "baby.nameLabelAttachedBy", label: "Name label attached by", col: "half" },
+                    { key: "baby.vitKGiven", label: "Vit K given", type: "select", options: yesNo, col: "quarter" },
+                    { key: "baby.vitKTime", label: "Time", type: "time", col: "quarter" },
+                    { key: "baby.hepBGiven", label: "Hep B given", type: "select", options: yesNo, col: "quarter" },
+                    { key: "baby.hepBTime", label: "Time", type: "time", col: "quarter" },
+                    { key: "baby.weight", label: "Weight (kg)", col: "quarter" },
+                    { key: "baby.length", label: "Length (cm)", col: "quarter" },
+                    { key: "baby.headCircumference", label: "Head circumference (cm)", col: "quarter" },
+                    { key: "baby.establishedRespirationsAt", label: "Established respirations at", col: "quarter" },
+                    { key: "baby.resuscitation", label: "Resuscitation", type: "multicheck", options: ["Suction", "O2", "Bag and mask", "IPPV", "Other"], col: "full" },
+                    { type: "apgar" },
+                    { key: "baby.passedUrine", label: "Passed urine", type: "select", options: yesNo, col: "quarter" },
+                    { key: "baby.passedMeconium", label: "Passed meconium", type: "select", options: yesNo, col: "quarter" },
+                    { type: "subhead", title: "Feeding/skin contact" },
+                    { key: "baby.skinContactWithin30Min", label: "Skin contact within 30 mins", type: "select", options: yesNo, col: "quarter" },
+                    { key: "baby.skinContactDuration", label: "Duration (mins)", col: "quarter" },
+                    { key: "baby.firstFeedDate", label: "First feed date", type: "date", col: "quarter" },
+                    { key: "baby.firstFeedTime", label: "Time", type: "time", col: "quarter" },
+                    { key: "baby.feedingType", label: "Feeding type", type: "select", options: ["", "Breastfeeding fully", "Breastfeeding partially artificial", "Formula", "Expressed breast milk"], col: "half" },
+                    { key: "baby.firstBreastfeedWithin30Min", label: "First breastfeed within 30 mins", type: "select", options: yesNo, col: "quarter" },
+                    { key: "baby.notes", label: "Baby notes", type: "textarea", rows: 5, col: "full" },
+                    { key: "baby.signName", label: "Name", col: "quarter" },
+                    { key: "baby.signSignature", label: "Signature", col: "quarter" },
+                    { key: "baby.signDesignation", label: "Designation", col: "quarter" },
+                    { key: "baby.signDate", label: "Date", type: "date", col: "quarter" },
+                    { type: "subhead", title: "Perinatal transfer" },
+                    { key: "baby.transferPerson", label: "Transfer for", type: "select", options: ["", "Mother", "Baby"], col: "quarter" },
+                    { key: "baby.transferStage", label: "Transfer stage", type: "select", options: ["", "During pregnancy", "Labour and birth", "Postnatal"], col: "quarter" },
+                    { key: "baby.transferredFrom", label: "Transferred from", col: "half" },
+                    { key: "baby.transferInternalExternal", label: "Transfer type", type: "select", options: ["", "Internal", "External"], col: "quarter" },
+                    { key: "baby.transferTo", label: "Transfer to", col: "quarter" },
+                    { key: "baby.accompaniedBy", label: "Accompanied by", type: "select", options: ["", "Midwife", "Doctor", "Other"], col: "quarter" },
+                    { key: "baby.transferTimeInvolved", label: "Length of time involved", col: "quarter" },
+                    { key: "baby.careTransferred", label: "Care transferred", type: "select", options: yesNo, col: "quarter" },
+                    { key: "baby.careTransferredDate", label: "Date", type: "date", col: "quarter" },
+                    { key: "baby.careTransferredTime", label: "Time", type: "time", col: "quarter" },
+                    { key: "baby.postnatalTransferPlanned", label: "Postnatal transfer planned", type: "select", options: yesNo, col: "quarter" },
+                    { key: "baby.postnatalTransferTo", label: "To", col: "quarter" },
+                    { key: "baby.postnatalTransferDate", label: "Date", type: "date", col: "quarter" },
+                    { key: "baby.postnatalTransferTime", label: "Time", type: "time", col: "quarter" }
+                ]
+            },
+            {
+                id: "home",
+                title: "Going Home",
+                theme: "blue",
+                fields: [
+                    {
+                        type: "table",
+                        title: "Observations/Postnatal assessments",
+                        base: "home.observations",
+                        rows: ["Wound healing: Caesarean/Perineum", "General wellbeing", "Postnatal feelings", "Infection", "Haemorrhoids", "Varicose veins", "Diastasis recti abdominal muscles", "Urinary/Bowel function", "Fundus", "Lochia", "Calf tenderness", "Breasts"],
+                        columns: [
+                            { key: "detail", label: "Details", wide: true }
+                        ],
+                        labelsAsRows: true
+                    },
+                    { key: "home.rubellaVaccinationRequired", label: "Rubella vaccination required?", type: "select", options: yesNo, col: "quarter" },
+                    { key: "home.rubellaDate", label: "Date", type: "date", col: "quarter" },
+                    { key: "home.rubellaTime", label: "Time", type: "time", col: "quarter" },
+                    { key: "home.rhNegMother", label: "Rh neg mother?", type: "select", options: yesNo, col: "quarter" },
+                    { key: "home.antiDGiven", label: "Anti D given?", type: "select", options: yesNo, col: "quarter" },
+                    { key: "home.antiDDate", label: "Date", type: "date", col: "quarter" },
+                    { key: "home.antiDTime", label: "Time", type: "time", col: "quarter" },
+                    { type: "subhead", title: "Baby feeding and domiciliary visits" },
+                    { key: "home.breastfeedingOnDischarge", label: "Breastfeeding on discharge?", type: "select", options: yesNo, col: "quarter" },
+                    { key: "home.breastfeedingConcerns", label: "Concerns/issues about breastfeeding", type: "textarea", rows: 3, col: "half" },
+                    { key: "home.domiciliaryVisits", label: "Domiciliary visit/s including signature and date/s", type: "textarea", rows: 8, col: "half" },
+                    {
+                        type: "table",
+                        title: "Follow-up appointments/referrals",
+                        base: "home.followups",
+                        rows: 7,
+                        columns: [
+                            { key: "visitType", label: "Visit at home/6 week check/MCHN/other", wide: true },
+                            { key: "date", label: "Date", type: "date" }
+                        ]
+                    },
+                    { type: "subhead", title: "Discharge from hospital" },
+                    { key: "home.dischargedFromHospital", label: "Discharged from hospital", type: "date", col: "quarter" },
+                    { key: "home.dischargeMotherBaby", label: "Discharge for", type: "select", options: ["", "Mother", "Baby", "Mother and Baby"], col: "quarter" },
+                    { key: "home.destinationAddress", label: "Destination address", type: "textarea", rows: 4, col: "half" },
+                    { key: "home.totalHospitalStayDays", label: "Total hospital stay days", col: "quarter" },
+                    { key: "home.totalHospitalStayHours", label: "Hours", col: "quarter" },
+                    { key: "home.birthNotificationCompleted", label: "Birth notification completed?", type: "select", options: yesNo, col: "quarter" },
+                    { key: "home.forwardMchn", label: "Forward MCHN", type: "select", options: yesNo, col: "quarter" },
+                    { key: "home.forwardMchnDate", label: "Date", type: "date", col: "quarter" },
+                    { key: "home.dataEnteredDatabase", label: "Data entered on database?", type: "select", options: yesNo, col: "quarter" },
+                    { key: "home.dataEnteredDate", label: "Date", type: "date", col: "quarter" },
+                    { key: "home.letterSentGp", label: "Letter sent to GP?", type: "select", options: yesNo, col: "quarter" },
+                    { key: "home.letterSentMchn", label: "Letter sent to MCHN?", type: "select", options: yesNo, col: "quarter" },
+                    { key: "home.familyAllowanceFormGiven", label: "Family allowance form given?", type: "select", options: yesNo, col: "quarter" },
+                    { key: "home.fafNumber", label: "FAF#", col: "quarter" },
+                    { key: "home.childHealthRecordGiven", label: "Child health record given?", type: "select", options: yesNo, col: "quarter" },
+                    { key: "home.signature", label: "Signature", col: "quarter" },
+                    { key: "home.signatureDate", label: "Date", type: "date", col: "quarter" },
+                    { key: "home.designation", label: "Designation", col: "quarter" }
+                ]
+            }
+        ];
+
+        function valueFor(key) {
+            return vmrData[key] ?? patientDefaults[key] ?? "";
+        }
+
+        function esc(value) {
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function fieldClass(field) {
+            return `vmr-field ${field.col || ""}`.trim();
+        }
+
+        function renderField(field) {
+            if (field.type === "subhead") {
+                return `<div class="vmr-subhead">${esc(field.title)}</div>`;
+            }
+            if (field.type === "table") return renderTable(field);
+            if (field.type === "visitTable") return renderVisitTable(field);
+            if (field.type === "apgar") return renderApgar();
+            if (field.type === "multicheck") return renderMultiCheck(field);
+
+            const value = valueFor(field.key);
+            let control = "";
+            const rows = field.rows || 2;
+
+            if (field.type === "textarea") {
+                control = `<textarea data-vmr-field="${esc(field.key)}" rows="${rows}">${esc(value)}</textarea>`;
+            } else if (field.type === "select") {
+                const options = (field.options || [""]).map(option => {
+                    const selected = value === option ? "selected" : "";
+                    return `<option value="${esc(option)}" ${selected}>${esc(option)}</option>`;
+                }).join("");
+                control = `<select data-vmr-field="${esc(field.key)}">${options}</select>`;
+            } else if (field.type === "checkbox") {
+                const checked = value === true || value === "true" ? "checked" : "";
+                control = `<label class="vmr-check"><input type="checkbox" data-vmr-field="${esc(field.key)}" ${checked}> <span>${esc(field.label)}</span></label>`;
+                return `<div class="${fieldClass(field)}">${control}</div>`;
+            } else {
+                const type = field.type || "text";
+                control = `<input type="${esc(type)}" data-vmr-field="${esc(field.key)}" value="${esc(value)}">`;
+            }
+
+            return `<div class="${fieldClass(field)}"><label>${esc(field.label)}</label>${control}</div>`;
+        }
+
+        function renderMultiCheck(field) {
+            const selected = Array.isArray(valueFor(field.key)) ? valueFor(field.key) : [];
+            const checks = (field.options || []).map(option => {
+                const checked = selected.includes(option) ? "checked" : "";
+                return `<label class="vmr-pill-check"><input type="checkbox" data-vmr-multifield="${esc(field.key)}" value="${esc(option)}" ${checked}> ${esc(option)}</label>`;
+            }).join("");
+
+            return `<div class="vmr-field full"><label>${esc(field.label)}</label><div class="vmr-check-grid">${checks}</div></div>`;
+        }
+
+        function renderTable(config) {
+            const rows = Array.isArray(config.rows) ? config.rows : Array.from({ length: config.rows }, (_, index) => index + 1);
+            const head = config.labelsAsRows ? `<th>${esc(config.title || "Item")}</th>` : `<th>#</th>`;
+            const columns = config.columns.map(column => `<th class="${column.wide ? "wide-col" : ""}">${esc(column.label)}</th>`).join("");
+            const body = rows.map((row, rowIndex) => {
+                const rowLabel = config.labelsAsRows ? row : rowIndex + 1;
+                const keyPart = config.labelsAsRows ? slug(row) : rowIndex + 1;
+                const cells = config.columns.map(column => {
+                    const key = `${config.base}.${keyPart}.${column.key}`;
+                    return `<td class="${column.wide ? "wide-col" : ""}">${tableInput(key, column.type || "text")}</td>`;
+                }).join("");
+                return `<tr><th>${esc(rowLabel)}</th>${cells}</tr>`;
+            }).join("");
+
+            return `<div class="vmr-table-block full"><h4>${esc(config.title)}</h4><div class="table-responsive"><table class="vmr-table"><thead><tr>${head}${columns}</tr></thead><tbody>${body}</tbody></table></div></div>`;
+        }
+
+        function renderVisitTable(config) {
+            const rows = [];
+            for (let visit = config.start; visit <= config.end; visit++) {
+                rows.push(visit);
+            }
+            const columns = visitColumns.map(column => `<th class="${column.wide ? "wide-col" : ""}">${esc(column.label)}</th>`).join("");
+            const body = rows.map(visit => {
+                const cells = visitColumns.map(column => {
+                    const key = `${config.base}.${visit}.${column.key}`;
+                    return `<td class="${column.wide ? "wide-col" : ""}">${tableInput(key, column.type || "text", column.options)}</td>`;
+                }).join("");
+                return `<tr><th>Visit ${visit}</th>${cells}</tr>`;
+            }).join("");
+
+            return `<div class="vmr-table-block full"><h4>${esc(config.title)}</h4><div class="table-responsive"><table class="vmr-table vmr-visit-table"><thead><tr><th>Visit</th>${columns}</tr></thead><tbody>${body}</tbody></table></div></div>`;
+        }
+
+        function renderTests() {
+            const columns = ["Explained", "Consent by mother", "Request by", "Date", "Reviewed by", "Review date", "Comments"];
+            const head = columns.map(column => `<th>${esc(column)}</th>`).join("");
+            const body = testRows.map(row => {
+                const [key, label, recommend] = row;
+                return `<tr>
+                    <th><span>${esc(label)}</span><small>${esc(recommend)}</small></th>
+                    <td>${tableInput(`tests.${key}.explained`, "checkbox")}</td>
+                    <td>${tableInput(`tests.${key}.consent`, "checkbox")}</td>
+                    <td>${tableInput(`tests.${key}.requestBy`)}</td>
+                    <td>${tableInput(`tests.${key}.date`, "date")}</td>
+                    <td>${tableInput(`tests.${key}.reviewedBy`)}</td>
+                    <td>${tableInput(`tests.${key}.reviewDate`, "date")}</td>
+                    <td class="wide-col">${tableInput(`tests.${key}.comments`)}</td>
+                </tr>`;
+            }).join("");
+
+            const additional = renderTable({
+                title: "Additional tests and investigations",
+                base: "tests.additional",
+                rows: 6,
+                columns: [
+                    { key: "test", label: "Test", wide: true },
+                    { key: "explained", label: "Explained" },
+                    { key: "consent", label: "Consent" },
+                    { key: "requestBy", label: "Request by" },
+                    { key: "date", label: "Date", type: "date" },
+                    { key: "reviewedBy", label: "Reviewed by" },
+                    { key: "reviewDate", label: "Review date", type: "date" },
+                    { key: "comments", label: "Comments", wide: true }
+                ]
+            });
+
+            return `<div class="vmr-table-block full"><h4>Recommended tests</h4><div class="table-responsive"><table class="vmr-table vmr-tests-table"><thead><tr><th>Test</th>${head}</tr></thead><tbody>${body}</tbody></table></div></div>${additional}`;
+        }
+
+        function renderApgar() {
+            const rows = ["Heart rate", "Respiratory effort", "Muscle tone", "Reflex response", "Colour", "Total"];
+            const minutes = ["1min", "5min", "otherMin"];
+            const body = rows.map(row => {
+                const cells = minutes.map(minute => `<td>${tableInput(`baby.apgar.${slug(row)}.${minute}`)}</td>`).join("");
+                return `<tr><th>${esc(row)}</th>${cells}</tr>`;
+            }).join("");
+            return `<div class="vmr-table-block half"><h4>Apgar details and score</h4><table class="vmr-table"><thead><tr><th>Score</th><th>1 min</th><th>5 min</th><th>min</th></tr></thead><tbody>${body}</tbody></table></div>`;
+        }
+
+        function tableInput(key, type = "text", options) {
+            const value = valueFor(key);
+            if (type === "checkbox") {
+                const checked = value === true || value === "true" ? "checked" : "";
+                return `<input type="checkbox" data-vmr-field="${esc(key)}" ${checked}>`;
+            }
+            if (type === "select") {
+                const opts = (options || [""]).map(option => `<option value="${esc(option)}" ${value === option ? "selected" : ""}>${esc(option)}</option>`).join("");
+                return `<select data-vmr-field="${esc(key)}">${opts}</select>`;
+            }
+            return `<input type="${esc(type)}" data-vmr-field="${esc(key)}" value="${esc(value)}">`;
+        }
+
+        function slug(text) {
+            return String(text).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+        }
+
+        function render() {
+            $("#vmrTabs").html(sections.map((section, index) => `<button type="button" class="vmr-tab ${index === 0 ? "active" : ""}" data-vmr-target="${esc(section.id)}">${esc(section.title)}</button>`).join(""));
+
+            const html = sections.map((section, index) => {
+                const body = section.custom === "tests"
+                    ? renderTests()
+                    : section.fields.map(renderField).join("");
+                return `<section class="vmr-section vmr-theme-${esc(section.theme)} ${index === 0 ? "active" : ""}" id="vmr-section-${esc(section.id)}">
+                    <div class="vmr-section-title"><span>${esc(section.title)}</span></div>
+                    <div class="vmr-grid">${body}</div>
+                </section>`;
+            }).join("");
+
+            $("#vmrSections").html(html);
+        }
+
+        function collectData() {
+            const data = {};
+            $("[data-vmr-field]").each(function () {
+                const key = $(this).data("vmr-field");
+                if (!key) return;
+                if ($(this).attr("type") === "checkbox") {
+                    data[key] = $(this).is(":checked");
+                } else {
+                    data[key] = $(this).val();
+                }
+            });
+
+            $("[data-vmr-multifield]").each(function () {
+                const key = $(this).data("vmr-multifield");
+                if (!data[key]) data[key] = [];
+                if ($(this).is(":checked")) data[key].push($(this).val());
+            });
+
+            return data;
+        }
+
+        function showMessage(text, kind) {
+            $("#vmrMessage")
+                .removeClass("success error")
+                .addClass(kind || "")
+                .text(text);
+        }
+
+        render();
+
+        $("#vmrTabs").on("click", ".vmr-tab", function () {
+            const target = $(this).data("vmr-target");
+            $(".vmr-tab").removeClass("active");
+            $(this).addClass("active");
+            $(".vmr-section").removeClass("active");
+            $(`#vmr-section-${target}`).addClass("active");
+        });
+
+        $("#btnPrintVmr").on("click", function () {
+            window.print();
+        });
+
+        $("#btnSaveVmr").on("click", function () {
+            const payload = {
+                LabId: parseInt($("#vmrLabId").val(), 10),
+                PatientId: parseInt($("#vmrPatientId").val(), 10),
+                FormDataJson: JSON.stringify(collectData()),
+                SupervisorReviewNotes: $("#vmrSupervisorReviewNotes").val()
+            };
+
+            if (!payload.LabId || !payload.PatientId) {
+                showMessage("Missing lab or patient context.", "error");
+                return;
+            }
+
+            $("#btnSaveVmr").prop("disabled", true).text("Saving...");
+            showMessage("", "");
+
+            $.ajax({
+                type: "POST",
+                url: "/Patient/SaveVictorianMaternityRecord",
+                contentType: "application/json",
+                data: JSON.stringify(payload),
+                success: function (response) {
+                    if (response && response.success) {
+                        const byLine = response.lastUpdatedBy ? ` by ${response.lastUpdatedBy} (${response.lastUpdatedRole || "user"})` : "";
+                        $("#vmrSavedMeta").html(`<strong>Last saved:</strong> ${response.lastUpdatedAt || "just now"}${byLine}`);
+                        if (isSupervisor) {
+                            $("#vmrReviewedBy").text(response.supervisorReviewedBy || "Not reviewed");
+                            $("#vmrReviewedAt").text(response.supervisorReviewedAt || "");
+                        }
+                        showMessage("Saved successfully.", "success");
+                    } else {
+                        showMessage("The record was not saved.", "error");
+                    }
+                },
+                error: function (xhr) {
+                    showMessage(xhr.responseText || "Server error while saving.", "error");
+                },
+                complete: function () {
+                    $("#btnSaveVmr").prop("disabled", false).text("Save VMR");
+                }
+            });
+        });
+    })();
+</script>

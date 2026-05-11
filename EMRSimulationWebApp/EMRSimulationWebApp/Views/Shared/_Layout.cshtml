@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="~/css/braden.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/foodintake.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/riskman-add.css" />
+    <link rel="stylesheet" href="~/css/vmr.css" asp-append-version="true" />
 </head>
 
 <body>
@@ -74,6 +75,7 @@
                         </button>
                         <ul id="flowSheetMenu" class="submenu">
 
+                            <li><a href="javascript:void(0);" class="load-patient-vmr" data-url="@Url.Action("GetVictorianMaternityRecord", "Patient")">Victorian Maternity Record</a></li>
                             <li><a href="javascript:void(0);" class="load-patient-adds" data-url="@Url.Action("GetPatientADDSList", "Patient")">ADDS Chart</a></li>
                             <li><a href="javascript:void(0);" class="load-patient-ivfluid" data-url="@Url.Action("GetPatientIvFluidChartList", "Patient")">IV Fluid Charts</a></li>
                             <!-- Neurological Chart with nested items -->
@@ -319,6 +321,28 @@
                 },
                 error: function (xhr, status, error) {
                     console.error("Error loading the page:", error);
+                }
+            });
+        });
+
+        $('.load-patient-vmr').on('click', function (e) {
+            e.preventDefault();
+            var pageUrl = $(this).data('url');
+            var LabId = $('#txtLabId').val();
+            var PatientId = $('#txtPatientId').val();
+
+            $.ajax({
+                url: pageUrl,
+                method: "GET",
+                data: { labId: LabId, patientId: PatientId },
+                success: function (response) {
+                    $('#content-area').html("");
+                    $('#content-area').html(response);
+                    $('#flowSheetMenu a').removeClass('active');
+                    $('.load-patient-vmr').addClass('active');
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading Victorian Maternity Record:", error);
                 }
             });
         });

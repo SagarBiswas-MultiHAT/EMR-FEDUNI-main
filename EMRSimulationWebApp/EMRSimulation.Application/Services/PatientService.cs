@@ -232,6 +232,15 @@ namespace EMRSimulation.Application.Services
             => _patientRepository.UpdateFoodIntakeAsync(dto);
 
         // -------------------------
+        // Victorian Maternity Record
+        // -------------------------
+        public Task<VictorianMaternityRecordDto> GetVictorianMaternityRecordAsync(int labId, int patientId)
+            => _patientRepository.GetVictorianMaternityRecordAsync(labId, patientId);
+
+        public Task<int> SaveVictorianMaternityRecordAsync(VictorianMaternityRecordDto dto, string updatedBy, string updatedRole)
+            => _patientRepository.SaveVictorianMaternityRecordAsync(dto, updatedBy, updatedRole);
+
+        // -------------------------
         // Riskman
         // -------------------------
         public Task<int> AddRiskmanIncidentAsync(RiskmanDto dto)
