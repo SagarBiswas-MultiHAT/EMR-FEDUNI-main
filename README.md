@@ -1,294 +1,368 @@
-1. EMRSimulationWebApp - folder contains all the source code files of the EMR Simulator web application.
-2. PublishedWebsite - folder contains all the deployment files of the web application
-3. DatabaseSchema.sql - file contains the database schema, tables, and stored procedures for managing patient records, IV fluid administration, medication charts, lab details, and user authentication in an EMR simulation system.
+# EMR Simulator - Electronic Medical Records System
+
+## What is This Project?
+
+This is an **Electronic Medical Records (EMR) Simulator** - a training application that simulates a real hospital/lab management system. It allows students and supervisors to practice managing patient records, medications, lab work, and assessments in a safe, controlled environment.
+
+**Think of it like:** A practice simulator for hospital staff, similar to flight simulators for pilots.
+
+## Project Folder Structure
+
+1. **EMRSimulationWebApp** - Contains all the website code and application files
+2. **PublishedWebsite** - Contains files ready for deployment/publishing to a server
+3. **DatabaseSchema.sql** - Instructions for creating the database (tables, data, etc.)
+4. **EmrSimulator_full_After_update_2026-01-13.sql** - Complete database setup with sample data
 
 ---
 
-# HOW TO RUN THE EMR SIMULATOR WEB APPLICATION
+# QUICK START GUIDE: HOW TO RUN THE EMR SIMULATOR
 
-To run the EMR Simulator website, follow these steps:
+This guide is designed for everyone, whether you're technical or not. Follow these steps in order.
 
-## Prerequisites
+## Prerequisites (What You Need to Install First)
 
-1. **SQL Server** - Ensure SQL Server Express is installed and running
-2. **.NET SDK** - Have .NET SDK installed on your machine
+Before you can run the application, you need two main tools:
 
-## Setup Steps
+### 1. SQL Server Express (The Database)
 
-1. **Create the Database** (first time only)
-   - Open SQL Server Management Studio (SSMS)
-   - Execute the SQL schema file: Databaseschema_three.sql
-   - Or run: EmrSimulator_full_After_update_2026-01-13.sql for the complete setup
+**What is it?** A database is like a filing cabinet that stores all the patient records, user accounts, and other information.
 
-2. **Restore NuGet Packages** (in the root directory)
+- **Download:** [SQL Server Express 2022](https://www.microsoft.com/en-us/sql-server/sql-server-editions-express)
+- **How to install:**
+  1. Run the downloaded installer
+  2. Choose **"Basic"** installation (it's the easiest)
+  3. Accept all default settings and click through to finish
+  4. You'll be prompted to restart - do that
+  5. **After installation:** Also install **SQL Server Management Studio (SSMS)** - it's the tool to manage your database
+     - Search for "SQL Server Management Studio" in Windows
+     - Download and install it
+
+### 2. .NET SDK (The Framework)
+
+**What is it?** This is the software framework needed to run the application code.
+
+- **Download:** [.NET 6.0 SDK or higher](https://dotnet.microsoft.com/download)
+- **How to install:**
+  1. Run the installer
+  2. Click through the installation wizard with default settings
+  3. When complete, restart your computer
+  4. **Verify installation:** Open Command Prompt/PowerShell and type:
+     ```
+     dotnet --version
+     ```
+     You should see a version number (like 6.0 or higher)
+
+---
+
+## Step-by-Step Setup Instructions
+
+### STEP 1: Create the Database (Do This Once)
+
+A database is where all the information is stored. Follow these sub-steps:
+
+#### Step 1a: Connect to SQL Server
+
+1. Open **SQL Server Management Studio (SSMS)** - search for it in Windows Start menu
+2. A window will appear asking you to connect. Fill in:
+   - **Server name:** `.\SQLEXPRESS` (the dot and backslash mean "this computer")
+   - **Authentication:** Windows Authentication (should already be selected)
+3. Click **Connect**
+4. If a certificate warning appears, click **Yes** or **Trust**
+
+#### Step 1b: Create an Empty Database
+
+1. In SSMS, on the left side, right-click on **"Databases"** folder
+2. Select **"New Database..."**
+3. Name it: `EmrSimulator` (exactly as shown - capitals matter)
+4. Click **OK**
+5. You should now see "EmrSimulator" in your Databases list
+
+#### Step 1c: Load Sample Data
+
+1. In SSMS, click **File** → **Open** → **File**
+2. Navigate to your project folder: `C:\GitHub\EMR-FEDUNI-main\`
+3. Open the file: **`EmrSimulator_full_After_update_2026-01-13.sql`**
+   - This file contains all the tables, patient records, and user accounts
+4. You'll see SQL code in the editor window
+5. Click the **Execute** button (green play button) or press **Ctrl+E**
+6. Wait for it to complete (this might take a minute)
+7. You should see messages saying "Commands completed successfully"
+
+**What just happened?** You've loaded:
+
+- All database tables (containers for data)
+- Sample patient records (for practice)
+- User accounts (student and supervisor logins)
+- All the application logic
+
+---
+
+### STEP 2: Download Project Files
+
+1. Open **File Explorer** (Windows key + E)
+2. Navigate to: `C:\GitHub\EMR-FEDUNI-main\EMRSimulationWebApp\`
+3. You should see a folder called `EMRSimulationWebApp`
+4. Remember this location - you'll need it in the next step
+
+---
+
+### STEP 3: Run the Application
+
+Now you're ready to start the application. Follow these steps:
+
+1. Open **Command Prompt** or **PowerShell**
+   - Right-click on your desktop or in a folder
+   - Select "Open Windows Terminal here" or "Open PowerShell here"
+   - Or search for "PowerShell" in Windows Start menu
+
+2. Navigate to the project folder:
 
    ```powershell
-   dotnet restore
+   cd "C:\GitHub\EMR-FEDUNI-main\EMRSimulationWebApp\EMRSimulationWebApp"
    ```
 
-3. **Run the Application**
+3. Start the application:
 
    ```powershell
-   cd EMRSimulationWebApp/EMRSimulationWebApp
    dotnet run
    ```
 
-4. **Access the Website**
-   - Open your browser and navigate to: `https://localhost:5001` or `http://localhost:5000`
-   - Login with your credentials (default user should be set up from the database schema)
+4. **Wait for this message to appear:**
 
-## Configuration
+   ```
+   Now listening on: http://localhost:5031
+   Application started. Press Ctrl+C to shut down.
+   ```
 
-- The application uses **SQL Server Express** with connection string configured in appsettings.json:
-  ```
-  Server=.\SQLEXPRESS
-  Database=EmrSimulator
-  User ID=sa
-  Password=Emrp@ssword123!
-  ```
+5. **Do NOT close this window** - this window keeps the application running
 
 ---
 
-## Database Setup Guide for Beginners
+### STEP 4: Access the Website
+
+1. Open your web browser (Chrome, Edge, Firefox, etc.)
+2. Go to the address bar and type: `http://localhost:5031`
+3. You should see: **"Welcome to Fed Uni EMR Simulator"** with login options
+4. You're ready to login!
+
+---
+
+## Login Credentials
+
+The application has two types of users: **Students** (who manage patients) and **Supervisors** (who oversee and manage the lab).
+
+### STUDENT / LAB TECHNICIAN Credentials
+
+These are for students practicing to manage patient care:
+
+| Location                | Username   | Password  | Status         |
+| ----------------------- | ---------- | --------- | -------------- |
+| Berwick Lab (Primary)   | **berlab** | **F5jh4** | ✓ Ready to Use |
+| Mt Helen Lab (Primary)  | **mthlab** | **4YwCj** | ✓ Ready to Use |
+| Gippsland Lab (Primary) | **giplab** | **hD6s2** | ✓ Ready to Use |
+| Berwick Lab 1           | berlab1    | h4F5j     | ✓ Ready to Use |
+| Berwick Lab 2           | berlab2    | 5jh4F     | ✓ Ready to Use |
+| Berwick Lab 3           | berlab3    | jh4F5     | ✓ Ready to Use |
+| Mt Helen Lab 1          | mthlab1    | Cj4Yw     | ✓ Ready to Use |
+| Mt Helen Lab 2          | mthlab2    | YwCj4     | ✓ Ready to Use |
+| Mt Helen Lab 3          | mthlab3    | wCj4Y     | ✓ Ready to Use |
+| Gippsland Lab 1         | giplab1    | s2hD6     | ✓ Ready to Use |
+| Gippsland Lab 2         | giplab2    | D6s2h     | ✓ Ready to Use |
+| Gippsland Lab 3         | giplab3    | 6s2hD     | ✓ Ready to Use |
 
-Here's what you need to do step-by-step:
+**How to login as a Student:**
 
-### Step 1: Install SQL Server Express (if not already installed)
+1. On the login page, click **"Student Login"**
+2. Enter any username from the table above
+3. Enter the corresponding password
+4. Click **Login**
+5. You'll see a list of patients to manage
+
+### SUPERVISOR Credentials
+
+These are for supervisors/instructors who oversee the system:
+
+| Location               | Username     | Password  |
+| ---------------------- | ------------ | --------- |
+| Berwick (Primary)      | **bersuper** | **Mb39R** |
+| Mt Helen (Primary)     | **mthsuper** | **7zGd3** |
+| Gippsland (Primary)    | **gipsuper** | **Ah48i** |
+| Berwick Supervisor 1   | bersuper1    | 9RMb3     |
+| Berwick Supervisor 2   | bersuper2    | b39RM     |
+| Berwick Supervisor 3   | bersuper3    | 39RMb     |
+| Mt Helen Supervisor 1  | mthsuper1    | d37zG     |
+| Mt Helen Supervisor 2  | mthsuper2    | zGd37     |
+| Mt Helen Supervisor 3  | mthsuper3    | Gd37z     |
+| Gippsland Supervisor 1 | gipsuper1    | 8iAh4     |
+| Gippsland Supervisor 2 | gipsuper2    | h48iA     |
+| Gippsland Supervisor 3 | gipsuper3    | 48iAh     |
 
-1. Download [SQL Server Express](https://www.microsoft.com/en-us/sql-server/sql-server-editions-express) from Microsoft
-2. Run the installer and select **"Basic"** installation
-3. Accept the defaults and complete installation
-4. Also install **SQL Server Management Studio (SSMS)** - this is the tool you'll use to manage databases
+**How to login as a Supervisor:**
 
-### Step 2: Create the Database
+1. On the login page, click **"Supervisor Login"**
+2. Enter any username from the table above
+3. Enter the corresponding password
+4. Click **Login**
+5. You'll see supervisor dashboard and analytics
 
-1. Open **SQL Server Management Studio** (search for "SSMS" on Windows)
+---
 
-![alt text](image.png)
+## Configuration
 
-- Enable Trusted server certificate.
-- Connect
+The application uses **SQL Server Express** as the database and is configured to connect automatically. The connection is set up in the file: `appsettings.Development.json` in the EMRSimulationWebApp folder.
 
-2. Connect using:
-   - Server name: `.` or `localhost` or `.\SQLEXPRESS`
-   - Authentication: Windows Authentication (default)
+**For non-technical users:** You don't need to change anything here - it's already configured correctly!
 
-3. Right-click on **Databases** → Select **New Database**
-4. Name it: `EmrSimulator` (must match the connection string)
+**For technical users:** The connection string uses Windows Authentication to `.\SQLEXPRESS` with the `EmrSimulator` database.
 
-### Step 3: Load the Database Schema
+---
 
-![alt text](Guide/2.png)
+## How to Create New User Accounts
 
-1. In SSMS, click **File** → **Open** → **File**
-2. Navigate to the project root and open EmrSimulator_full_After_update_2026-01-13.sql
-3. Click the **Execute** button (or press Ctrl+E)
-4. This will create all the necessary tables and data
+If you need to add more student or supervisor accounts, you can do this directly in the database:
 
-### Step 4: Verify Connection
+### Adding a New Student/Lab Account
 
-The connection string in appsettings.json is:
+1. Open **SQL Server Management Studio (SSMS)**
+2. Connect to your database
+3. Click **File** → **New** → **Query with Current Connection**
+4. Copy and paste this code:
+   ```sql
+   INSERT INTO [dbo].[Lab] ([LabName], [LabLogin], [LabPassword], [Active])
+   VALUES ('My New Lab', 'mylab', 'password123', 1)
+   ```
+5. Change:
+   - `'My New Lab'` - to your lab name
+   - `'mylab'` - to your login username
+   - `'password123'` - to your password
+6. Click **Execute** (green play button)
+7. The new account is ready to use immediately
 
-```
-Server=.\SQLEXPRESS
-Database=EmrSimulator
-User ID=sa
-Password=Emrp@ssword123!
-```
+### Adding a New Supervisor Account
 
-If you installed with a different password or setup, update these values accordingly.
+1. Follow steps 1-3 above
+2. Copy and paste this code:
+   ```sql
+   INSERT INTO [dbo].[Supervisor] ([UserName], [UserLogin], [UserPassword], [LabId])
+   VALUES ('Dr. Smith', 'dsmith', 'password123', 1)
+   ```
+3. Change:
+   - `'Dr. Smith'` - to the supervisor's name
+   - `'dsmith'` - to the login username
+   - `'password123'` - to the password
+   - `1` - to the Lab ID (1=Berwick, 2=Mt Helen, 3=Gippsland, etc.)
+4. Click **Execute**
+5. The new supervisor account is ready to use
 
-### Step 5: Run the Application
+---
 
-Once the database is ready, run:
+## Troubleshooting Guide
 
-```powershell
-dotnet run
-```
+### Problem: "Cannot connect to database" or "Login failed"
 
-### Extra Guidance
+**Solution:**
 
-Credentials Summary
-Based on the database schema I found, here are the login credentials for the EMR system:
+1. Make sure SQL Server is running
+2. In Windows, search for **"SQL Server Configuration Manager"**
+3. Look for **"SQL Server (SQLEXPRESS)"** and make sure it shows green circle (Running)
+4. If it's not running, right-click it and select **"Start"**
 
-Supervisor Credentials
-bersuper / Mb39R (Berwick Lab)
-mthsuper / 7zGd3 (Mt Helen Lab)
-gipsuper / Ah48i (Gippsland Lab)
-bersuper1 / 9RMb3 (Berwick Supervisor 1)
-bersuper2 / b39RM (Berwick Supervisor 2)
-bersuper3 / 39RMb (Berwick Supervisor 3)
-mthsuper1 / d37zG (Mt Helen Supervisor 1)
-mthsuper2 / zGd37 (Mt Helen Supervisor 2)
-mthsuper3 / Gd37z (Mt Helen Supervisor 3)
-gipsuper1 / 8iAh4 (Gippsland Supervisor 1)
-gipsuper2 / h48iA (Gippsland Supervisor 2)
-gipsuper3 / 48iAh (Gippsland Supervisor 3)
+### Problem: "The application won't start" or shows errors
 
-How to Create New Accounts
-Based on the code architecture, new accounts are typically created by inserting records into the Supervisor or Student tables in the database:
+**Solution:**
 
-For Supervisors:
+1. Make sure you're in the correct folder: `C:\GitHub\EMR-FEDUNI-main\EMRSimulationWebApp\EMRSimulationWebApp`
+2. Try these commands in order:
+   ```powershell
+   dotnet clean
+   dotnet build
+   dotnet run
+   ```
+3. If it still doesn't work, close the terminal window completely and start fresh
 
-INSERT INTO [dbo].[Supervisor] ([UserName], [UserLogin], [UserPassword], [LabId])
-VALUES ('New Supervisor', 'newsuper', 'password123', 1)
+### Problem: "Port 5031 is already in use"
 
-I'll check if student credentials exist in the database, and if not, I'll create them.
+**Solution:**
 
-Ran terminal command: $cs = "Server=.\SQLEXPRESS;Database=EmrSimulator;Integrated Security=true;Encrypt=false;TrustServerCertificate=true;Connection Timeout=30;"; $c = New-Object System.Data.SqlClient.SqlConnection($cs); try { $c.Open(); $cmd = $c.CreateCommand(); $cmd.CommandText = "SELECT TOP 10 * FROM Student"; $r = $cmd.ExecuteReader(); $count = 0; while ($r.Read()) { Write-Host "ID: $($r[0]), Login: $($r['StudentLogin']), Password: $($r['StudentPassword'])"; $count++ }; if ($count -eq 0) { Write-Host "No student records found" }; $r.Close(); } catch { Write-Host "Error: $_" }; finally { $c.Close() }
-Completed with input: $cs = "Server=.\SQLEXPRESS;Database=EmrSimulator;Integrated Security=true;Encrypt=false;TrustServerCertificate=true;Connection Timeout=30;"; $c = New-Object System.Data.SqlClient.SqlConnection($cs); try { $c.Open(); $cmd = $c.CreateCommand(); $cmd.CommandText = "SELECT TOP 10 * FROM Student"; $r = $cmd.ExecuteReader(); $count = 0; while ($r.Read()) { Write-Host "ID: $($r[0]), Login: $($r['StudentLogin']), Password: $($r['StudentPassword'])"; $count++ }; if ($count -eq 0) { Write-Host "No student records found" }; $r.Close(); } catch { Write-Host "Error: $\_" }; finally { $c.Close() }
+1. The application is already running on your computer
+2. Either use it in another browser window
+3. Or, find the PowerShell window running it and close it (Ctrl+C)
+4. Then start it again with `dotnet run`
 
-Ran terminal command: $cs = "Server=.\SQLEXPRESS;Database=EmrSimulator;Integrated Security=true;Encrypt=false;TrustServerCertificate=true;Connection Timeout=30;"; $c = New-Object System.Data.SqlClient.SqlConnection($cs); $c.Open(); $cmd = $c.CreateCommand(); $cmd.CommandText = "SELECT name FROM sys.objects WHERE type='U' ORDER BY name"; $r = $cmd.ExecuteReader(); while ($r.Read()) { Write-Host $r[0] }; $r.Close(); $c.Close()
+### Problem: "Page shows 'Error occurred' when trying to login"
 
-Searched for text `ValidateLabLogin`, 5 results
+**Solution:**
 
-Read [](file:///c%3A/GitHub/EMR-FEDUNI-main/EmrSimulator_full_After_update_2026-01-13.sql#3100-3100), lines 3100 to 3643
+1. Make sure you typed the username and password correctly (they're case-sensitive)
+2. Make sure you're using the correct login type (Student vs Supervisor)
+3. Check the credentials table above to verify the username and password
 
-Read [](file:///c%3A/GitHub/EMR-FEDUNI-main/Databaseschema_three.sql#3052-3052), lines 3052 to 3100
+### Problem: "I can't see any patients after logging in"
 
-Ran terminal command: $cs = "Server=.\SQLEXPRESS;Database=EmrSimulator;Integrated Security=true;Encrypt=false;TrustServerCertificate=true;Connection Timeout=30;"; $c = New-Object System.Data.SqlClient.SqlConnection($cs); $c.Open(); $cmd = $c.CreateCommand(); $cmd.CommandText = "SELECT OBJECT_DEFINITION(OBJECT_ID('ValidateLabLogin'))"; $result = $cmd.ExecuteScalar(); Write-Host $result; $c.Close()
+**Solution:**
 
-Ran terminal command: $cs = "Server=.\SQLEXPRESS;Database=EmrSimulator;Integrated Security=true;Encrypt=false;TrustServerCertificate=true;Connection Timeout=30;"; $c = New-Object System.Data.SqlClient.SqlConnection($cs); $c.Open(); $cmd = $c.CreateCommand(); $cmd.CommandText = "SELECT Id, LabName, LabLogin, LabPassword, Active FROM Lab ORDER BY Id"; $r = $cmd.ExecuteReader(); while ($r.Read()) { Write-Host "ID: $($r['Id']), Name: $($r['LabName']), Login: $($r['LabLogin']), Password: $($r['LabPassword']), Active: $($r['Active'])" }; $r.Close(); $c.Close()
+1. This might be normal - different labs might have different patient records
+2. Try logging in with **"berlab"** / **"F5jh4"** - this lab definitely has sample patients
+3. If still no patients appear, contact your instructor
 
-Updated memory file [](file:///c%3A/Users/sagar/AppData/Roaming/Code/User/workspaceStorage/ff3c8f7aee98fb28b156eec76b355a6d/GitHub.copilot-chat/memory-tool/memories/NzIwZTdiNzktNWUxNS00NDJjLTgzNmYtN2JlZTZiODFiYzRh/emr_login_credentials.md)
+---
 
-Perfect! I found the **Student Credentials**. In this system, students log in using Lab credentials from the `Lab` table. Here's the complete list:
+## What Can You Do in This Application?
 
-## Student/Lab Credentials
+Once you log in, you can:
 
-**Primary Labs:**
+### As a Student:
 
-- **berlab** / **F5jh4** (Berwick Lab)
-- **mthlab** / **4YwCj** (Mt Helen Lab)
-- **giplab** / **hD6s2** (Gippsland Lab)
+- View a list of patients assigned to your lab
+- Access and update patient records
+- Track patient vitals and assessments
+- Manage medications and IV fluids
+- Record progress notes
+- View risk assessments (falls, pressure ulcers, etc.)
+- Practice proper EMR documentation
 
-**Individual Lab Stations:**
+### As a Supervisor:
 
-- **berlab1** / **h4F5j** (Berwick Lab 1)
-- **berlab2** / **5jh4F** (Berwick Lab 2)
-- **berlab3** / **jh4F5** (Berwick Lab 3)
-- **mthlab1** / **Cj4Yw** (Mt Helen Lab 1)
-- **mthlab2** / **YwCj4** (Mt Helen Lab 2)
-- **mthlab3** / **wCj4Y** (Mt Helen Lab 3)
-- **giplab1** / **s2hD6** (Gippsland Lab 1)
-- **giplab2** / **D6s2h** (Gippsland Lab 2)
-- **giplab3** / **6s2hD** (Gippsland Lab 3)
+- View all patient data across your lab
+- Monitor student activities
+- Generate reports and analytics
+- Manage user accounts
+- Oversee student performance
 
-Let me test one of these credentials to verify they work:
+---
 
-Navigated to http://localhost:5031/account/login in [Browser](vscode-browser:/2b23b8c4-dc06-478a-b3e0-e7161bc62689?vscodeLinkType=browser)
+## Technical Details (For Developers)
 
-Typed text in [Browser](vscode-browser:/2b23b8c4-dc06-478a-b3e0-e7161bc62689?vscodeLinkType=browser)
+**Technology Stack:**
 
-Typed text in [Browser](vscode-browser:/2b23b8c4-dc06-478a-b3e0-e7161bc62689?vscodeLinkType=browser)
+- **Frontend:** HTML, CSS, JavaScript, Bootstrap
+- **Backend:** ASP.NET Core (C#)
+- **Database:** SQL Server Express
+- **Architecture:** Multi-layered (Application, Domain, Infrastructure, Web layers)
 
-Clicked Login button in [Browser](vscode-browser:/2b23b8c4-dc06-478a-b3e0-e7161bc62689?vscodeLinkType=browser)
+**Port:** http://localhost:5031 (HTTP)
 
-Checked terminal output
+**Database Tables Include:**
 
-Read [Browser](vscode-browser:/2b23b8c4-dc06-478a-b3e0-e7161bc62689?vscodeLinkType=browser)
+- Patient, Supervisor, Lab information
+- Medical assessments (Braden, Fall Risk)
+- Medication charts and administration logs
+- IV fluid administration
+- Progress notes
+- Fluid balance records
 
-Captured browser screenshot
-Completed with input: {
-"pageId": "2b23b8c4-dc06-478a-b3e0-e7161bc62689"
-}
+---
 
-Let me check if the frontend JavaScript is properly sending the login request:
+## Support and Contact
 
-Searched for files matching `**/Views/**/*.html`, no matches
+If you encounter issues or need help:
 
-Searched for files matching `**/Views/**/*.cshtml`, 20 matches
+1. Check the **Troubleshooting Guide** section above
+2. Review the credentials to ensure they're correct
+3. Contact your instructor or IT support
 
-Read [](file:///c%3A/GitHub/EMR-FEDUNI-main/EMRSimulationWebApp/EMRSimulationWebApp/Views/Account/Login.cshtml)
+---
 
-Navigated to http://localhost:5031/account/login?login=student in [Browser](vscode-browser:/2b23b8c4-dc06-478a-b3e0-e7161bc62689?vscodeLinkType=browser)
-
-Typed text in [Browser](vscode-browser:/2b23b8c4-dc06-478a-b3e0-e7161bc62689?vscodeLinkType=browser)
-
-Typed text in [Browser](vscode-browser:/2b23b8c4-dc06-478a-b3e0-e7161bc62689?vscodeLinkType=browser)
-
-Clicked Login button in [Browser](vscode-browser:/2b23b8c4-dc06-478a-b3e0-e7161bc62689?vscodeLinkType=browser)
-
-Perfect! ✓ The student credentials work! I've successfully logged in with **berlab** / **F5jh4** and the application loaded successfully showing the Berwick Lab patient dashboard.
-
-## Summary
-
-### Student Credentials Status: **AVAILABLE**
-
-All lab credentials already exist in the database and are active. Here's the complete list organized by location:
-
-**Berwick Labs:**
-
-- **berlab** / **F5jh4** (Primary) ✓ TESTED & WORKING
-- **berlab1** / **h4F5j**
-- **berlab2** / **5jh4F**
-- **berlab3** / **jh4F5**
-
-**Mt Helen Labs:**
-
-- **mthlab** / **4YwCj** (Primary)
-- **mthlab1** / **Cj4Yw**
-- **mthlab2** / **YwCj4**
-- **mthlab3** / **wCj4Y**
-
-**Gippsland Labs:**
-
-- **giplab** / **hD6s2** (Primary)
-- **giplab1** / **s2hD6**
-- **giplab2** / **D6s2h**
-- **giplab3** / **6s2hD**
-
-### Supervisor Credentials
-
-**Primary Supervisors:**
-
-- **bersuper** / **Mb39R** (Berwick)
-- **mthsuper** / **7zGd3** (Mt Helen)
-- **gipsuper** / **Ah48i** (Gippsland)
-
-Plus 9 additional supervisor accounts for individual lab stations.
-
-### Account Creation
-
-To create new accounts, insert directly into the database:
-
-**For Student/Lab Accounts:**
-
-```sql
-INSERT INTO [dbo].[Lab] ([LabName], [LabLogin], [LabPassword], [Active])
-VALUES ('New Lab Name', 'newlab', 'Password123', 1)
-```
-
-**For Supervisor Accounts:**
-
-```sql
-INSERT INTO [dbo].[Supervisor] ([UserName], [UserLogin], [UserPassword], [LabId])
-VALUES ('New Supervisor', 'newsupervisor', 'Password123', 1)
-```
-
-
-Ran command: `dotnet run`
-Ran command: `cd .\EMRSimulationWebApp\`
-Ran command: `dotnet run`
-Ran command: `cd .\EMRSimulationWebApp\EMRSimulationWebApp\`
-Ran command: `dotnet restore`
-Listed directory EMR-FEDUNI-main
-Listed directory EMRSimulationWebApp
-Listed directory EMRSimulationWebApp
-
-The issue is that you added an extra `EMRSimulationWebApp` when trying to change directories. 
-
-Because you are already in the `C:\GitHub\EMR-FEDUNI-main\EMRSimulationWebApp` directory, you only need to go down one more level to reach the project file.
-
-To run the project from your current location, you can do one of two things:
-
-**Option 1: Navigate to the correct directory and run it**
-```powershell
-cd .\EMRSimulationWebApp\
-dotnet run
-```
-
-**Option 2: Run it directly from your current location**
-```powershell
-dotnet run --project .\EMRSimulationWebApp\
-```
+**Version:** 0.0.0  
+**Last Updated:** January 2026  
+**Institution:** Federation University
