@@ -80,7 +80,7 @@ A database is where all the information is stored. Follow these sub-steps:
 #### Step 1c: Load Sample Data
 
 1. In SSMS, click **File** → **Open** → **File**
-2. Navigate to your project folder: `C:\GitHub\EMR-FEDUNI-main-fahim\`
+2. Navigate to your project folder: `C:\GitHub\EMR-FEDUNI-main\`
 3. Open the file: **`EmrSimulator_full_After_update_2026-01-13.sql`**
    - This file contains all the tables, patient records, and user accounts
 4. You'll see SQL code in the editor window
@@ -100,7 +100,7 @@ A database is where all the information is stored. Follow these sub-steps:
 ### STEP 2: Download Project Files
 
 1. Open **File Explorer** (Windows key + E)
-2. Navigate to: `C:\GitHub\EMR-FEDUNI-main-fahim\EMRSimulationWebApp\`
+2. Navigate to: `C:\GitHub\EMR-FEDUNI-main\EMRSimulationWebApp\`
 3. You should see a folder called `EMRSimulationWebApp`
 4. Remember this location - you'll need it in the next step
 
@@ -115,32 +115,11 @@ Now you're ready to start the application. Follow these steps:
    - Select "Open Windows Terminal here" or "Open PowerShell here"
    - Or search for "PowerShell" in Windows Start menu
 
-2. Navigate to the project folder:
+2. Navigate to the correct project folder (note the nested structure):
 
    ```powershell
-   cd "EMR-FEDUNI-main-fahim\EMRSimulationWebApp\EMRSimulationWebApp"
+   cd "EMR-FEDUNI-main\EMRSimulationWebApp\EMRSimulationWebApp"
    ```
-
----
-
-The issue is that you're in the parent EMRSimulationWebApp folder, but the actual project file `EMRSimulationWebApp.csproj` is nested one level deeper in EMRSimulationWebApp.
-
-You can fix this by running:
-
-```powershell
-dotnet run --project .\EMRSimulationWebApp\EMRSimulationWebApp.csproj
-```
-
-Or navigate into the actual project directory:
-
-```powershell
-cd .\EMRSimulationWebApp
-dotnet run
-```
-
-The second approach is cleaner. Try navigating to the nested directory where the `.csproj` file is located, then running `dotnet run`.
-
----
 
 3. Start the application:
 
