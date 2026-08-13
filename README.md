@@ -1,5 +1,22 @@
 # EMR Simulator - Electronic Medical Records System
 
+<div align="right">
+
+[![.NET Version](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+&nbsp;
+[![Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture-00599C?style=for-the-badge&logo=diagramsdotnet&logoColor=white)](#)
+&nbsp;
+[![Database](https://img.shields.io/badge/Database-MS%20SQL%20Server-CC292B?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)](https://www.microsoft.com/sql-server)
+&nbsp;
+[![License](https://img.shields.io/badge/License-MIT-green.style=for-the-badge?style=for-the-badge)](#)
+&nbsp;
+[![Institution](https://img.shields.io/badge/Institution-Federation%20University-002B49?style=for-the-badge)](https://www.federation.edu.au)
+&nbsp;
+[![Clinical Modules](https://img.shields.io/badge/Clinical%20Modules-14%20Active-008080?style=for-the-badge)](#)
+
+</div>
+
+
 ## What is This Project?
 
 This is an **Electronic Medical Records (EMR) Simulator** - a training application that simulates a real hospital/lab management system. It allows students and supervisors to practice managing patient records, medications, lab work, and assessments in a safe, controlled environment.
@@ -80,7 +97,7 @@ A database is where all the information is stored. Follow these sub-steps:
 #### Step 1c: Load Sample Data
 
 1. In SSMS, click **File** → **Open** → **File**
-2. Navigate to your project folder: `C:\GitHub\EMR-FEDUNI-main\`
+2. Navigate to your project folder: `C:\GitHub\FedUni-Clinical-EMR-Simulator\`
 3. Open the file: **`EmrSimulator_full_After_update_2026-01-13.sql`**
    - This file contains all the tables, patient records, and user accounts
 4. You'll see SQL code in the editor window
@@ -100,7 +117,7 @@ A database is where all the information is stored. Follow these sub-steps:
 ### STEP 2: Download Project Files
 
 1. Open **File Explorer** (Windows key + E)
-2. Navigate to: `C:\GitHub\EMR-FEDUNI-main\EMRSimulationWebApp\`
+2. Navigate to: `C:\GitHub\FedUni-Clinical-EMR-Simulator\EMRSimulationWebApp\`
 3. You should see a folder called `EMRSimulationWebApp`
 4. Remember this location - you'll need it in the next step
 
@@ -118,7 +135,7 @@ Now you're ready to start the application. Follow these steps:
 2. Navigate to the correct project folder (note the nested structure):
 
    ```powershell
-   cd "EMR-FEDUNI-main\EMRSimulationWebApp\EMRSimulationWebApp"
+   cd "FedUni-Clinical-EMR-Simulator\EMRSimulationWebApp\EMRSimulationWebApp"
    ```
 
 3. Start the application:
@@ -271,7 +288,7 @@ If you need to add more student or supervisor accounts, you can do this directly
 
 **Solution:**
 
-1. Make sure you're in the correct folder: `C:\GitHub\EMR-FEDUNI-main-fahim\EMRSimulationWebApp\EMRSimulationWebApp`
+1. Make sure you're in the correct folder: `C:\GitHub\FedUni-Clinical-EMR-Simulator\EMRSimulationWebApp\EMRSimulationWebApp`
 2. Try these commands in order:
    ```powershell
    dotnet clean
